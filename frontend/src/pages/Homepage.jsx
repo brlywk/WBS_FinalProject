@@ -1,9 +1,37 @@
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react";
 import { ProtectedPart } from "./Protected";
 import { Link } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
 
+// just for testing
+import axios from "axios";
+import { useEffect } from "react";
+import { apiEndpoint } from "../utils/apiEndpoints";
+
 export default function Homepage() {
+  const { getToken } = useAuth();
+
+  const testApi = `${apiEndpoint}/restricted`;
+
+  useEffect(() => {
+    async function authGetReq() {
+      const token = await getToken();
+
+      axios
+        .get(testApi, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
+    }
+
+    authGetReq();
+  }, []);
+
   return (
     <div>
       <h1>Hi, I am the homepage</h1>
@@ -24,6 +52,7 @@ export default function Homepage() {
         {/* Show a protected component */}
         <ProtectedPart />
         <div>
+          <hr />
           {/* Show user information */}
           <UserButton />
 
