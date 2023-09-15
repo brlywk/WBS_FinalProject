@@ -14,6 +14,11 @@ export default function Homepage() {
   const testApi = `${apiEndpoint}/restricted`;
 
   useEffect(() => {
+    // we need to get the token to authenticate our requests to Clerk
+    // BUT getting the token is async, so we have to wrap everything
+    // in an async function before calling that function...
+    // ... probably a good idea to make this into a helper function for easier use
+    //     later on
     async function authGetReq() {
       const token = await getToken();
 
