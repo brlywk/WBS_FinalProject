@@ -5,6 +5,8 @@ import cors from "cors";
 import db from "./data/_mongodb.js";
 
 import apiRouter from "./routes/_apiRouter.js";
+import categoryRouter from "./routes/_categoryRouter.js";
+
 import errorHandler from "./middleware/_errorHandler.js";
 
 dotenv.config();
@@ -15,6 +17,9 @@ server.use(cors());
 
 // ---- ROUTE: /api ----
 server.use("/api", apiRouter);
+
+// ---- ROUTE: /catgories ----
+server.use("/categories", categoryRouter);
 
 // ---- ERROR HANDLING ----
 server.use(errorHandler);
