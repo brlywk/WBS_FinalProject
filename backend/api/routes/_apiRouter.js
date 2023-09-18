@@ -3,38 +3,34 @@ import clerk, {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
 
+import subscriptionRouter from "./_subscriptionRouter.js";
+import categoryRouter from "./_categoryRouter.js";
+import usageRouter from "./_usageRouter.js";
+
 import { Router } from "express";
-import asyncWrapper from "../utils/_asyncWrapper.js";
 
 const apiRouter = Router();
 
-// test for a route that does not need authorisation
-apiRouter.route("/public").get(
-  asyncWrapper(async (req, res, next) => {
-    const userList = await clerk.users.getUserList();
+// ---- ROUTE: /api/subscriptions ----
+apiRouter.use("/subscriptions", subscriptionRouter);
 
-    res.status(200).json(userList);
-  }),
-);
+// ---- ROUTE: /api/categories ----
+apiRouter.use("/categories", categoryRouter);
 
-// test for restricted route that just returns nothing
-apiRouter.route("/private").get(
-  ClerkExpressWithAuth(),
-  asyncWrapper(async (req, res, next) => {
-    res.json(req.auth);
-  }),
-);
+// ---- ROUTE: /api/usages ----
+apiRouter.use("/usages", usageRouter);
+
+export default apiRouter;
 
 // test for restricted route that returns an error when unauhtorised
-apiRouter.route("/restricted").get(
-  ClerkExpressRequireAuth(),
-  asyncWrapper(async (req, res, next) => {
-    console.log(
-      new Date().toLocaleDateString(),
-      "Request has been made to restricted endpoint by user:\n",
-      req.auth.userId,
-    );
-    res.status(200).json({ message: "Allowed" });
-  }),
-);
-export default apiRouter;
+// apiRouter.route("/restricted").get(
+//   ClerkExpressRequireAuth(),
+//   asyncWrapper(async (req, res, next) => {
+//     console.log(
+//       new Date().toLocaleDateString(),
+//       "Request has been made to restricted endpoint by user:\n",
+//       req.auth.userId,
+//     );
+//     res.status(200).json({ message: "Allowed" });
+//   }),
+// );
