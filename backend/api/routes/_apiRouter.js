@@ -3,18 +3,24 @@ import clerk, {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
 
-import categoryRouter from "./_categoryRouter.js";
 import subscriptionRouter from "./_subscriptionRouter.js";
+import categoryRouter from "./_categoryRouter.js";
+import usageRouter from "./_usageRouter.js";
 
 import { Router } from "express";
 
 const apiRouter = Router();
 
+// ---- ROUTE: /api/subscriptions ----
+apiRouter.use("/subscriptions", subscriptionRouter);
+
 // ---- ROUTE: /api/categories ----
 apiRouter.use("/categories", categoryRouter);
 
-// ---- ROUTE: /api/subscriptions ----
-apiRouter.use("/subscriptions", subscriptionRouter);
+// ---- ROUTE: /api/usages ----
+apiRouter.use("/usages", usageRouter);
+
+export default apiRouter;
 
 // test for restricted route that returns an error when unauhtorised
 // apiRouter.route("/restricted").get(
@@ -28,4 +34,3 @@ apiRouter.use("/subscriptions", subscriptionRouter);
 //     res.status(200).json({ message: "Allowed" });
 //   }),
 // );
-export default apiRouter;
