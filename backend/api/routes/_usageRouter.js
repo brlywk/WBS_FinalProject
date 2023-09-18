@@ -1,22 +1,21 @@
 import { Router } from "express";
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
-
-import asyncWrap from "../utils/_asyncWrapper.js";
 
 import {
   getAllUsages,
-  postUsage,
   getUsageById,
-} from "../controllers/_usageController";
+  postUsage,
+} from "../controllers/_usageController.js";
+import { checkBody, checkParamForId } from "../middleware/_requestChecker.js";
+import asyncWrap from "../utils/_asyncWrapper.js";
 
 const usageRouter = Router();
 
 // ---- ROUTE: /api/usages ----
-usageRouter.route("/").get(ClerkExpressRequireAuth(), asyncWrap(getAllUsages));
+usageRouter.route("/").get(asyncWrap(getAllUsages));
 
-usageRouter.route("/").post(ClerkExpressRequireAuth(), asyncWrap(postUsage));
+usageRouter.route("/").post(checkBody, asyncWrap(postUsage));
 
 // ---- ROUTE: /api/usages/:id ----
-usageRouter
-  .route("/:id")
-  .get(ClerkExpressRequireAuth(), asyncWrap(getUsageById));
+usageRouter.route("/:id").get(checkParamForId, asyncWrap(getUsageById));
+
+export default usageRouter;
