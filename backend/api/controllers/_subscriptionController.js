@@ -10,6 +10,10 @@ export async function getAllSubscriptions(req, res, next) {
     "category",
   );
 
+  if (!subscriptions) {
+    return res.status(404).send("No subscriptions found.");
+  }
+
   res.status(200).json(subscriptions);
 }
 
@@ -48,7 +52,9 @@ export async function getSubscriptionById(req, res, next) {
   const { userId } = req.auth;
   const { id } = req.params;
 
-  const subscription = Subscription.findOne({ _id: id, userId });
+  const subscription = Subscription.findOne({ _id: id, userId }).populate(
+    "category",
+  );
 
   if (!subscription) {
     return res.status(404).send(`Subscription ${id} not found.`);
