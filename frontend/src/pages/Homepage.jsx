@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { apiEndpoint } from "../utils/apiEndpoints";
 
 export default function Homepage() {
+  // access JWT from clerk session
   const { getToken } = useAuth();
 
   const testApi = `${apiEndpoint}/restricted`;
