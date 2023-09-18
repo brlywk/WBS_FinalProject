@@ -9,8 +9,13 @@ const subscriptionSchema = new Schema(
     name: { type: String, required: true },
     price: { type: Number, required: true },
     interval: { type: String, required: true },
-    category: { type: Schema.Types.ObjectId, ref: Category },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: Category,
+      default: "65085704f18207c1481e6642", // Category "None"
+    },
     billing_date: { type: Date, required: true },
+    active: { type: Boolean, default: true },
   },
   { timestamps: true },
 );

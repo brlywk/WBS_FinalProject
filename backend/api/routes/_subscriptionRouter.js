@@ -1,4 +1,3 @@
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 import { Router } from "express";
 import {
   deleteSubscriptionById,
@@ -7,30 +6,27 @@ import {
   postSubscription,
   putSubscriptionById,
 } from "../controllers/_subscriptionController.js";
+import { checkBody, checkParamForId } from "../middleware/_requestChecker.js";
 import asyncWrap from "../utils/_asyncWrapper.js";
 
 const subscriptionRouter = Router();
 
 // ---- ROUTE: /api/subscriptions ----
-subscriptionRouter
-  .route("/")
-  .get(ClerkExpressRequireAuth(), asyncWrap(getAllSubscriptions));
+subscriptionRouter.route("/").get(asyncWrap(getAllSubscriptions));
 
-subscriptionRouter
-  .route("/")
-  .post(ClerkExpressRequireAuth(), asyncWrap(postSubscription));
+subscriptionRouter.route("/").post(checkBody, asyncWrap(postSubscription));
 
 // ---- ROUTE: /api/subscriptions/:id ----
 subscriptionRouter
   .route("/:id")
-  .get(ClerkExpressRequireAuth(), asyncWrap(getSubscriptionById));
+  .get(checkParamForId, asyncWrap(getSubscriptionById));
 
 subscriptionRouter
   .route("/:id")
-  .get(ClerkExpressRequireAuth(), asyncWrap(putSubscriptionById));
+  .put(checkParamForId, checkBody, asyncWrap(putSubscriptionById));
 
 subscriptionRouter
   .route("/:id")
-  .delete(ClerkExpressRequireAuth(), asyncWrap(deleteSubscriptionById));
+  .delete(checkParamForId, asyncWrap(deleteSubscriptionById));
 
 export default subscriptionRouter;
