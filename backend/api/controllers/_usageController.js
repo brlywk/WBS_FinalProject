@@ -4,6 +4,12 @@ import Usage from "../models/_usageSchema.js";
 export async function getAllUsages(req, res, next) {
   const { userId } = req.query;
 
+  console.info(
+    new Date().toISOString(),
+    "getAllUsages, request for user",
+    userId,
+  );
+
   const usages = await Usage.find({ userId });
 
   if (!usages) {
@@ -19,6 +25,14 @@ export async function postUsage(req, res, next) {
     body,
     auth: { userId },
   } = req;
+
+  console.info(
+    new Date().toISOString(),
+    "postUsage, request for user",
+    userId,
+    "with body",
+    body,
+  );
 
   const postThis = { ...body };
 
@@ -45,6 +59,8 @@ export async function postUsage(req, res, next) {
 export async function getUsageById(req, res, next) {
   const { id } = req.params;
   const { userId } = req.query;
+
+  console.info(new Date().toISOString(), "getUsageById, request for id", id);
 
   const usage = await Usage.findOne({ _id: id, userId });
 

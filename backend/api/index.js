@@ -24,9 +24,6 @@ server.use(checkUserId);
 // ---- ROUTE: /api ----
 server.use("/api", apiRouter);
 
-// ---- ROUTE: /catgories ----
-server.use("/categories", categoryRouter);
-
 // ---- ERROR HANDLING ----
 server.use(errorHandler);
 

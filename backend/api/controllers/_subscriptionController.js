@@ -6,6 +6,12 @@ export async function getAllSubscriptions(req, res, next) {
   // subscriptions, so we can rather safely forgoe pagination for now
   const { userId } = req.auth;
 
+  console.info(
+    new Date().toISOString(),
+    "getAllSubscriptions, request for user",
+    userId,
+  );
+
   const subscriptions = await Subscription.find({ userId }).populate(
     "category",
   );
@@ -24,7 +30,13 @@ export async function postSubscription(req, res, next) {
     auth: { userId },
   } = req;
 
-  console.log(body);
+  console.info(
+    new Date().toISOString(),
+    "postSubscription, request for user",
+    userId,
+    "with body",
+    body,
+  );
 
   const postThis = { ...body };
 
@@ -52,7 +64,15 @@ export async function getSubscriptionById(req, res, next) {
   const { userId } = req.auth;
   const { id } = req.params;
 
-  const subscription = Subscription.findOne({ _id: id, userId }).populate(
+  console.info(
+    new Date().toISOString(),
+    "getSubscriptionById, request for user",
+    userId,
+    "with id",
+    id,
+  );
+
+  const subscription = await Subscription.findOne({ _id: id, userId }).populate(
     "category",
   );
 
@@ -71,7 +91,15 @@ export async function putSubscriptionById(req, res, next) {
     auth: { userId },
   } = req;
 
-  console.log(body);
+  console.info(
+    new Date().toISOString(),
+    "putSubscriptionById, request for user",
+    userId,
+    "with id",
+    id,
+    "and body",
+    body,
+  );
 
   const putThis = { ...body };
 
@@ -97,9 +125,15 @@ export async function deleteSubscriptionById(req, res, next) {
   const { userId } = req.auth;
   const { id } = req.params;
 
-  const result = await Subscription.deleteOne({ _id: id, userId });
+  console.info(
+    new Date().toISOString(),
+    "deleteSubscriptionById, request for user",
+    userId,
+    "with id",
+    id,
+  );
 
-  console.log("delete", result);
+  const result = await Subscription.deleteOne({ _id: id, userId });
 
   if (result.deletedCount === 0) {
     return res.status(404).send(`Subscription ${id} not found.`);

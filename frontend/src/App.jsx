@@ -1,10 +1,17 @@
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import ErrorPage from "./pages/ErrorPage";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import { ProtectedPage } from "./pages/Protected";
+import Signup from "./pages/Signup";
+import ApiTest from "./pages/ApiTest";
 
 // access our key
 const publishableKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
@@ -40,6 +47,19 @@ function ClerkRouteProvider() {
               {/* If not signed in, show this when user accesses route */}
               <SignedOut>
                 <div>You are not allowed here!</div>
+              </SignedOut>
+            </>
+          }
+        />
+        <Route
+          path="/apiTest"
+          element={
+            <>
+              <SignedIn>
+                <ApiTest />
+              </SignedIn>
+              <SignedOut>
+                <Navigate to="/login" />
               </SignedOut>
             </>
           }
