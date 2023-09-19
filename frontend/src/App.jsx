@@ -5,7 +5,7 @@ import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { ProtectedPage } from "./pages/Protected";
-
+import Dashboard from "./pages/Dashboard";
 // access our key
 const publishableKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -28,6 +28,22 @@ function ClerkRouteProvider() {
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/dashboard"
+          element={
+            <>
+              {/* If signed in, load this page / component */}
+              <SignedIn>
+                <Dashboard />
+              </SignedIn>
+
+              {/* If not signed in, show this when user accesses route */}
+              <SignedOut>
+                <div>You are not allowed here!</div>
+              </SignedOut>
+            </>
+          }
+        />
         <Route
           path="/test"
           element={
