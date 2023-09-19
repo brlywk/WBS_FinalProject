@@ -2,6 +2,8 @@ import Category from "../models/_categorySchema.js";
 
 // ---- GET /api/categories ----
 export async function getAllCategories(req, res, next) {
+  console.info(new Date().toISOString(), "getAllCategories");
+
   const categories = await Category.find({});
 
   if (!categories) {
@@ -14,6 +16,8 @@ export async function getAllCategories(req, res, next) {
 // ---- GET /api/categories/:id ----
 export async function getCategoryById(req, res, next) {
   const { id } = req.params;
+
+  console.info(new Date().toISOString(), "getCategoryById, request for id", id);
 
   const category = await Category.findOne({ _id: id });
 

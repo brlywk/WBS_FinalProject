@@ -1,8 +1,14 @@
 export function checkUserId(req, res, next) {
   const { userId } = req.auth;
+  const { body } = req;
 
   if (!userId) {
     throw new Error("user_id_missing");
+  }
+
+  // If there is a body let's add the userId to make all subsequent requests easier
+  if (body && !Object.hasOwn(body, "userId")) {
+    body.userId = userId;
   }
 
   next();
@@ -11,7 +17,7 @@ export function checkUserId(req, res, next) {
 export function checkBody(req, res, next) {
   const { body } = req;
 
-  if (!body) {
+  if (!body || Object.keys(body).length === 0) {
     throw new Error("body_missing");
   }
 

@@ -15,7 +15,21 @@ dotenv.config();
 
 const server = express();
 server.use(express.json());
-server.use(cors());
+server.use(
+  cors({
+    exposedHeaders: ["Location"],
+  }),
+);
+
+// Log all incoming requests
+server.use((req, res, next) => {
+  console.log("============================================");
+  console.log(`${req.method} ${req.path}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`Body: ${req.body}`);
+  }
+  next();
+});
 
 // All requests need to have clerk auth infos, and we need a userId in the request!
 server.use(ClerkExpressRequireAuth());
@@ -23,9 +37,6 @@ server.use(checkUserId);
 
 // ---- ROUTE: /api ----
 server.use("/api", apiRouter);
-
-// ---- ROUTE: /catgories ----
-server.use("/categories", categoryRouter);
 
 // ---- ERROR HANDLING ----
 server.use(errorHandler);
@@ -40,7 +51,7 @@ let retries = 0;
 
 function startServer() {
   server.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.info(`Server running on port ${port}`);
   });
 }
 
