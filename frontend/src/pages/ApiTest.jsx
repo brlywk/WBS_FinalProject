@@ -13,6 +13,11 @@ export default function ApiTest() {
   useEffect(() => {
     const abortController = new AbortController();
 
+    // NOTE:
+    // If we want to use loading spinners, we need to use useState
+    // These custom hooks don't provide data, loading, error status, but rather the result
+    // of the actual operation, i.e. subscriptions, if a deletion was successful etc...
+
     // GET ALL SUBSCRIPTIONS
     // This construct here is a nameless function that immediately gets executed
     (async function () {
