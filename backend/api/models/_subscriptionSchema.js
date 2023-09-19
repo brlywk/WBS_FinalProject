@@ -14,7 +14,7 @@ const subscriptionSchema = new Schema(
       ref: Category,
       default: "65085704f18207c1481e6642", // Category "None"
     },
-    billing_date: { type: Date, required: true },
+    billing_date: { type: Date },
     active: { type: Boolean, default: true },
   },
   { timestamps: true },
