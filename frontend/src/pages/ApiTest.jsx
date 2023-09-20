@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import useSubscription from "../hooks/useSubscription";
 import useDashboard from "../hooks/useDashboard";
+import useSubscriptionUsage from "../hooks/useSubscriptionUsage";
 
 export default function ApiTest() {
   const {
@@ -18,6 +19,9 @@ export default function ApiTest() {
     getTotalMonthlyCost,
   } = useDashboard();
 
+  const { getAllSubscriptionUsage, getSubscriptionUsageById } =
+    useSubscriptionUsage();
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -25,6 +29,29 @@ export default function ApiTest() {
     // If we want to use loading spinners, we need to use useState
     // These custom hooks don't provide data, loading, error status, but rather the result
     // of the actual operation, i.e. subscriptions, if a deletion was successful etc...
+
+    // GET ALL SUBSCRIPTION USAGE DATA
+    (async function () {
+      try {
+        const su = await getAllSubscriptionUsage(abortController);
+        console.log("su", su);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+
+    // GET SINGLE SUBSCRIPTION USAGE DATA
+    (async function () {
+      try {
+        const ssu = await getSubscriptionUsageById(
+          "65085093ae0d34a75257a626",
+          abortController,
+        );
+        console.log("ssu", ssu);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
 
     // GET DASHBOARD DATA
     // (async function () {

@@ -15,7 +15,6 @@ export async function getAllSubscriptionUsage(req, res, next) {
   );
 
   const aggregate = subscriptionUsageAggregate(userId);
-  console.log(aggregate);
 
   const result = await Subscription.aggregate(aggregate);
 
@@ -37,7 +36,7 @@ export async function getSingleSubscriptionUsage(req, res, next) {
 
   const aggregate = subscriptionUsageAggregate(userId, id);
 
-  const result = await Subscription.aggregate(aggregate);
+  const [result] = await Subscription.aggregate(aggregate);
 
   res.status(200).json(result);
 }
