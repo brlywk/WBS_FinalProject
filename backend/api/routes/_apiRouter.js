@@ -1,17 +1,17 @@
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
-
 import categoryRouter from "./_categoryRouter.js";
 import subscriptionRouter from "./_subscriptionRouter.js";
+import subscriptionUsageRouter from "./_subscriptionUsageRouter.js";
 import usageRouter from "./_usageRouter.js";
 
 import { Router } from "express";
-
-import asyncWrap from "../utils/_asyncWrapper.js";
 
 const apiRouter = Router();
 
 // ---- ROUTE: /api/subscriptions ----
 apiRouter.use("/subscriptions", subscriptionRouter);
+
+// ROUTE: /api/subscriptionUsage ----
+apiRouter.use("/subscriptionUsage", subscriptionUsageRouter);
 
 // ---- ROUTE: /api/categories ----
 apiRouter.use("/categories", categoryRouter);

@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const usageSchema = new Schema(
   {
     userId: { type: String, required: true },
-    subscription: {
+    subscriptionId: {
       type: Schema.Types.ObjectId,
       ref: Subscription,
       required: true,
