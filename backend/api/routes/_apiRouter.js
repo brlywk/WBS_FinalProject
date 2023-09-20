@@ -3,6 +3,7 @@ import subscriptionRouter from "./_subscriptionRouter.js";
 import subscriptionUsageRouter from "./_subscriptionUsageRouter.js";
 import usageRouter from "./_usageRouter.js";
 import dashboardDataRouter from "./_dashboardDataRouter.js";
+import searchRouter from "./_searchRouter.js";
 
 import { Router } from "express";
 
@@ -22,5 +23,8 @@ apiRouter.use("/usages", usageRouter);
 
 // ---- ROUTE: /api/dashboard
 apiRouter.use("/dashboard", dashboardDataRouter);
+
+// ---- ROUTE: /api/search
+apiRouter.use("/search", searchRouter);
 
 export default apiRouter;
