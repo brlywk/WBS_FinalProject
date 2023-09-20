@@ -8,7 +8,7 @@ import {
 /**
  * Returns consolidated dashboard data
  */
-export function getDashboardData(req, res, next) {
+export async function getDashboardData(req, res, next) {
   const { userId } = req.auth;
 
   console.info(
@@ -22,19 +22,30 @@ export function getDashboardData(req, res, next) {
   const totalCostAggregate = totalMonthlyCostAggregate(userId);
   const potentialSavingsAggregate = potentialMonthlySavingsAggregate(userId);
 
-  const [mostUsedResult, totalCostResult, potentialSavingsResult] = Promise.all(
-    [
+  const [mostUsedResult, totalCostResult, potentialSavingsResult] =
+    await Promise.all([
       Subscription.aggregate(mostUsedAggregate),
       Subscription.aggregate(totalCostAggregate),
       Subscription.aggregate(potentialSavingsAggregate),
-    ],
-  );
+    ]);
 
-  console.log("mostUsedResult", mostUsedResult);
-  console.log("totalCostResult", totalCostResult);
-  console.log("potentialSavingsResult", potentialSavingsResult);
+  // all results here are arrays with exactly one object in them
+  // TODO: More error handling. Probably...
+  const mostUsed = mostUsedResult[0];
+  const totalCost = totalCostResult[0];
+  const potentialSavings = potentialSavingsResult[0];
 
-  res.status(200).send("k");
+  if (!mostUsed || !totalCost || !potentialSavings) {
+    throw new Error("Could not get dashboard data");
+  }
+
+  const dashboardData = {
+    mostUsed,
+    ...totalCost,
+    ...potentialSavings,
+  };
+
+  res.status(200).json(dashboardData);
 }
 
 /**
@@ -51,7 +62,7 @@ export async function getMostUsedSubscription(req, res, next) {
 
   const aggregate = mostUsedSubscriptionAggregate(userId);
 
-  const result = await Subscription.aggregate(aggregate);
+  const [result] = await Subscription.aggregate(aggregate);
 
   res.status(200).json(result);
 }
@@ -70,7 +81,7 @@ export async function getPotentialMonthlySavings(req, res, next) {
 
   const aggregate = potentialMonthlySavingsAggregate(userId);
 
-  const result = await Subscription.aggregate(aggregate);
+  const [result] = await Subscription.aggregate(aggregate);
 
   res.status(200).json(result);
 }
@@ -89,7 +100,7 @@ export async function getTotalMonthlyCost(req, res, next) {
 
   const aggregate = totalMonthlyCostAggregate(userId);
 
-  const result = await Subscription.aggregate(aggregate);
+  const [result] = await Subscription.aggregate(aggregate);
 
   res.status(200).json(result);
 }

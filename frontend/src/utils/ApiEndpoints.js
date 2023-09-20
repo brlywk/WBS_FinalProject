@@ -17,6 +17,8 @@ export default class ApiEndpoints {
       subscriptions: `${baseUrl.href}/subscriptions`,
       categories: `${baseUrl.href}/categories`,
       usage: `${baseUrl.href}/usage`,
+      subscriptionUsage: `${baseUrl.href}/subscriptionUsage`,
+      dashboard: `${baseUrl.href}/dashboard`,
     };
   }
 
@@ -41,6 +43,14 @@ export default class ApiEndpoints {
     return this.endpoints.usage;
   }
 
+  static get subscriptionUsage() {
+    return this.endpoints.subscriptionUsage;
+  }
+
+  static get dashboard() {
+    return this.endpoints.dashboard;
+  }
+
   // ---- API endpoints with params ----
   static subscription(id) {
     return `${this.subscriptions}/${id}`;
@@ -52,5 +62,21 @@ export default class ApiEndpoints {
 
   static usageById(id) {
     return `${this.usage}/${id}`;
+  }
+
+  static subscriptionUsageById(id) {
+    return `${this.subscriptionUsage}/${id}`;
+  }
+
+  static get mostUsedSubscription() {
+    return `${this.dashboard}/mostUsed`;
+  }
+
+  static get potentialMonthlySavings() {
+    return `${this.dashboard}/savings`;
+  }
+
+  static get totalMonthlyCost() {
+    return `${this.dashboard}/totalCost`;
   }
 }
