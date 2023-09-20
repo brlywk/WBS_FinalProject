@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import useSubscription from "../hooks/useSubscription";
 import useDashboard from "../hooks/useDashboard";
 import useSubscriptionUsage from "../hooks/useSubscriptionUsage";
+import useSearch from "../hooks/useSearch";
 
 export default function ApiTest() {
   const {
@@ -19,8 +20,10 @@ export default function ApiTest() {
     getTotalMonthlyCost,
   } = useDashboard();
 
-  const { getAllSubscriptionUsage, getSubscriptionUsageById } =
+  const { getAllSubscriptionUsage, getSusbcriptionUsageById } =
     useSubscriptionUsage();
+
+  const { startSearch } = useSearch();
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -30,28 +33,38 @@ export default function ApiTest() {
     // These custom hooks don't provide data, loading, error status, but rather the result
     // of the actual operation, i.e. subscriptions, if a deletion was successful etc...
 
-    // GET ALL SUBSCRIPTION USAGE DATA
+    // SEARCH FOR SOMETHING
     (async function () {
       try {
-        const su = await getAllSubscriptionUsage(abortController);
-        console.log("su", su);
+        const sr = await startSearch("dusnay minus", abortController);
+        console.log("sr", sr);
       } catch (error) {
         console.log(error);
       }
     })();
 
+    // GET ALL SUBSCRIPTION USAGE DATA
+    // (async function () {
+    //   try {
+    //     const su = await getAllSubscriptionUsage(abortController);
+    //     console.log("su", su);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
+
     // GET SINGLE SUBSCRIPTION USAGE DATA
-    (async function () {
-      try {
-        const ssu = await getSubscriptionUsageById(
-          "65085093ae0d34a75257a626",
-          abortController,
-        );
-        console.log("ssu", ssu);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
+    // (async function () {
+    //   try {
+    //     const ssu = await get(
+    //       "65085704f18207c1481e6642",
+    //       abortController,
+    //     );
+    //     console.log("ssu", ssu);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
 
     // GET DASHBOARD DATA
     // (async function () {

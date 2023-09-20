@@ -207,3 +207,53 @@ export function mostUsedSubscriptionAggregate(userId) {
 
   return finalPipeline;
 }
+
+export function searchAggregate(query) {
+  const queryRegex = new RegExp(query, "i");
+
+  const pipeline = [
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "categoryDetails",
+      },
+    },
+    {
+      $match: {
+        $or: [
+          {
+            name: {
+              $regex: queryRegex,
+            },
+          },
+          {
+            interval: {
+              $regex: queryRegex,
+            },
+          },
+          {
+            "categoryDetails.name": {
+              $regex: queryRegex,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        category: {
+          $arrayElemAt: ["$categoryDetails", 0],
+        },
+      },
+    },
+    {
+      $project: {
+        categoryDetails: 0,
+      },
+    },
+  ];
+
+  return pipeline;
+}
