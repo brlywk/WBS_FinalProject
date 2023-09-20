@@ -2,7 +2,10 @@ import { Types } from "mongoose";
 
 const { ObjectId } = Types;
 
-export function getSubscriptionUsageAggregate(userId, id = null) {
+/**
+ * Returns the pipeline to get usage score for subscriptions
+ */
+export function subscriptionUsageAggregate(userId, id = null) {
   const matchFilter = {
     userId,
   };
@@ -11,7 +14,9 @@ export function getSubscriptionUsageAggregate(userId, id = null) {
     matchFilter._id = ObjectId(id);
   }
 
-  const aggregate = [
+  console.log("matchFilter", matchFilter);
+
+  const pipeline = [
     {
       $match: matchFilter,
     },
@@ -61,6 +66,7 @@ export function getSubscriptionUsageAggregate(userId, id = null) {
           $divide: ["$totalScore", "$count"],
         },
         "originalDoc.category": "$category",
+        "originalDoc.count": "$count",
       },
     },
     {
@@ -75,5 +81,139 @@ export function getSubscriptionUsageAggregate(userId, id = null) {
     },
   ];
 
-  return aggregate;
+  console.log("pipeline", pipeline);
+
+  return pipeline;
+}
+
+/*
+ * Return pipeline to get monthly savings per user
+ */
+export function potentialMonthlySavingsAggregate(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId,
+      },
+    },
+    {
+      $lookup: {
+        from: "usages",
+        localField: "_id",
+        foreignField: "subscriptionId",
+        as: "subscriptionUsage",
+      },
+    },
+    {
+      $project: {
+        price: 1,
+        interval: 1,
+        usageCount: {
+          $size: "$subscriptionUsage",
+        },
+        adjustedPrize: {
+          $cond: [
+            {
+              $eq: ["$interval", "year"],
+            },
+            {
+              $divide: ["$price", 12],
+            },
+            "$price",
+          ],
+        },
+      },
+    },
+    {
+      $match: {
+        usageCount: {
+          $gt: 4,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        potentialMonthlySavings: {
+          $sum: "$adjustedPrize",
+        },
+        count: {
+          $sum: 1,
+        },
+      },
+    },
+  ];
+
+  console.log("pipeline", pipeline);
+
+  return pipeline;
+}
+
+/*
+ * Return pipeline to get total monthly cost of all subscriptions
+ */
+export function totalMonthlyCostAggregate(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId,
+      },
+    },
+    {
+      $project: {
+        price: 1,
+        interval: 1,
+        adjustedPrize: {
+          $cond: [
+            {
+              $eq: ["$interval", "year"],
+            },
+            {
+              $divide: ["$price", 12],
+            },
+            "$price",
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalCostPerMonth: {
+          $sum: "$adjustedPrize",
+        },
+        count: {
+          $sum: 1,
+        },
+      },
+    },
+  ];
+
+  console.log("pipeline", pipeline);
+
+  return pipeline;
+}
+
+/**
+ * Returns the most used subscription (i.e. highest total score) for user
+ */
+export function mostUsedSubscriptionAggregate(userId) {
+  const pipeline = subscriptionUsageAggregate(userId);
+
+  const additionalStages = [
+    {
+      $sort: {
+        averageScore: -1,
+      },
+    },
+    {
+      $limit: 1,
+    },
+  ];
+
+  const finalPipeline = pipeline.concat(additionalStages);
+
+  console.log("finalPipeline", finalPipeline);
+
+  return finalPipeline;
 }

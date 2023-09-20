@@ -1,5 +1,8 @@
 import Subscription from "../models/_subscriptionSchema.js";
-import { getSubscriptionUsageAggregate } from "../data/_aggregates.js";
+import {
+  mostUsedSubscriptionAggregate,
+  subscriptionUsageAggregate,
+} from "../data/_aggregates.js";
 
 // ---- GET /api/subscriptionUsage ----
 export async function getAllSubscriptionUsage(req, res, next) {
@@ -11,7 +14,7 @@ export async function getAllSubscriptionUsage(req, res, next) {
     userId,
   );
 
-  const aggregate = getSubscriptionUsageAggregate(userId);
+  const aggregate = subscriptionUsageAggregate(userId);
   console.log(aggregate);
 
   const result = await Subscription.aggregate(aggregate);
@@ -32,7 +35,7 @@ export async function getSingleSubscriptionUsage(req, res, next) {
     id,
   );
 
-  const aggregate = getSubscriptionUsageAggregate(userId, id);
+  const aggregate = subscriptionUsageAggregate(userId, id);
 
   const result = await Subscription.aggregate(aggregate);
 
