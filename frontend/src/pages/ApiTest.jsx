@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import useSubscription from "../hooks/useSubscription";
+import useDashboard from "../hooks/useDashboard";
+import useSubscriptionUsage from "../hooks/useSubscriptionUsage";
 
 export default function ApiTest() {
   const {
@@ -10,6 +12,16 @@ export default function ApiTest() {
     deleteSubscription,
   } = useSubscription();
 
+  const {
+    getDashboardData,
+    getMostUsedSubscription,
+    getPotentialMonthlySavings,
+    getTotalMonthlyCost,
+  } = useDashboard();
+
+  const { getAllSubscriptionUsage, getSubscriptionUsageById } =
+    useSubscriptionUsage();
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -18,18 +30,81 @@ export default function ApiTest() {
     // These custom hooks don't provide data, loading, error status, but rather the result
     // of the actual operation, i.e. subscriptions, if a deletion was successful etc...
 
-    // GET ALL SUBSCRIPTIONS
-    // This construct here is a nameless function that immediately gets executed
+    // GET ALL SUBSCRIPTION USAGE DATA
     (async function () {
       try {
-        // IMPORTAT: To avoid pending requests if the user navigates away, ALL requests
-        // require an abortController (see above) as the last argument
-        const subs = await getAllSubscriptions(abortController);
-        console.log("Subs", subs);
+        const su = await getAllSubscriptionUsage(abortController);
+        console.log("su", su);
       } catch (error) {
         console.log(error);
       }
     })();
+
+    // GET SINGLE SUBSCRIPTION USAGE DATA
+    (async function () {
+      try {
+        const ssu = await getSubscriptionUsageById(
+          "65085093ae0d34a75257a626",
+          abortController,
+        );
+        console.log("ssu", ssu);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+
+    // GET DASHBOARD DATA
+    // (async function () {
+    //   try {
+    //     const dbd = await getDashboardData(abortController);
+    //     console.log("dbd", dbd);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
+
+    // GET MOST USED SUBSCRIPTION
+    // (async function () {
+    //   try {
+    //     const ms = await getMostUsedSubscription(abortController);
+    //     console.log("ms", ms);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
+
+    // GET POTENTIAL MONTHLY SAVINGS
+    // (async function () {
+    //   try {
+    //     const tms = await getPotentialMonthlySavings(abortController);
+    //     console.log("tms", tms);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
+
+    // GET TOTAL MONTHLY COST
+    // (async function () {
+    //   try {
+    //     const tm = await getTotalMonthlyCost(abortController);
+    //     console.log("tm", tm);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
+
+    // GET ALL SUBSCRIPTIONS
+    // This construct here is a nameless function that immediately gets executed
+    // (async function () {
+    //   try {
+    //     // IMPORTAT: To avoid pending requests if the user navigates away, ALL requests
+    //     // require an abortController (see above) as the last argument
+    //     const subs = await getAllSubscriptions(abortController);
+    //     console.log("Subs", subs);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })();
 
     // GET SINGLE SUBSCRIPTION
     // (async function () {

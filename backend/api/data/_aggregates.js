@@ -11,10 +11,8 @@ export function subscriptionUsageAggregate(userId, id = null) {
   };
 
   if (id) {
-    matchFilter._id = ObjectId(id);
+    matchFilter._id = new ObjectId(id);
   }
-
-  console.log("matchFilter", matchFilter);
 
   const pipeline = [
     {
@@ -81,8 +79,6 @@ export function subscriptionUsageAggregate(userId, id = null) {
     },
   ];
 
-  console.log("pipeline", pipeline);
-
   return pipeline;
 }
 
@@ -144,8 +140,6 @@ export function potentialMonthlySavingsAggregate(userId) {
     },
   ];
 
-  console.log("pipeline", pipeline);
-
   return pipeline;
 }
 
@@ -189,8 +183,6 @@ export function totalMonthlyCostAggregate(userId) {
     },
   ];
 
-  console.log("pipeline", pipeline);
-
   return pipeline;
 }
 
@@ -212,8 +204,6 @@ export function mostUsedSubscriptionAggregate(userId) {
   ];
 
   const finalPipeline = pipeline.concat(additionalStages);
-
-  console.log("finalPipeline", finalPipeline);
 
   return finalPipeline;
 }
