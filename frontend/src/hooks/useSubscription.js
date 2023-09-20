@@ -5,6 +5,10 @@ import useAuthRequest from "./useAuthRequest";
 export default function useSubscription() {
   const { startRequest } = useAuthRequest();
 
+  /**
+   * Returns all subscriptions for the current user
+   * @return {Array} subscriptions
+   */
   async function getAllSubscriptions(abortController) {
     return await startRequest(
       ApiEndpoints.subscriptions,
@@ -13,6 +17,10 @@ export default function useSubscription() {
     );
   }
 
+  /**
+   * Returns a subscription by ID
+   * @return {object} subscription
+   */
   async function getSubscriptionById(id, abortController) {
     if (!id) {
       throw new Error("Invalid subscription ID");
@@ -25,6 +33,10 @@ export default function useSubscription() {
     );
   }
 
+  /**
+   * Creates a new subscription
+   * @return {object} subscription
+   */
   async function createSubscription(subscription, abortController) {
     if (!subscription) {
       throw new Error("Invalid subscription");
@@ -40,6 +52,10 @@ export default function useSubscription() {
     );
   }
 
+  /**
+   * Updates a subscription
+   * @return {string} api lookup url to new subscription
+   */
   async function updateSubscription(subscription, abortController) {
     if (!subscription) {
       throw new Error("Invalid subscription");
@@ -55,6 +71,10 @@ export default function useSubscription() {
     );
   }
 
+  /**
+   * Deletes a subscription
+   * @return {boolean} true if delete succeeded
+   */
   async function deleteSubscription(id, abortController) {
     if (!id) {
       throw new Error("Invalid subscription ID");

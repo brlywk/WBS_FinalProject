@@ -1,11 +1,10 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
 
 import db from "./data/_mongodb.js";
 
 import apiRouter from "./routes/_apiRouter.js";
-import categoryRouter from "./routes/_categoryRouter.js";
 
 import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 import errorHandler from "./middleware/_errorHandler.js";
@@ -21,7 +20,7 @@ server.use(
   }),
 );
 
-// Log all incoming requests
+// ---- LOGGING ----
 server.use((req, res, next) => {
   console.log("============================================");
   console.log(`${req.method} ${req.path}`);
@@ -31,7 +30,7 @@ server.use((req, res, next) => {
   next();
 });
 
-// All requests need to have clerk auth infos, and we need a userId in the request!
+// ---- AUTHENTICATION ----
 server.use(ClerkExpressRequireAuth());
 server.use(checkUserId);
 
