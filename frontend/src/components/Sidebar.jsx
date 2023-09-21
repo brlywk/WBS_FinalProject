@@ -4,7 +4,7 @@ import Loading from "./Loading";
 import ErrorDisplay from "./ErrorDisplay";
 import CategoryButton from "./CategoryButton";
 
-export default function Sidebar() {
+export default function Sidebar({ className = "w-full" }) {
   const [loading, setLoading] = useState();
   const [error, setError] = useState();
   const [categories, setCategories] = useState([]);
@@ -28,13 +28,13 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="absolute left-0 top-[5rem] w-[200px]"> {/* Adjusted top positioning to align with Tabs */}
+    <div className={className}>
+      {" "}
+      {/* Adjusted top positioning to align with Tabs */}
       {loading && <Loading />}
-
       {!loading && error && (
         <ErrorDisplay message="Unable to fetch categories" />
       )}
-
       {!loading &&
         !error &&
         categories?.length > 0 &&
@@ -48,4 +48,3 @@ export default function Sidebar() {
     </div>
   );
 }
-

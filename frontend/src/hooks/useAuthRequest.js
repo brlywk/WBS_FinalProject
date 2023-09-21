@@ -25,16 +25,12 @@ export default function useAuthRequest() {
       options.headers["Content-Type"] = "application/json";
     }
 
-    console.log("startRequest", url, options);
-
     try {
       const result = await fetch(url, options);
 
       if (!result.ok) {
         throw new Error("Request failed");
       }
-
-      console.log("startRequest result", result);
 
       // In case of creation of something we need to check status and give back location
       if (result.status === 201) {
