@@ -84,20 +84,18 @@ function Dashboard() {
       setError(true);
       setErrorMessage(error.message);
     } finally {
-      console.log("Refetch complete");
       setLoading(false);
       setErrorMessage("");
     }
   }
 
+  // TODO: Right now this always refetches when the form closes... \
+  // We need to add a way to check if a subscription has actually been added
   function handleSubscriptionAdded() {
     setIsAddSubscriptionOpen(false);
 
     refetchData();
   }
-
-  console.log("Subscrotions", subscriptions);
-  console.log("Dashboard data", dashboardData);
 
   // Main return block for the Dashboard component
   return (
@@ -204,6 +202,7 @@ function Dashboard() {
                             element: (
                               <MainContent
                                 subscriptions={subscriptions}
+                                categories={categories}
                                 filter="active"
                               />
                             ),
@@ -213,6 +212,7 @@ function Dashboard() {
                             element: (
                               <MainContent
                                 subscriptions={subscriptions}
+                                categories={categories}
                                 filter="inactive"
                               />
                             ),

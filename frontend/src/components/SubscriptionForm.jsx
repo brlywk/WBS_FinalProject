@@ -14,11 +14,30 @@ export default function SubscriptionForm({
   const billingCycles = ["month", "year"];
   const noneCategoryId = "65085704f18207c1481e6642";
 
+  // This feels very hack-y... might need to refactor everything to use a context
+  const setInitialCategory = () => {
+    if (mode === "add") {
+      return categories.find((c) => c._id === noneCategoryId);
+    } else {
+      return subscription.category;
+    }
+  };
+
+  const setInitialBillingCycle = () => {
+    if (mode === "add") {
+      return "month";
+    } else {
+      return subscription.interval;
+    }
+  };
+
   // ---- State ----
   const [selectedCategory, setSelectedCategory] = useState(
-    categories.find((c) => c._id === noneCategoryId),
+    setInitialCategory(),
   );
-  const [selectedBillingCycle, setSelectedBillingCycle] = useState("month");
+  const [selectedBillingCycle, setSelectedBillingCycle] = useState(
+    setInitialBillingCycle(),
+  );
   const [currentMode, setCurrentMode] = useState(mode);
   const [openSubscription, setOpenSubscription] = useState(subscription);
   const [working, setWorking] = useState();
@@ -32,13 +51,9 @@ export default function SubscriptionForm({
   const priceRef = useRef();
 
   // ---- Functions ----
-  async function handleAddSubscription() {
-    // TODO: Better validation, i.e. show user which fields are missing
-    if (!nameRef.current?.value || !priceRef.current?.value) {
-      alert("Please enter a name and price");
-      return;
-    }
 
+  // create temp. subscription from current form data
+  function createSubscriptionDataFromForm() {
     const cleanPrice = parseFloat(priceRef.current.value.replace(",", "."));
 
     if (isNaN(cleanPrice)) {
@@ -46,14 +61,27 @@ export default function SubscriptionForm({
       return;
     }
 
-    const newSubscription = {
+    const formSubscription = {
       name: nameRef.current.value,
       price: cleanPrice,
       category: selectedCategory._id,
       interval: selectedBillingCycle,
     };
 
+    return formSubscription;
+  }
+
+  // Sub should be added
+  async function handleAddSubscription() {
+    // TODO: Better validation, i.e. show user which fields are missing
+    if (!nameRef.current?.value || !priceRef.current?.value) {
+      alert("Please enter a name and price");
+      return;
+    }
+
     setWorking(true);
+
+    const newSubscription = createSubscriptionDataFromForm();
 
     try {
       const abortController = new AbortController();
@@ -77,14 +105,65 @@ export default function SubscriptionForm({
     // TODO: Reset Form Data once saving is successful
   }
 
-  function handleSaveEditSubscription() {
+  // Change in edit mode needs to be saved
+  async function handleSaveEditSubscription() {
     if (!subscription._id) return;
-    alert("edit");
+
+    setWorking(true);
+
+    const updatedSubscription = createSubscriptionDataFromForm();
+    updatedSubscription._id = subscription._id;
+
+    console.log("Trying to update id", subscription._id);
+
+    try {
+      const abortController = new AbortController();
+      const subscriptionUpdate = await updateSubscription(
+        updatedSubscription,
+        abortController,
+      );
+
+      console.log(subscriptionUpdate);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setWorking(false);
+    }
+
+    onClose();
   }
 
-  function handleDeleteSubscription() {
+  // Sub should be deleted
+  async function handleDeleteSubscription() {
     if (!subscription._id) return;
-    alert(subscription._id);
+
+    setWorking(true);
+
+    try {
+      const abortController = new AbortController();
+
+      const { successful } = await deleteSubscription(
+        subscription._id,
+        abortController,
+      );
+
+      if (!successful) {
+        throw new Error("Unable to delete subscription");
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setWorking(false);
+    }
+
+    onClose();
+  }
+
+  // close form handler, we need this because we otherwise don't exit edit mode
+  function handleClose() {
+    console.log("Close", mode);
+    setCurrentMode(mode);
+    onClose();
   }
 
   return (
@@ -132,6 +211,7 @@ export default function SubscriptionForm({
                   name="name"
                   placeholder="Subscription Name"
                   ref={nameRef}
+                  defaultValue={subscription.name || ""}
                 />
               )}
               {currentMode === "show" && <div>{subscription.name}</div>}
@@ -144,6 +224,7 @@ export default function SubscriptionForm({
                   name="price"
                   placeholder="Price in EUR"
                   ref={priceRef}
+                  defaultValue={subscription.price || ""}
                 />
               )}
               {currentMode === "show" && <div>{subscription.price}</div>}
@@ -218,9 +299,18 @@ export default function SubscriptionForm({
             <div className="flex justify-end gap-4">
               <button onClick={handleDeleteSubscription}>Delete</button>
               <button onClick={() => setCurrentMode("edit")}>Edit</button>
+
+              {/* Needs to be made nicer */}
+              {currentMode === "edit" && (
+                <>
+                  <button onClick={handleSaveEditSubscription}>Save</button>
+                  <button onClick={() => setCurrentMode("show")}>Cancel</button>
+                </>
+              )}
+
               <button
                 className="button-white-white-instance rounded-md border border-gray-300 bg-white px-4 py-2"
-                onClick={onClose}
+                onClick={handleClose}
               >
                 Cancel
               </button>
