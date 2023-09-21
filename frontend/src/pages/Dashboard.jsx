@@ -61,6 +61,11 @@ function Dashboard() {
 
     fetchData();
 
+    // Apply the background from index.css
+    document.body.style.background = "linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 2% 5%, #f5f3f4, #3b82f6, #800080, #f5f3f4)";
+    document.body.style.backgroundSize = "500% 500%, 100% 100%";
+    document.body.style.animation = "gradient 60s ease infinite";
+
     return () => abortController.abort();
   }, []);
 
@@ -136,83 +141,83 @@ function Dashboard() {
                 {/* User Icon */}
                 <UserButton />
               </div>
+            </div>
+          </header>
 
-              {/* Content Area */}
-              <div className="flex w-full flex-row divide-x divide-black/25">
-                {/* Sidebar Content */}
-                <div className="flex flex-col divide-y divide-black/25">
-                  {/* Add Subscription Button */}
-                  <button
-                    onClick={() => setIsAddSubscriptionOpen(true)}
-                    className="bg-black/25 p-4 hover:bg-black hover:text-white"
-                  >
-                    Add Subscription
-                  </button>
+          {/* Content Area */}
+          <div className="flex w-full flex-row divide-x divide-black/25">
+            {/* Sidebar Content */}
+            <div className="flex flex-col divide-y divide-black/25">
+              {/* Add Subscription Button */}
+              <button
+                onClick={() => setIsAddSubscriptionOpen(true)}
+                className="bg-black/25 p-4 hover:bg-black hover:text-white"
+              >
+                Add Subscription
+              </button>
 
-                  {/* Overview, Recommendations, Cancel */}
-                  <SidebarTop className="w-full p-2" />
+              {/* Overview, Recommendations, Cancel */}
+              <SidebarTop className="w-full p-2" />
 
-                  {/* Categories */}
-                  <Sidebar categories={categories} className="w-full p-2" />
-                </div>
+              {/* Categories */}
+              <Sidebar categories={categories} className="w-full p-2" />
+            </div>
 
-                {/* Main Content */}
-                <div className="w-full bg-white/25">
-                  {loading && <Loading />}
+            {/* Main Content */}
+            <div className="w-full bg-white/25">
+              {loading && <Loading />}
 
-                  {!loading && error && <ErrorDisplay message={errorMessage} />}
+              {!loading && error && <ErrorDisplay message={errorMessage} />}
 
-                  {!loading &&
-                    !error &&
-                    dashboardData &&
-                    categories?.length > 0 &&
-                    subscriptions?.length > 0 && (
-                      <TabNavigation
-                        tabs={[
-                          {
-                            name: "Dashboard",
-                            element: (
-                              <div className="grid w-full gap-4">
-                                <Stats
-                                  dashboardData={dashboardData}
-                                  totalSubscriptions={subscriptions.length}
-                                />
-                                <MainContent
-                                  subscriptions={subscriptions}
-                                  categories={categories}
-                                />
-                              </div>
-                            ),
-                          },
-                          {
-                            name: "Active",
-                            element: (
-                              <MainContent
-                                subscriptions={subscriptions}
-                                categories={categories}
-                                filter="active"
-                              />
-                            ),
-                          },
-                          {
-                            name: "Inactive",
-                            element: (
-                              <MainContent
-                                subscriptions={subscriptions}
-                                categories={categories}
-                                filter="inactive"
-                              />
-                            ),
-                          },
-                          {
-                            name: "Usage",
-                            element: <div>Usage</div>,
-                          },
-                        ]}
-                      />
-                    )}
-                </div>
-              </div>
+              {!loading &&
+                !error &&
+                dashboardData &&
+                categories?.length > 0 &&
+                subscriptions?.length > 0 && (
+                  <TabNavigation
+                    tabs={[
+                      {
+                        name: "Dashboard",
+                        element: (
+                          <div className="grid w-full gap-4">
+                            <Stats
+                              dashboardData={dashboardData}
+                              totalSubscriptions={subscriptions.length}
+                            />
+                            <MainContent
+                              subscriptions={subscriptions}
+                              categories={categories}
+                            />
+                          </div>
+                        ),
+                      },
+                      {
+                        name: "Active",
+                        element: (
+                          <MainContent
+                            subscriptions={subscriptions}
+                            categories={categories}
+                            filter="active"
+                          />
+                        ),
+                      },
+                      {
+                        name: "Inactive",
+                        element: (
+                          <MainContent
+                            subscriptions={subscriptions}
+                            categories={categories}
+                            filter="inactive"
+                          />
+                        ),
+                      },
+                      {
+                        name: "Usage",
+                        element: <div>Usage</div>,
+                      },
+                    ]}
+                  />
+                )}
             </div>
           </div>
         </div>
@@ -227,8 +232,10 @@ function Dashboard() {
           onClose={handleSubscriptionAdded}
         />
       )}
-    </>
+    </div>
   );
 }
 
 export default Dashboard;
+
+

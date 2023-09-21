@@ -2,43 +2,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @layer components {
-  .gradient-bg {
-    /* Adjust the gradient to be more radial and slow, similar to a gentle breeze */
-    /* The colors are adjusted to be primarily blue, cream, and a hint of purple, to give an Apple-esque feel */
-    /* The `via-cream-200` class does not exist. Replaced it with `via-blue-300` which is a valid tailwind class */
-    /* The gradient now transitions from blue to cream, giving a more antique feel */
-    /* As Tailwind doesn't provide a cream color, we'll use a custom CSS color instead */
-    /* To make white more dominant, we'll start and end the gradient with white */
-    /* We'll also slow down the animation to make it less noticeable */
-    /* Adding a hint of purple to the gradient */
-    /* The radial-gradient is overriding the linear-gradient, hence the animation is not working. */
-    /* We need to combine both gradients in a single background property for the animation to work */
-    background: linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4),
-      radial-gradient(circle at 10% 20%, #f5f3f4, #3b82f6, #800080, #f5f3f4);
-    background-size:
-      500% 500%,
-      100% 100%; /* Increase the size of the gradient to make it more grainy */
-    animation: gradient 60s ease infinite; /* Slow down the animation to make it less noticeable */
+  .dashboard .gradient-bg {
+    background: linear-gradient(to right, rgba(245, 243, 244, 0.022), rgba(59, 131, 246, 0.028), rgba(128, 0, 128, 0.1), rgba(245, 243, 244, 0.018)),
+      radial-gradient(circle at 10% 20%, rgba(245, 243, 244, 0.032), rgba(59, 131, 246, 0.022), rgba(128, 0, 128, 0.029), rgba(245, 243, 244, 0.028));
+    background-size: 800% 800%, 100% 100%;
+    animation: gradient 120s ease infinite;
   }
 
   @keyframes gradient {
     0% {
-      background-position:
-        0% 50%,
-        0% 50%;
+      background-position: 0% 50%, 0% 50%;
     }
     50% {
-      /* Adjust the background position to give a more wave-like effect */
-      background-position:
-        50% 100%,
-        50% 100%;
+      background-position: 100% 100%, 50% 100%;
     }
     100% {
-      background-position:
-        0% 50%,
-        0% 50%;
+      background-position: 0% 50%, 0% 50%;
     }
   }
 }
+
