@@ -31,13 +31,11 @@ export async function getDashboardData(req, res, next) {
 
   // all results here are arrays with exactly one object in them
   // TODO: More error handling. Probably...
-  const mostUsed = mostUsedResult[0];
-  const totalCost = totalCostResult[0];
-  const potentialSavings = potentialSavingsResult[0];
-
-  if (!mostUsed || !totalCost || !potentialSavings) {
-    throw new Error("Could not get dashboard data");
-  }
+  const mostUsed = mostUsedResult[0] ?? {};
+  const totalCost = totalCostResult[0] ?? { totalCostPerMonth: 0 };
+  const potentialSavings = potentialSavingsResult[0] ?? {
+    potentialMonthlySavings: 0,
+  };
 
   const dashboardData = {
     mostUsed,

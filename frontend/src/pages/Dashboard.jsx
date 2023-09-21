@@ -1,166 +1,246 @@
-import React, { useState, useEffect } from "react";
-import useDashboardToggles from "../hooks/useDashboardToggles";
-import useSidebar from "../hooks/useSidebar"; // Added useSidebar hook
-import { SubscriptionsComponent } from "../components/Subscriptions";
+import { useEffect, useState } from "react";
+import { UserButton } from "@clerk/clerk-react";
+
+import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
+import ErrorDisplay from "../components/ErrorDisplay";
+import Loading from "../components/Loading";
 import MainContent from "../components/MainContent";
-import LinkItem from "../components/LinkItem"; // Import LinkItem component
-import Stats from "../components/Stats"; // Import Stats component
+import SearchModal from "../components/SearchModal"; // Import SearchModal component
 import Sidebar from "../components/Sidebar";
-import useTabsNav from '../hooks/useTabsNav';
-import Logo from "/subzero_logo_icon.png";
-import SubscriptionCard from '../components/SubscriptionCard';
-import useSearch from '../hooks/useSearch';
-import useSubscription from '../hooks/useSubscription'; // Import useSubscription hook
-import { Dialog, Listbox } from '@headlessui/react'; // Import Dialog and Listbox from headlessui
-import AddSubscriptionForm from '../components/AddSubscriptions'; // Import AddSubscriptionForm component
-import SearchModal from '../components/SearchModal'; // Import SearchModal component
+import SidebarTop from "../components/SidebarTop";
+import Stats from "../components/Stats"; // Import Stats component
+import TabNavigation from "../components/TabNavigation";
 
-// Removed useHeader2 as it's not used in this component
-// Removed useClickOutside, useHeader, useSidebar, useMainContent as they are not used in this component
-// Removed import statements for SubscriptionCard, StatsCard as they are not used in this component
-// Removed useState, useEffect as they are not used in this component
-// Removed the fetch data from API code as we are now getting data from MainContent.jsx
+import useSubscription from "../hooks/useSubscription";
+import useDashboard from "../hooks/useDashboard";
+import useCategory from "../hooks/useCategory";
+
 function Dashboard() {
-  useEffect(() => {
-    document.body.classList.add('gradient-bg');
+  // ---- STATE ----
+  const [loading, setLoading] = useState();
+  const [error, setError] = useState();
+  const [errorMessage, setErrorMessage] = useState("");
 
-    return () => {
-      document.body.classList.remove('gradient-bg');
-    };
+  const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
+  const [isTestShowSub, setTestShowSub] = useState(false);
+
+  const [dashboardData, setDashboardData] = useState(null);
+  const [subscriptions, setSubscriptions] = useState(null);
+  const [categories, setCategories] = useState(null);
+
+  // ---- CUSTOM HOOKS ----
+  const { getAllSubscriptions } = useSubscription();
+  const { getDashboardData } = useDashboard();
+  const { getAllCategories } = useCategory();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    setLoading(true);
+    setError(false);
+    setErrorMessage("");
+
+    async function fetchData() {
+      try {
+        const [subs, dashData, cats] = await Promise.all([
+          getAllSubscriptions(abortController),
+          getDashboardData(abortController),
+          getAllCategories(abortController),
+        ]);
+
+        setDashboardData(dashData);
+        setSubscriptions(subs);
+        setCategories(cats);
+      } catch (error) {
+        setError(true);
+        setErrorMessage(error.message);
+      }
+      setLoading(false);
+      setErrorMessage("");
+    }
+
+    fetchData();
+
+    return () => abortController.abort();
   }, []);
 
-  // Usage in component
-  const { isMenuOpen, toggleMenu } = useDashboardToggles();
-  const { activeLink, links, setActiveLink } = useSidebar(); // Added useSidebar hook
-  // Removed the useState for isMenuOpen as it's already defined in useDashboardToggles
-  // Removed the toggleMenu function as it's already defined in useDashboardToggles
-  const { activeTab, tabs, setActiveTab } = useTabsNav('All Subscriptions'); // Use useMainContent hook
-  const [isOpen, setIsOpen] = useState(false); // State for controlling the visibility of the dialog
-  const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false); // State for controlling the visibility of the AddSubscriptionForm modal
-  const billingCycles = ['Monthly', 'Quarterly', 'Yearly']; // Billing cycles
-  const [selectedBillingCycle, setSelectedBillingCycle] = useState(billingCycles[0]); // State for selected billing cycle in the Listbox
-  const { createSubscription } = useSubscription(); // Hook for creating a subscription
+  // We need to refetch after all operations...
+  async function refetchData() {
+    const abortController = new AbortController();
+    setLoading(true);
+    setSubscriptions(null);
+    setDashboardData(null);
+    setError(false);
+    setErrorMessage("");
 
-  // Function for handling the addition of a subscription
-  const handleAddSubscription = async (event) => {
-    event.preventDefault();
-    // Gather data from the form and create a subscription object
-    const subscription = { /* ... */ };
-    console.log("Attempting to create subscription with data: ", subscription); // Debug log
     try {
-      const result = await createSubscription(subscription);
-      console.log("Subscription creation result: ", result); // Debug log
-      // Handle the result
-      if (result.success) {
-        setIsOpen(false); // Close the dialog if the subscription was successfully created
-      }
+      const [subs, dashData] = await Promise.all([
+        getAllSubscriptions(abortController),
+        getAllCategories(abortController),
+      ]);
+      setDashboardData(dashData);
+      setSubscriptions(subs);
     } catch (error) {
-      console.error("Error while creating subscription: ", error); // Error log
+      setError(true);
+      setErrorMessage(error.message);
+    } finally {
+      setLoading(false);
+      setErrorMessage("");
     }
-  };
+  }
+
+  // TODO: Right now this always refetches when the form closes... \
+  // We need to add a way to check if a subscription has actually been added
+  function handleSubscriptionAdded() {
+    setIsAddSubscriptionOpen(false);
+
+    refetchData();
+  }
 
   // Main return block for the Dashboard component
   return (
-    // The main container with fixed positioning and semi-transparent background
-    
-    <div className="overlay-app">
-                  {/* Search Modal */}
-                  <SearchModal className="w-72" />
-      <div className="flex justify-center">
-        <div className="absolute inset-0 bg-gray-900/70 -z-10 backdrop-blur rounded-lg bg-white/25"></div>
-        <div className="relative w-[1024px] h-[701.22px] rounded-lg border border-transparent bg-white/10 p-6 backdrop-blur light-mode">
-          {/* Header */}
-          {/* Header with flex layout, centered items, space between items, specific height, bottom border, and semi-transparent gray border color */}
-          <header className="flex items-center justify-between h-16 border-b bo">
-            {/* Dashboard title */}
-            <h1 className="text-xl font-bold">DASHBOARD</h1> {/* Increased font size and weight for better legibility */}
-            {/* Notifications */}
-            {/* Notifications with relative positioning */}
-            <div className="relative">
-              {/* Placeholder for the notifications */}
-              <div className="h-10 w-32 rounded-lg bg-gray-300"></div>
-              {/* Container for the notification icon and count */}
-              <div className="absolute right-14 top-0 flex flex-col items-start gap-y-1">
-                {/* Notification icon */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-6 w-6"
-                >
-                  {/* SVG paths go here */}
-                </svg>
-                {/* Notification count */}
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
-                  <p className="text-xs text-white">3</p>
+    <>
+      <div className="flex h-full w-full flex-col items-center p-4">
+        {/* Top bar with logo and search */}
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          {/* Logo */}
+          <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+
+          {/* Search Bar */}
+          <div className="flex w-full justify-center">
+            <SearchModal />
+          </div>
+        </div>
+
+        {/* App content */}
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          <div className="col-start-2 pt-8">
+            <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+              {/* Title Bar */}
+              <div className="flex items-center gap-4 p-4">
+                {/* Title */}
+                <div className="w-full text-lg font-bold uppercase">
+                  Dashboard
+                </div>
+
+                {/* Notification */}
+                <div>
+                  <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
+                    <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+                      2
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-6 w-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* User Icon */}
+                <UserButton />
+              </div>
+
+              {/* Content Area */}
+              <div className="flex w-full flex-row divide-x divide-black/25">
+                {/* Sidebar Content */}
+                <div className="flex flex-col divide-y divide-black/25">
+                  {/* Add Subscription Button */}
+                  <button
+                    onClick={() => setIsAddSubscriptionOpen(true)}
+                    className="bg-black/25 p-4 hover:bg-black hover:text-white"
+                  >
+                    Add Subscription
+                  </button>
+
+                  {/* Overview, Recommendations, Cancel */}
+                  <SidebarTop className="w-full p-2" />
+
+                  {/* Categories */}
+                  <Sidebar categories={categories} className="w-full p-2" />
+                </div>
+
+                {/* Main Content */}
+                <div className="w-full bg-white/25">
+                  {loading && <Loading />}
+
+                  {!loading && error && <ErrorDisplay message={errorMessage} />}
+
+                  {!loading &&
+                    !error &&
+                    dashboardData &&
+                    categories?.length > 0 &&
+                    subscriptions?.length > 0 && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Dashboard",
+                            element: (
+                              <div className="grid w-full gap-4">
+                                <Stats
+                                  dashboardData={dashboardData}
+                                  totalSubscriptions={subscriptions.length}
+                                />
+                                <MainContent
+                                  subscriptions={subscriptions}
+                                  categories={categories}
+                                />
+                              </div>
+                            ),
+                          },
+                          {
+                            name: "Active",
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                categories={categories}
+                                filter="active"
+                              />
+                            ),
+                          },
+                          {
+                            name: "Inactive",
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                categories={categories}
+                                filter="inactive"
+                              />
+                            ),
+                          },
+                          {
+                            name: "Usage",
+                            element: <div>Usage</div>,
+                          },
+                        ]}
+                      />
+                    )}
                 </div>
               </div>
-            </div>
-
-          </header>
-          {/* Tabs */}
-          {/* Navigation for the tabs */}
-          <nav className="space-x-4 ml-40"> {/* Added margin-left to move the tabs to the right by 2cm */}
-            {/* Map through the tabs and create a button for each one */}
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                // Apply different styles based on whether the tab is active or not
-                // Increased padding to provide more space around the items in the tabs
-                className={`py-4 px-6 border-b-2 ${activeTab === tab ? 'border-black' : 'border-transparent'}`}
-                // Set the active tab when a tab button is clicked
-                onClick={() => setActiveTab(tab)}
-              >
-                {/* Display the tab name */}
-                {tab}
-              </button>
-            ))}
-            {/* Add Subscription button */}
-            <button 
-  onClick={() => setIsAddSubscriptionOpen(true)}
-  className="bg-black text-white rounded-full py-2 px-4"
->
-  Add Subscription
-</button>
-          </nav>
-          <div className="overflow-x-hidden"> {/* or overflow-auto */}
-            {/* Tab content */}
-            {/* Display different content based on the active tab */}
-            {activeTab === 'Active' && 
-              <div className="flex items-center border-b h-14 w-full px-8 whitespace-nowrap sm:px-4 bg-red-500">
-                Active content
-              </div>
-            }
-            {activeTab === 'Inactive' && 
-              <div className="flex items-center border-b h-14 w-full px-8 whitespace-nowrap sm:px-4 bg-blue-500">
-                Inactive content
-              </div>
-            }
-            {activeTab === 'Usage' && 
-              <div className="flex items-center border-b h-14 w-full px-8 whitespace-nowrap sm:px-4 bg-green-500">
-                Usage content
-              </div>
-            }
-            {activeTab === 'All Subscriptions' && 
-              <>
-                {/* Stats */}
-                <Stats />
-                {/* ...Main content here... */}
-                <MainContent />
-              </>
-            }
-            {/* Sidebar for sub navigation */}
-            <div className="border-l overflow-auto h-[calc(100%-40px)] ml-40 mt-[-40px]">
-              <Sidebar />
             </div>
           </div>
         </div>
       </div>
-      <div>
-        <img src={Logo} className="absolute left-6 top-6 h-7 w-7" alt="Logo" />
-      </div>
-      <AddSubscriptionForm open={isAddSubscriptionOpen} onClose={() => setIsAddSubscriptionOpen(false)} />
-    </div>
+
+      {/* Subscription Add Form */}
+      {categories?.length > 0 && (
+        <SubscriptionForm
+          mode="add"
+          categories={categories}
+          opened={isAddSubscriptionOpen}
+          onClose={handleSubscriptionAdded}
+        />
+      )}
+    </>
   );
 }
 

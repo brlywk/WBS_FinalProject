@@ -13,7 +13,7 @@ export async function getSubscriptionSearch(req, res, next) {
     new Date().toISOString(),
     "getSubscriptionSearch, request for user",
     userId,
-    "with query",
+    "with query:",
     query,
   );
 
