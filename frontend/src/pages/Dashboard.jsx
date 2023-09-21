@@ -67,7 +67,7 @@ function Dashboard() {
                   {/* Search Modal */}
                   <SearchModal className="w-72" />
       <div className="flex justify-center">
-        <div className="absolute inset-0 bg-gray-900/70 -z-10 backdrop-blur rounded-lg bg-white/25"></div>
+        <div className=" inset-0 bg-gray-900/70 -z-10 backdrop-blur rounded-lg bg-white/25"></div>
         <div className="relative w-[1024px] h-[701.22px] rounded-lg border border-transparent bg-white/10 p-6 backdrop-blur light-mode">
           {/* Header */}
           {/* Header with flex layout, centered items, space between items, specific height, bottom border, and semi-transparent gray border color */}
