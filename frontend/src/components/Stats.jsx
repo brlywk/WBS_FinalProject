@@ -2,6 +2,14 @@
 import StatsCard from "./StatsCard";
 
 export default function Stats({ totalSubscriptions, dashboardData }) {
+  if (
+    !dashboardData.totalCostPerMonth ||
+    !dashboardData.potentialMonthlySavings ||
+    !dashboardData.mostUsed.name ||
+    !totalSubscriptions
+  )
+    return;
+
   return (
     <div className="flex items-center justify-around">
       <StatsCard

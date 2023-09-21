@@ -16,7 +16,7 @@ export default function SearchModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="flex w-full items-center space-x-2 rounded-lg border border-gray-900/10 bg-white/50 px-3 py-1.5 shadow-sm hover:border-gray-300 focus:border-gray-300 focus:outline-none"
+        className="flex w-1/2 items-center space-x-2 rounded-lg border border-gray-900/10 bg-white/50 px-3 py-1.5 shadow-sm hover:border-gray-300 focus:border-gray-300 focus:outline-none"
       >
         <svg
           className="-ml-1 flex-none text-gray-400"

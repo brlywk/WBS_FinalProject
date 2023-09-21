@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserButton } from "@clerk/clerk-react";
 
-import AddSubscriptionForm from "../components/AddSubscriptions"; // Import AddSubscriptionForm component
+import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import ErrorDisplay from "../components/ErrorDisplay";
 import Loading from "../components/Loading";
 import MainContent from "../components/MainContent";
@@ -13,6 +13,7 @@ import TabNavigation from "../components/TabNavigation";
 
 import useSubscription from "../hooks/useSubscription";
 import useDashboard from "../hooks/useDashboard";
+import useCategory from "../hooks/useCategory";
 
 function Dashboard() {
   // ---- STATE ----
@@ -21,16 +22,16 @@ function Dashboard() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
+  const [isTestShowSub, setTestShowSub] = useState(false);
 
   const [dashboardData, setDashboardData] = useState(null);
   const [subscriptions, setSubscriptions] = useState(null);
+  const [categories, setCategories] = useState(null);
 
   // ---- CUSTOM HOOKS ----
   const { getAllSubscriptions } = useSubscription();
   const { getDashboardData } = useDashboard();
-
-  console.log("dashboardData", dashboardData);
-  console.log("subscriptions", subscriptions);
+  const { getAllCategories } = useCategory();
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -41,13 +42,15 @@ function Dashboard() {
 
     async function fetchData() {
       try {
-        const [subs, dashData] = await Promise.all([
+        const [subs, dashData, cats] = await Promise.all([
           getAllSubscriptions(abortController),
           getDashboardData(abortController),
+          getAllCategories(abortController),
         ]);
 
         setDashboardData(dashData);
         setSubscriptions(subs);
+        setCategories(cats);
       } catch (error) {
         setError(true);
         setErrorMessage(error.message);
@@ -61,25 +64,58 @@ function Dashboard() {
     return () => abortController.abort();
   }, []);
 
+  // We need to refetch after all operations...
+  async function refetchData() {
+    const abortController = new AbortController();
+    setLoading(true);
+    setSubscriptions(null);
+    setDashboardData(null);
+    setError(false);
+    setErrorMessage("");
+
+    try {
+      const [subs, dashData] = await Promise.all([
+        getAllSubscriptions(abortController),
+        getAllCategories(abortController),
+      ]);
+      setDashboardData(dashData);
+      setSubscriptions(subs);
+    } catch (error) {
+      setError(true);
+      setErrorMessage(error.message);
+    } finally {
+      console.log("Refetch complete");
+      setLoading(false);
+      setErrorMessage("");
+    }
+  }
+
+  function handleSubscriptionAdded() {
+    setIsAddSubscriptionOpen(false);
+
+    refetchData();
+  }
+
+  console.log("Subscrotions", subscriptions);
+  console.log("Dashboard data", dashboardData);
+
   // Main return block for the Dashboard component
   return (
     <>
-      <div className="w-fullitems-center grid h-full p-4">
+      <div className="flex h-full w-full flex-col items-center p-4">
         {/* Top bar with logo and search */}
-        <div className="grid grid-cols-[15vw_1fr_15vw] ">
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
           {/* Logo */}
-          <div>
-            <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
-          </div>
+          <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
 
           {/* Search Bar */}
-          <div className="w-full">
+          <div className="flex w-full justify-center">
             <SearchModal />
           </div>
         </div>
 
         {/* App content */}
-        <div className="grid grid-cols-[15vw_1fr_15vw]">
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
           <div className="col-start-2 pt-8">
             <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
               {/* Title Bar */}
@@ -132,7 +168,7 @@ function Dashboard() {
                   <SidebarTop className="w-full p-2" />
 
                   {/* Categories */}
-                  <Sidebar className="w-full p-2" />
+                  <Sidebar categories={categories} className="w-full p-2" />
                 </div>
 
                 {/* Main Content */}
@@ -144,6 +180,7 @@ function Dashboard() {
                   {!loading &&
                     !error &&
                     dashboardData &&
+                    categories?.length > 0 &&
                     subscriptions?.length > 0 && (
                       <TabNavigation
                         tabs={[
@@ -155,17 +192,30 @@ function Dashboard() {
                                   dashboardData={dashboardData}
                                   totalSubscriptions={subscriptions.length}
                                 />
-                                <MainContent subscriptions={subscriptions} />
+                                <MainContent
+                                  subscriptions={subscriptions}
+                                  categories={categories}
+                                />
                               </div>
                             ),
                           },
                           {
                             name: "Active",
-                            element: <div>Active</div>,
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                filter="active"
+                              />
+                            ),
                           },
                           {
                             name: "Inactive",
-                            element: <div>Inactive</div>,
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                filter="inactive"
+                              />
+                            ),
                           },
                           {
                             name: "Usage",
@@ -182,10 +232,14 @@ function Dashboard() {
       </div>
 
       {/* Subscription Add Form */}
-      <AddSubscriptionForm
-        open={isAddSubscriptionOpen}
-        onClose={() => setIsAddSubscriptionOpen(false)}
-      />
+      {categories?.length > 0 && (
+        <SubscriptionForm
+          mode="add"
+          categories={categories}
+          opened={isAddSubscriptionOpen}
+          onClose={handleSubscriptionAdded}
+        />
+      )}
     </>
   );
 }

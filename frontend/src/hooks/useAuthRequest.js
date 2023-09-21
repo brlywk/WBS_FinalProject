@@ -34,12 +34,12 @@ export default function useAuthRequest() {
 
       // In case of creation of something we need to check status and give back location
       if (result.status === 201) {
-        return result.headers.get("Location");
+        return { successful: true, message: result.headers.get("Location") };
       }
 
       // we deleted something and deletion was successful
       if (result.status === 204) {
-        return true;
+        return { successful: true, message: "Deleted" };
       }
 
       return await result.json();
