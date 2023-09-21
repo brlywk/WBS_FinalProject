@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import LogoutButton from "../components/LogoutButton";
-import { ProtectedPart } from "./Protected";
 import styles from './Homepage.module.css';
 
 export default function Homepage() {
