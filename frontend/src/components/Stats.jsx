@@ -14,10 +14,10 @@ export default function Stats() {
 
   return (
     <div className="stats flex justify-center space-x-4 mb-4">
-        <StatsCard className="text-sm text-gray-700" title="Total Subscriptions" value={totalSubscriptions} />
-        <StatsCard className="text-sm text-gray-700" title="Total Cost" value={`$${totalCost.toFixed(2)}`} />  
-        <StatsCard className="text-sm text-gray-700" title="Potential Savings" value="$50" />
-        <StatsCard className="text-sm text-gray-700" title="Most Used" value="Product 2" />
+        <StatsCard className="text-sm" title="Total Subscriptions" value={totalSubscriptions} />
+        <StatsCard className="text-sm" title="Total Cost" value={`$${totalCost.toFixed(2)}`} />  
+        <StatsCard className="text-sm" title="Potential Savings" value="$50" />
+        <StatsCard className="text-sm" title="Most Used" value="Product 2" />
     </div>
   );
 }

@@ -28,7 +28,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="absolute left-0 top-0 w-[200px]">
+    <div className="absolute left-0 top-[5rem] w-[200px]"> {/* Adjusted top positioning to align with Tabs */}
       {loading && <Loading />}
 
       {!loading && error && (
@@ -48,3 +48,4 @@ export default function Sidebar() {
     </div>
   );
 }
+

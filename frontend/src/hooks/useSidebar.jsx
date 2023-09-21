@@ -84,16 +84,3 @@ export default function useSidebar() {
     setActiveLink
   };
 }
-
-const Link = ({title, active, notifications, onClick}) => {
-  // link styling based on active prop
-  // notifications badge
-  // onClick handler
-  return (
-    <div onClick={onClick}>
-      {title}
-      {active ? 'Active' : 'Inactive'}
-      {notifications}
-    </div>
-  );
-};

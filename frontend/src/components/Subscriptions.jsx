@@ -10,16 +10,4 @@
         status={sub.status} 
       />
     )) : null; // If subscriptions is undefined, we set subscriptionCards to null
-    
-    return (
-      <div className="bg-transparent flex justify-center w-full dashboard">
-        {/* rest of your code... */}
-        <main className="bg-white/40 flex flex-col gap-y-6">
-          <div className="subscription-cards">
-            {subscriptionCards}
-          </div>
-        </main>
-      </div>
-    );
-  }
-
+    }

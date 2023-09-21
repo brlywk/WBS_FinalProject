@@ -25,6 +25,13 @@ const subscriptions = [
     status: "Active", 
     image: "/img/prime.png"
   },
+  {
+    id: 4,
+    title: "Ocado",
+    price: "$99.99/year",
+    status: "Active", 
+    image: "/img/grocery.png"
+  },
   // etc
 ];
 
@@ -45,19 +52,11 @@ const MainContent = memo(() => {
     }
     fetchData();
   }, []);
-
+  
   return (
-    <div>
-      {/* Sidebar links */}
-      <div className="sidebar">
-        {/* Assuming sidebarLinks is defined somewhere in the component */}
-        {/* {sidebarLinks.map((link, index) => (
-          <LinkItem key={index} {...link} />
-        ))} */}
-      </div>
-      {/* Main content */}
-      <main className="bg-white flex flex-col gap-y-6">
-        <div className="subscription-cards">
+    <div className="flex justify-end"> {/* Added justify-end to move the cards to the right */}
+      <main className="bg-transparent flex flex-row flex-wrap ml-2"> {/* Removed gap-0 to remove the gap between the cards */}
+        <div className="subscription-cards flex flex-row flex-wrap"> {/* No changes needed here */}
           {subscriptionData.map(sub => (
             <SubscriptionCard 
               key={sub.id}
@@ -71,7 +70,8 @@ const MainContent = memo(() => {
       </main>
     </div>
   );
-}, 'MainContent'); // Added display name to the memo function
+});
 
+MainContent.displayName = 'MainContent';
+  
 export default MainContent;
-

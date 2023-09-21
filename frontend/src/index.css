@@ -2,16 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-.subscription-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    grid-gap: 0.5rem;
+@layer components {
+  .gradient-bg {
+    /* Adjust the gradient to be more radial and slow, similar to a gentle breeze */
+    /* The colors are adjusted to be primarily blue, cream, and a hint of purple, to give an Apple-esque feel */
+    /* The `via-cream-200` class does not exist. Replaced it with `via-blue-300` which is a valid tailwind class */
+    /* The gradient now transitions from blue to cream, giving a more antique feel */
+    /* As Tailwind doesn't provide a cream color, we'll use a custom CSS color instead */
+    /* To make white more dominant, we'll start and end the gradient with white */
+    /* We'll also slow down the animation to make it less noticeable */
+    /* Adding a hint of purple to the gradient */
+    /* The radial-gradient is overriding the linear-gradient, hence the animation is not working. */
+    /* We need to combine both gradients in a single background property for the animation to work */
+    background: linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 10% 20%, #f5f3f4, #3b82f6, #800080, #f5f3f4);
+    background-size: 500% 500%, 100% 100%; /* Increase the size of the gradient to make it more grainy */
+    animation: gradient 60s ease infinite; /* Slow down the animation to make it less noticeable */
   }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%, 0% 50%;
+  }
+  50% {
+    /* Adjust the background position to give a more wave-like effect */
+    background-position: 50% 100%, 50% 100%;
+  }
+  100% {
+    background-position: 0% 50%, 0% 50%;
+  }
+}
+
+  :root {
+    /* Typography */
+    --font-family: "Poppins", sans-serif;
+    --font-size: 15px;
+    --font-weight: 500;
   
-  .subscription-card {
-    height: 10rem;
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    padding: 1rem;
+    /* Colors */
+    --theme-bg-color: rgba(16, 18, 27, 0.4);
+    --theme-color: #f9fafb;
+    --inactive-color: rgb(113, 119, 144 / 78%);
+  
+    /* Other */
+    --border-radius: 14px;
+    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --transition: 0.3s;
   }
+
+  
+  
+  body {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+  }
+
+  html {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+   }
+
+   body {
+    font-family: var(--body-font);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 2em;
+    width: 100%;
+    height: 100vh;
+    @media screen and (max-width: 480px) {
+     padding: 0.8em;
+    }
+   }
+   
+   
+   
