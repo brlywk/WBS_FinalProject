@@ -133,21 +133,21 @@ export default function ApiTest() {
     // })();
 
     // CREATE SUBSCRIPTION
-    // (async function () {
-    //   try {
-    //     const subscription = {
-    //       name: "FlatNix",
-    //       price: 100,
-    //       interval: "monthly",
-    //     };
-    //
-    //     // Note: This returns the location of the newly created object!
-    //     const sub = await createSubscription(subscription, abortController);
-    //     console.log("ApiTest - createSubscription", sub);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
+    (async function () {
+      try {
+        const subscription = {
+          name: "Hello There",
+          price: 100,
+          interval: "monthly",
+        };
+
+        // Note: This returns the location of the newly created object!
+        const sub = await createSubscription(subscription, abortController);
+        console.log("ApiTest - createSubscription", sub);
+      } catch (error) {
+        console.log(error);
+      }
+    })();
 
     // UPDATE SUBSCRIPTION
     // (async function () {

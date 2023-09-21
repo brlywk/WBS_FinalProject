@@ -6,13 +6,12 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
+import ApiTest from "./pages/ApiTest";
+import Dashboard from "./pages/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
-import { ProtectedPage } from "./pages/Protected";
 import Signup from "./pages/Signup";
-import ApiTest from "./pages/ApiTest";
-import Dashboard from "./pages/Dashboard";
 
 // access our key
 const publishableKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
@@ -43,22 +42,6 @@ function ClerkRouteProvider() {
               {/* If signed in, load this page / component */}
               <SignedIn>
                 <Dashboard />
-              </SignedIn>
-
-              {/* If not signed in, show this when user accesses route */}
-              <SignedOut>
-                <div>You are not allowed here!</div>
-              </SignedOut>
-            </>
-          }
-        />
-        <Route
-          path="/test"
-          element={
-            <>
-              {/* If signed in, load this page / component */}
-              <SignedIn>
-                <ProtectedPage />
               </SignedIn>
 
               {/* If not signed in, show this when user accesses route */}

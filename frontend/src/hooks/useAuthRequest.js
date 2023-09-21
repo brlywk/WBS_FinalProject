@@ -25,8 +25,6 @@ export default function useAuthRequest() {
       options.headers["Content-Type"] = "application/json";
     }
 
-    console.log("startRequest", url, options);
-
     try {
       const result = await fetch(url, options);
 
@@ -34,16 +32,14 @@ export default function useAuthRequest() {
         throw new Error("Request failed");
       }
 
-      console.log("startRequest result", result);
-
       // In case of creation of something we need to check status and give back location
       if (result.status === 201) {
-        return result.headers.get("Location");
+        return { successful: true, message: result.headers.get("Location") };
       }
 
       // we deleted something and deletion was successful
       if (result.status === 204) {
-        return true;
+        return { successful: true, message: "Deleted" };
       }
 
       return await result.json();

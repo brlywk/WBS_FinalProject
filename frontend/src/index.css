@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,22 +15,30 @@
     /* Adding a hint of purple to the gradient */
     /* The radial-gradient is overriding the linear-gradient, hence the animation is not working. */
     /* We need to combine both gradients in a single background property for the animation to work */
-    background: linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 10% 20%, #f5f3f4, #3b82f6, #800080, #f5f3f4);
-    background-size: 500% 500%, 100% 100%; /* Increase the size of the gradient to make it more grainy */
+    background: linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4),
+      radial-gradient(circle at 10% 20%, #f5f3f4, #3b82f6, #800080, #f5f3f4);
+    background-size:
+      500% 500%,
+      100% 100%; /* Increase the size of the gradient to make it more grainy */
     animation: gradient 60s ease infinite; /* Slow down the animation to make it less noticeable */
   }
-}
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%, 0% 50%;
-  }
-  50% {
-    /* Adjust the background position to give a more wave-like effect */
-    background-position: 50% 100%, 50% 100%;
-  }
-  100% {
-    background-position: 0% 50%, 0% 50%;
+  @keyframes gradient {
+    0% {
+      background-position:
+        0% 50%,
+        0% 50%;
+    }
+    50% {
+      /* Adjust the background position to give a more wave-like effect */
+      background-position:
+        50% 100%,
+        50% 100%;
+    }
+    100% {
+      background-position:
+        0% 50%,
+        0% 50%;
+    }
   }
 }
-

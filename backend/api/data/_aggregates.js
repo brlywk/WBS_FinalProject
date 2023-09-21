@@ -208,6 +208,9 @@ export function mostUsedSubscriptionAggregate(userId) {
   return finalPipeline;
 }
 
+/**
+ * Returns pipeline needed for a search in a subscription and associated category
+ */
 export function searchAggregate(query) {
   const queryRegex = new RegExp(query, "i");
 
