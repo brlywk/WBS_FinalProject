@@ -12,6 +12,8 @@ import ErrorPage from "./pages/ErrorPage";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import DataProvider from "./contexts/dataContext";
+import DataContextProvider from "./contexts/dataContext";
 
 // access our key
 const publishableKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
@@ -41,7 +43,9 @@ function ClerkRouteProvider() {
             <>
               {/* If signed in, load this page / component */}
               <SignedIn>
-                <Dashboard />
+                <DataProvider>
+                  <Dashboard />
+                </DataProvider>
               </SignedIn>
 
               {/* If not signed in, show this when user accesses route */}
@@ -56,7 +60,9 @@ function ClerkRouteProvider() {
           element={
             <>
               <SignedIn>
-                <ApiTest />
+                <DataProvider>
+                  <ApiTest />
+                </DataProvider>
               </SignedIn>
               <SignedOut>
                 <Navigate to="/login" />

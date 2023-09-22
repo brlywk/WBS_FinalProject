@@ -1,193 +1,83 @@
 import { useEffect } from "react";
-import useSubscription from "../hooks/useSubscription";
-import useDashboard from "../hooks/useDashboard";
-import useSubscriptionUsage from "../hooks/useSubscriptionUsage";
-import useSearch from "../hooks/useSearch";
+import { useDataContext } from "../contexts/dataContext";
+import useDataFetching from "../hooks/useDataFetching";
+import eventEmitter from "../utils/EventEmitter";
+
+function ApiTestChild() {
+  return (
+    <div>
+      <h1 className="mt-4 text-xl">
+        I am a child component and will send an event to request a refetch!
+      </h1>
+      <div>
+        <button
+          onClick={() => eventEmitter.emit("refetchData")}
+          className="rounded border-black bg-white/25 p-4 hover:bg-blue-300"
+        >
+          Request a refetch from parent component!
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function ApiTest() {
+  // Context
   const {
-    getAllSubscriptions,
-    getSubscriptionById,
-    createSubscription,
-    updateSubscription,
-    deleteSubscription,
-  } = useSubscription();
+    subscriptions,
+    usedCategories,
+    usages,
+    dashboardData,
+    allCategories,
+  } = useDataContext();
 
-  const {
-    getDashboardData,
-    getMostUsedSubscription,
-    getPotentialMonthlySavings,
-    getTotalMonthlyCost,
-  } = useDashboard();
-
-  const { getAllSubscriptionUsage, getSusbcriptionUsageById } =
-    useSubscriptionUsage();
-
-  const { startSearch } = useSearch();
+  const { loading, errorMessage, error, refetchData } = useDataFetching();
 
   useEffect(() => {
     const abortController = new AbortController();
 
-    // NOTE:
-    // If we want to use loading spinners, we need to use useState
-    // These custom hooks don't provide data, loading, error status, but rather the result
-    // of the actual operation, i.e. subscriptions, if a deletion was successful etc...
+    const refetchCallback = () => refetchData(abortController);
 
-    // SEARCH FOR SOMETHING
-    (async function () {
-      try {
-        const sr = await startSearch("dusnay minus", abortController);
-        console.log("sr", sr);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
+    eventEmitter.on("refetchData", refetchCallback);
 
-    // GET ALL SUBSCRIPTION USAGE DATA
-    // (async function () {
-    //   try {
-    //     const su = await getAllSubscriptionUsage(abortController);
-    //     console.log("su", su);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET SINGLE SUBSCRIPTION USAGE DATA
-    // (async function () {
-    //   try {
-    //     const ssu = await get(
-    //       "65085704f18207c1481e6642",
-    //       abortController,
-    //     );
-    //     console.log("ssu", ssu);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET DASHBOARD DATA
-    // (async function () {
-    //   try {
-    //     const dbd = await getDashboardData(abortController);
-    //     console.log("dbd", dbd);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET MOST USED SUBSCRIPTION
-    // (async function () {
-    //   try {
-    //     const ms = await getMostUsedSubscription(abortController);
-    //     console.log("ms", ms);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET POTENTIAL MONTHLY SAVINGS
-    // (async function () {
-    //   try {
-    //     const tms = await getPotentialMonthlySavings(abortController);
-    //     console.log("tms", tms);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET TOTAL MONTHLY COST
-    // (async function () {
-    //   try {
-    //     const tm = await getTotalMonthlyCost(abortController);
-    //     console.log("tm", tm);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET ALL SUBSCRIPTIONS
-    // This construct here is a nameless function that immediately gets executed
-    // (async function () {
-    //   try {
-    //     // IMPORTAT: To avoid pending requests if the user navigates away, ALL requests
-    //     // require an abortController (see above) as the last argument
-    //     const subs = await getAllSubscriptions(abortController);
-    //     console.log("Subs", subs);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // GET SINGLE SUBSCRIPTION
-    // (async function () {
-    //   try {
-    //     const sub = await getSubscriptionById(
-    //       "65085093ae0d34a75257a626",
-    //       abortController,
-    //     );
-    //     console.log("fetchSubscriptionById", sub);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // CREATE SUBSCRIPTION
-    (async function () {
-      try {
-        const subscription = {
-          name: "Hello There",
-          price: 100,
-          interval: "monthly",
-        };
-
-        // Note: This returns the location of the newly created object!
-        const sub = await createSubscription(subscription, abortController);
-        console.log("ApiTest - createSubscription", sub);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
-
-    // UPDATE SUBSCRIPTION
-    // (async function () {
-    //   try {
-    //     const updatedSub = {
-    //       _id: "6509a971290ff801fa54b8ed",
-    //       name: "Dusnay Minus",
-    //       price: 20,
-    //       interval: "monthly",
-    //     };
-    //
-    //     const changedSub = await updateSubscription(
-    //       updatedSub,
-    //       abortController,
-    //     );
-    //     console.log("ApiTest - updateSubscription", changedSub);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // DELETE SUBSCRIPTION
-    // (async function () {
-    //   try {
-    //     const deleteId = "6509ab6ff0abc109fea58f36";
-    //
-    //     const deletionResult = await deleteSubscription(
-    //       deleteId,
-    //       abortController,
-    //     );
-    //     console.log(deletionResult);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // })();
-
-    // All useEffect calls to the backend need this cleanup function which cancels
-    // all running fetch requests
-    return () => abortController.abort();
+    return () => {
+      abortController.abort();
+      eventEmitter.off("refetchData", refetchCallback);
+    };
   }, []);
 
-  return <div>ApiTest</div>;
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center">
+      <ApiTestChild />
+      <div>
+        {loading && <div>Loading...</div>}
+        {!loading && error && <div>Error: {errorMessage}</div>}
+
+        <h1 className="mt-4 text-xl">Dashboard Data</h1>
+        {!loading && !error && dashboardData && (
+          <div className="text-xs">{JSON.stringify(dashboardData)}</div>
+        )}
+
+        <h1 className="mt-4 text-xl">Subscriptions</h1>
+        {!loading && !error && subscriptions && (
+          <div className="text-xs">{JSON.stringify(subscriptions)}</div>
+        )}
+
+        <h1 className="mt-4 text-xl">Used Categories</h1>
+        {!loading && !error && usedCategories && (
+          <div className="text-xs">{JSON.stringify(usedCategories)}</div>
+        )}
+
+        <h1 className="mt-4 text-xl">Usages</h1>
+        {!loading && !error && usages && (
+          <div className="text-xs">{JSON.stringify(usages)}</div>
+        )}
+
+        <h1 className="mt-4 text-xl">All Categories</h1>
+        {!loading && !error && allCategories && (
+          <div className="text-xs">{JSON.stringify(allCategories)}</div>
+        )}
+      </div>
+    </div>
+  );
 }
