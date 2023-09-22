@@ -1,0 +1,41 @@
+// simple event emitter class to allow components to communicate with each other
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(eventName, callback) {
+    // if event 'eventName' doesn't exist, create it
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
+
+    // attach the provided callback to the event
+    this.events[eventName].push(callback);
+  }
+
+  off(eventName, callback) {
+    // if this event doesnt exist, do nothing
+    if (!this.events[eventName]) return;
+
+    // otherwise, remove the callback from the event
+    const eventIndex = this.events[eventName].indexOf(callback);
+    if (eventIndex > -1) {
+      this.events[eventName].splice(eventIndex, 1);
+    }
+  }
+
+  emit(eventName, ...args) {
+    // if this event doesnt exist, do nothing
+    if (!this.events[eventName]) return;
+
+    // otherwise, call all callbacks attached to the event
+    this.events[eventName].forEach((callback) => {
+      callback(...args);
+    });
+  }
+}
+
+// create a singleton instance of the event emitter and export it
+const emitter = new EventEmitter();
+export default emitter;
