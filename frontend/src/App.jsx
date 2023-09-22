@@ -55,6 +55,27 @@ function ClerkRouteProvider() {
             </>
           }
         />
+
+        {/* Route used for category links in sidebar */}
+        <Route
+          path="/dashboard/:pageId"
+          element={
+            <>
+              {/* If signed in, load this page / component */}
+              <SignedIn>
+                <DataProvider>
+                  <Dashboard />
+                </DataProvider>
+              </SignedIn>
+
+              {/* If not signed in, show this when user accesses route */}
+              <SignedOut>
+                <div>You are not allowed here!</div>
+              </SignedOut>
+            </>
+          }
+        />
+
         <Route
           path="/apiTest"
           element={

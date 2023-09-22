@@ -17,6 +17,9 @@ export default function MainContent({ filter = "none" }) {
     if (filter === "inactive") {
       return subscriptions?.filter((sub) => !sub.active);
     }
+
+    // Filter by pageId
+    return subscriptions?.filter((sub) => sub.category._id === filter);
   };
 
   return (

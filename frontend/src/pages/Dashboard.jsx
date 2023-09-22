@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { UserButton } from "@clerk/clerk-react";
+import { useParams } from "react-router-dom";
 
 import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -34,6 +35,7 @@ function Dashboard() {
 
   // ---- CUSTOM HOOKS ----
   const { loading, error, errorMessage, refetchData } = useDataFetching();
+  const { pageId } = useParams();
 
   // ---- Event Callbacks ----
 
@@ -67,6 +69,12 @@ function Dashboard() {
     eventEmitter.on("refetchData", refetchCallback);
     eventEmitter.on("openSubscriptionForm", openSubscriptionFormCallback);
     eventEmitter.on("changeFormMode", switchFormModeCallback);
+
+    // TODO: more robust implementation
+    document.body.style.background =
+      "linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 2% 5%, #f5f3f4, #3b82f6, #800080, #f5f3f4)";
+    document.body.style.backgroundSize = "500% 500%, 100% 100%";
+    document.body.style.animation = "gradient 60s ease infinite";
 
     return () => {
       abortController.abort();
@@ -177,31 +185,60 @@ function Dashboard() {
 
                   {/* Main Content */}
                   <div className="w-full bg-white/25">
-                    <TabNavigation
-                      tabs={[
-                        {
-                          name: "Dashboard",
-                          element: (
-                            <div className="grid w-full gap-4">
-                              <Stats />
-                              <MainContent />
-                            </div>
-                          ),
-                        },
-                        {
-                          name: "Active",
-                          element: <MainContent filter="active" />,
-                        },
-                        {
-                          name: "Inactive",
-                          element: <MainContent filter="inactive" />,
-                        },
-                        {
-                          name: "Usage",
-                          element: <div>Usage</div>,
-                        },
-                      ]}
-                    />
+                    {/* Main Dashboard View */}
+                    {!pageId && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Dashboard",
+                            element: (
+                              <div className="grid w-full gap-4">
+                                <Stats />
+                                <MainContent />
+                              </div>
+                            ),
+                          },
+                          {
+                            name: "Active",
+                            element: <MainContent filter="active" />,
+                          },
+                          {
+                            name: "Inactive",
+                            element: <MainContent filter="inactive" />,
+                          },
+                          {
+                            name: "Usage",
+                            element: <div className="w-full">Usage</div>,
+                          },
+                        ]}
+                      />
+                    )}
+
+                    {/* Recommendations / Cancel */}
+                    {(pageId === "recommendations" || pageId === "cancel") && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Recommendations",
+                            element: (
+                              <div className="w-full">Recommendations</div>
+                            ),
+                          },
+                          {
+                            name: "Cancel",
+                            element: (
+                              <div className="w-full">Recommendations</div>
+                            ),
+                          },
+                        ]}
+                        initialTabIndex={pageId === "recommendations" ? 0 : 1}
+                      />
+                    )}
+
+                    {/* Category Pages */}
+                    {pageId &&
+                      pageId !== "recommendations" &&
+                      pageId !== "cancel" && <MainContent filter={pageId} />}
                   </div>
                 </div>
               </div>
