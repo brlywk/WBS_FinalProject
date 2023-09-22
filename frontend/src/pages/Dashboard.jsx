@@ -61,11 +61,6 @@ function Dashboard() {
 
     fetchData();
 
-    // Apply the background from index.css
-    document.body.style.background = "linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 2% 5%, #f5f3f4, #3b82f6, #800080, #f5f3f4)";
-    document.body.style.backgroundSize = "500% 500%, 100% 100%";
-    document.body.style.animation = "gradient 60s ease infinite";
-
     return () => abortController.abort();
   }, []);
 
@@ -104,120 +99,133 @@ function Dashboard() {
 
   // Main return block for the Dashboard component
   return (
-    // The main container with fixed positioning and semi-transparent background
-    
-    <div className="overlay-app">
-                  {/* Search Modal */}
-                  <SearchModal className="w-72" />
-      <div className="flex justify-center">
-        <div className="absolute inset-0 bg-gray-900/70 -z-10 backdrop-blur rounded-lg bg-white/25"></div>
-        <div className="relative w-[1024px] h-[701.22px] rounded-lg border border-transparent bg-white/10 p-6 backdrop-blur light-mode">
-          {/* Header */}
-          {/* Header with flex layout, centered items, space between items, specific height, bottom border, and semi-transparent gray border color */}
-          <header className="flex items-center justify-between h-16 border-b bo">
-            {/* Dashboard title */}
-            <h1 className="text-xl font-bold">DASHBOARD</h1> {/* Increased font size and weight for better legibility */}
-            {/* Notifications */}
-            {/* Notifications with relative positioning */}
-            <div className="relative">
-              {/* Placeholder for the notifications */}
-              <div className="h-10 w-32 rounded-lg bg-gray-300"></div>
-              {/* Container for the notification icon and count */}
-              <div className="absolute right-14 top-0 flex flex-col items-start gap-y-1">
-                {/* Notification icon */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="h-6 w-6"
-                >
-                  {/* SVG paths go here */}
-                </svg>
-                {/* Notification count */}
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
-                  <p className="text-xs text-white">3</p>
+    <>
+      <div className="flex h-full w-full flex-col items-center p-4">
+        {/* Top bar with logo and search */}
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          {/* Logo */}
+          <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+
+          {/* Search Bar */}
+          <div className="flex w-full justify-center">
+            <SearchModal />
+          </div>
+        </div>
+
+        {/* App content */}
+        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          <div className="col-start-2 pt-8">
+            <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+              {/* Title Bar */}
+              <div className="flex items-center gap-4 p-4">
+                {/* Title */}
+                <div className="w-full text-lg font-bold uppercase">
+                  Dashboard
+                </div>
+
+                {/* Notification */}
+                <div>
+                  <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
+                    <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+                      2
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-6 w-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                      />
+                    </svg>
+                  </div>
                 </div>
 
                 {/* User Icon */}
                 <UserButton />
               </div>
-            </div>
-          </header>
 
-          {/* Content Area */}
-          <div className="flex w-full flex-row divide-x divide-black/25">
-            {/* Sidebar Content */}
-            <div className="flex flex-col divide-y divide-black/25">
-              {/* Add Subscription Button */}
-              <button
-                onClick={() => setIsAddSubscriptionOpen(true)}
-                className="bg-black/25 p-4 hover:bg-black hover:text-white"
-              >
-                Add Subscription
-              </button>
+              {/* Content Area */}
+              <div className="flex w-full flex-row divide-x divide-black/25">
+                {/* Sidebar Content */}
+                <div className="flex flex-col divide-y divide-black/25">
+                  {/* Add Subscription Button */}
+                  <button
+                    onClick={() => setIsAddSubscriptionOpen(true)}
+                    className="bg-black/25 p-4 hover:bg-black hover:text-white"
+                  >
+                    Add Subscription
+                  </button>
 
-              {/* Overview, Recommendations, Cancel */}
-              <SidebarTop className="w-full p-2" />
+                  {/* Overview, Recommendations, Cancel */}
+                  <SidebarTop className="w-full p-2" />
 
-              {/* Categories */}
-              <Sidebar categories={categories} className="w-full p-2" />
-            </div>
+                  {/* Categories */}
+                  <Sidebar categories={categories} className="w-full p-2" />
+                </div>
 
-            {/* Main Content */}
-            <div className="w-full bg-white/25">
-              {loading && <Loading />}
+                {/* Main Content */}
+                <div className="w-full bg-white/25">
+                  {loading && <Loading />}
 
-              {!loading && error && <ErrorDisplay message={errorMessage} />}
+                  {!loading && error && <ErrorDisplay message={errorMessage} />}
 
-              {!loading &&
-                !error &&
-                dashboardData &&
-                categories?.length > 0 &&
-                subscriptions?.length > 0 && (
-                  <TabNavigation
-                    tabs={[
-                      {
-                        name: "Dashboard",
-                        element: (
-                          <div className="grid w-full gap-4">
-                            <Stats
-                              dashboardData={dashboardData}
-                              totalSubscriptions={subscriptions.length}
-                            />
-                            <MainContent
-                              subscriptions={subscriptions}
-                              categories={categories}
-                            />
-                          </div>
-                        ),
-                      },
-                      {
-                        name: "Active",
-                        element: (
-                          <MainContent
-                            subscriptions={subscriptions}
-                            categories={categories}
-                            filter="active"
-                          />
-                        ),
-                      },
-                      {
-                        name: "Inactive",
-                        element: (
-                          <MainContent
-                            subscriptions={subscriptions}
-                            categories={categories}
-                            filter="inactive"
-                          />
-                        ),
-                      },
-                      {
-                        name: "Usage",
-                        element: <div>Usage</div>,
-                      },
-                    ]}
-                  />
-                )}
+                  {!loading &&
+                    !error &&
+                    dashboardData &&
+                    categories?.length > 0 &&
+                    subscriptions?.length > 0 && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Dashboard",
+                            element: (
+                              <div className="grid w-full gap-4">
+                                <Stats
+                                  dashboardData={dashboardData}
+                                  totalSubscriptions={subscriptions.length}
+                                />
+                                <MainContent
+                                  subscriptions={subscriptions}
+                                  categories={categories}
+                                />
+                              </div>
+                            ),
+                          },
+                          {
+                            name: "Active",
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                categories={categories}
+                                filter="active"
+                              />
+                            ),
+                          },
+                          {
+                            name: "Inactive",
+                            element: (
+                              <MainContent
+                                subscriptions={subscriptions}
+                                categories={categories}
+                                filter="inactive"
+                              />
+                            ),
+                          },
+                          {
+                            name: "Usage",
+                            element: <div>Usage</div>,
+                          },
+                        ]}
+                      />
+                    )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -232,10 +240,8 @@ function Dashboard() {
           onClose={handleSubscriptionAdded}
         />
       )}
-    </div>
+    </>
   );
 }
 
 export default Dashboard;
-
-
