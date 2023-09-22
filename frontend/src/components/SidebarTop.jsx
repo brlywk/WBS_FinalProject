@@ -9,7 +9,7 @@ export default function SidebarTop({ className = "w-full" }) {
         strokeLinecap: "round",
         strokeLinejoin: "round",
       },
-      handler: () => alert("Overview"),
+      to: "/dashboard",
     },
     {
       name: "Recommendations",
@@ -18,7 +18,7 @@ export default function SidebarTop({ className = "w-full" }) {
         strokeLinecap: "round",
         strokeLinejoin: "round",
       },
-      handler: () => alert("Recommendations"),
+      to: "/dashboard/recommendations",
     },
     {
       name: "Cancel",
@@ -27,18 +27,14 @@ export default function SidebarTop({ className = "w-full" }) {
         strokeLinecap: "round",
         strokeLinejoin: "round",
       },
-      handler: () => alert("Cancel"),
+      to: "/dashboard/cancel",
     },
   ];
 
   return (
     <div className={className}>
       {sidebarTopLinks.map((link) => (
-        <NotificationButton
-          key={link.name}
-          category={link}
-          clickHandler={link.handler}
-        />
+        <NotificationButton key={link.name} category={link} to={link.to} />
       ))}
     </div>
   );

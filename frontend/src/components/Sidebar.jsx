@@ -12,7 +12,7 @@ export default function Sidebar({ className = "w-full" }) {
           <CategoryButton
             key={c.name}
             category={c}
-            clickHandler={() => alert(c.name)}
+            to={`/dashboard/${c._id}`}
           />
         ))}
     </div>

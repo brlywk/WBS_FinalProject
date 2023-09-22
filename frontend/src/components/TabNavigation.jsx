@@ -1,7 +1,15 @@
 import { useState } from "react";
 
-export default function TabNavigation({ className = "h-full w-full", tabs }) {
-  const [active, setActive] = useState(tabs[0]);
+export default function TabNavigation({
+  className = "h-full w-full",
+  tabs,
+  initialTabIndex = 0,
+}) {
+  // Safety: if initial index happens to be out of bounds for the tabs, set to last tab
+  if (initialTabIndex > tabs?.length - 1) {
+    initialTabIndex = tabs?.length - 1;
+  }
+  const [active, setActive] = useState(tabs[initialTabIndex]);
 
   const buttonStyle = " border-b-2 p-2 hover:border-black/25";
 
