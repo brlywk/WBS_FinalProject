@@ -1,56 +1,46 @@
 import { Dialog, Listbox, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import CategoryIcon from "./CategoryIcon";
+import { Fragment, useRef, useState } from "react";
+import { useDataContext } from "../contexts/dataContext";
 import useSubscription from "../hooks/useSubscription";
+import eventEmitter from "../utils/EventEmitter";
+import CategoryIcon from "./CategoryIcon";
 
 export default function SubscriptionForm({
-  mode = "show",
+  mode,
+  subscription,
   opened,
   onClose,
-  subscription = {},
-  categories,
 }) {
+  // ---- Data Context ----
+  const { allCategories } = useDataContext();
+
   // ---- Some settings ----
   const billingCycles = ["month", "year"];
   const noneCategoryId = "65085704f18207c1481e6642";
 
-  // This feels very hack-y... might need to refactor everything to use a context
-  const setInitialCategory = () => {
-    if (mode === "add") {
-      return categories.find((c) => c._id === noneCategoryId);
-    } else {
-      return subscription.category;
-    }
-  };
-
-  const setInitialBillingCycle = () => {
-    if (mode === "add") {
-      return "month";
-    } else {
-      return subscription.interval;
-    }
-  };
-
   // ---- State ----
   const [selectedCategory, setSelectedCategory] = useState(
-    setInitialCategory(),
+    subscription?.category ??
+      allCategories.find((c) => c._id === noneCategoryId),
   );
   const [selectedBillingCycle, setSelectedBillingCycle] = useState(
-    setInitialBillingCycle(),
+    subscription?.interval ?? "month",
   );
-  const [currentMode, setCurrentMode] = useState(mode);
-  const [openSubscription, setOpenSubscription] = useState(subscription);
   const [working, setWorking] = useState();
 
-  // ---- Custom hooks ----
+  // ---- HOOKS ----
   const { createSubscription, updateSubscription, deleteSubscription } =
     useSubscription();
 
-  // ---- Refs ----
+  // ---- REFS ----
   const nameRef = useRef();
   const priceRef = useRef();
 
-  // ---- Functions ----
+  // ---- FUNCTIONS ----
+  // switch to another form mode
+  function switchMode(mode) {
+    eventEmitter.emit("changeFormMode", mode);
+  }
 
   // create temp. subscription from current form data
   function createSubscriptionDataFromForm() {
@@ -98,11 +88,10 @@ export default function SubscriptionForm({
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
     onClose();
-
-    // TODO: Reset Form Data once saving is successful
   }
 
   // Change in edit mode needs to be saved
@@ -122,12 +111,11 @@ export default function SubscriptionForm({
         updatedSubscription,
         abortController,
       );
-
-      console.log(subscriptionUpdate);
     } catch (error) {
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
     onClose();
@@ -154,15 +142,9 @@ export default function SubscriptionForm({
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
-    onClose();
-  }
-
-  // close form handler, we need this because we otherwise don't exit edit mode
-  function handleClose() {
-    console.log("Close", mode);
-    setCurrentMode(mode);
     onClose();
   }
 
@@ -170,7 +152,7 @@ export default function SubscriptionForm({
     <Transition show={opened} as={Fragment} className="w-full">
       <Dialog
         className="fixed inset-0 z-10 flex items-center justify-center"
-        isOpen={opened}
+        open={opened}
         onClose={onClose}
       >
         {/* Backdrop overlay */}
@@ -198,40 +180,40 @@ export default function SubscriptionForm({
           <Dialog.Panel className="z-20 rounded-lg bg-white p-4">
             {/* Title Bar */}
             <Dialog.Title className="text-xl font-bold uppercase">
-              {currentMode} Subscription
+              {mode} Subscription
             </Dialog.Title>
 
             {/* Subscription Form */}
             <div className="grid grid-cols-[max-content_1fr] gap-4">
               {/* Subscription Name */}
               <label htmlFor="name">Name</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              {(mode === "add" || mode === "edit") && (
                 <input
                   type="text"
                   name="name"
                   placeholder="Subscription Name"
                   ref={nameRef}
-                  defaultValue={subscription.name || ""}
+                  defaultValue={subscription?.name || ""}
                 />
               )}
-              {currentMode === "show" && <div>{subscription.name}</div>}
+              {mode === "show" && <div>{subscription?.name}</div>}
 
               {/* Price */}
               <label htmlFor="price">Price</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              {(mode === "add" || mode === "edit") && (
                 <input
                   type="text"
                   name="price"
                   placeholder="Price in EUR"
                   ref={priceRef}
-                  defaultValue={subscription.price || ""}
+                  defaultValue={subscription?.price || ""}
                 />
               )}
-              {currentMode === "show" && <div>{subscription.price}</div>}
+              {mode === "show" && <div>{subscription?.price}</div>}
 
               {/* Category */}
               <label htmlFor="category">Category</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              {(mode === "add" || mode === "edit") && (
                 <Listbox
                   value={selectedCategory}
                   onChange={setSelectedCategory}
@@ -240,38 +222,38 @@ export default function SubscriptionForm({
                 >
                   <Listbox.Button className="">
                     <div className="flex items-center gap-2">
-                      <CategoryIcon icon={selectedCategory.icon} />
-                      <div>{selectedCategory.name}</div>
+                      <CategoryIcon icon={selectedCategory?.icon} />
+                      <div>{selectedCategory?.name}</div>
                     </div>
                   </Listbox.Button>
                   <Listbox.Options className="absolute mt-1 max-h-60 overflow-auto  rounded-md bg-white p-4 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {categories.map((category) => (
+                    {allCategories?.map((category) => (
                       <Listbox.Option
                         key={category._id}
                         value={category}
                         className="cursor-pointer p-2 hover:bg-gray-100"
                       >
                         <div className="flex items-center gap-2">
-                          <CategoryIcon icon={category.icon} />
-                          <div>{category.name}</div>
+                          <CategoryIcon icon={category?.icon} />
+                          <div>{category?.name}</div>
                         </div>
                       </Listbox.Option>
                     ))}
                   </Listbox.Options>
                 </Listbox>
               )}
-              {currentMode === "show" && (
+              {mode === "show" && (
                 <div>
                   <div className="flex items-center gap-2">
-                    <CategoryIcon icon={subscription.category.icon} />
-                    <div>{subscription.category.name}</div>
+                    <CategoryIcon icon={subscription?.category?.icon} />
+                    <div>{subscription?.category?.name}</div>
                   </div>
                 </div>
               )}
 
               {/* Billing Cycle */}
               <label htmlFor="billing_cycle">Billing Cycle</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              {(mode === "add" || mode === "edit") && (
                 <Listbox
                   value={selectedBillingCycle}
                   onChange={setSelectedBillingCycle}
@@ -293,24 +275,24 @@ export default function SubscriptionForm({
                   </Listbox.Options>
                 </Listbox>
               )}
-              {currentMode === "show" && <div>per {subscription.interval}</div>}
+              {mode === "show" && <div>per {subscription?.interval}</div>}
             </div>
 
             <div className="flex justify-end gap-4">
               <button onClick={handleDeleteSubscription}>Delete</button>
-              <button onClick={() => setCurrentMode("edit")}>Edit</button>
+              <button onClick={() => switchMode("edit")}>Edit</button>
 
               {/* Needs to be made nicer */}
-              {currentMode === "edit" && (
+              {mode === "edit" && (
                 <>
                   <button onClick={handleSaveEditSubscription}>Save</button>
-                  <button onClick={() => setCurrentMode("show")}>Cancel</button>
+                  <button onClick={() => switchMode("show")}>Cancel</button>
                 </>
               )}
 
               <button
                 className="button-white-white-instance rounded-md border border-gray-300 bg-white px-4 py-2"
-                onClick={handleClose}
+                onClick={() => onClose()}
               >
                 Cancel
               </button>

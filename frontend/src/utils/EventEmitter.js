@@ -10,6 +10,13 @@ class EventEmitter {
       this.events[eventName] = [];
     }
 
+    // Logging
+    console.info(
+      `Event registered: ${eventName} with callback: ${JSON.stringify(
+        callback,
+      )}`,
+    );
+
     // attach the provided callback to the event
     this.events[eventName].push(callback);
   }
@@ -17,6 +24,11 @@ class EventEmitter {
   off(eventName, callback) {
     // if this event doesnt exist, do nothing
     if (!this.events[eventName]) return;
+
+    // Logging
+    console.info(
+      `Event deleted: ${eventName} with callback: ${JSON.stringify(callback)}`,
+    );
 
     // otherwise, remove the callback from the event
     const eventIndex = this.events[eventName].indexOf(callback);
@@ -28,6 +40,11 @@ class EventEmitter {
   emit(eventName, ...args) {
     // if this event doesnt exist, do nothing
     if (!this.events[eventName]) return;
+
+    // Logging
+    console.info(
+      `Event emitted: ${eventName} with arguments: ${JSON.stringify(args)}`,
+    );
 
     // otherwise, call all callbacks attached to the event
     this.events[eventName].forEach((callback) => {

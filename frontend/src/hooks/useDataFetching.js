@@ -36,7 +36,6 @@ export default function useDataFetching() {
     // Fetch all the required data
     async function fetchRequiredData() {
       try {
-        console.log("Stargin fetch");
         const [fetchedSubscriptions, fetchedDashboardData, fetchedUsages] =
           await Promise.all([
             getAllSubscriptions(abortController),
@@ -44,17 +43,6 @@ export default function useDataFetching() {
             getAllSubscriptionUsage(abortController),
           ]);
 
-        console.log("Fetch done, proceeding...");
-        console.log("fetchedSubscriptions", fetchedSubscriptions);
-
-        // build used categories array
-        if (!fetchedSubscriptions) {
-          throw new Error(
-            "Error loading subscriptions, please reload the page to try again",
-          );
-        }
-
-        console.log("Building used categories array");
         const fetchedUsedCategories = fetchedSubscriptions?.reduce(
           (prev, curr) => {
             if (!prev.some((category) => category._id === curr.category._id)) {

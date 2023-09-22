@@ -5,6 +5,7 @@ export const DataContext = createContext(null);
 
 // Data Context Provider
 export default function DataContextProvider({ children }) {
+  // ---- DATA STATES ----
   const [subscriptions, setSubscriptions] = useState(null);
   const [allCategories, setAllCategories] = useState(null);
   const [usedCategories, setUsedCategories] = useState(null);

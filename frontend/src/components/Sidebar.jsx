@@ -1,11 +1,14 @@
 import CategoryButton from "./CategoryButton";
+import { useDataContext } from "../contexts/dataContext";
 
-export default function Sidebar({ categories, className = "w-full" }) {
+export default function Sidebar({ className = "w-full" }) {
+  const { usedCategories } = useDataContext();
+
   return (
     <div className={className}>
       {/* Adjusted top positioning to align with Tabs */}
-      {categories?.length > 0 &&
-        categories.map((c) => (
+      {usedCategories?.length > 0 &&
+        usedCategories.map((c) => (
           <CategoryButton
             key={c.name}
             category={c}

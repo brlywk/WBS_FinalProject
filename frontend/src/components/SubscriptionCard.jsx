@@ -1,14 +1,16 @@
-import { useState } from "react";
-import SubscriptionForm from "./SubscriptionForm";
+import eventEmitter from "../utils/EventEmitter";
 
-export default function SubscriptionCard({ subscription, categories }) {
-  const [subFormOpened, setSubFormOpened] = useState(false);
+export default function SubscriptionCard({ subscription }) {
+  // ---- Functions ----
+  function openSubscriptionForm() {
+    eventEmitter.emit("openSubscriptionForm", subscription, "show");
+  }
 
   return (
     <>
       <button
         className="grid w-full grid-cols-[max-content_1fr] justify-center gap-4 rounded-lg bg-gray-100 p-4"
-        onClick={() => setSubFormOpened(true)}
+        onClick={openSubscriptionForm}
       >
         {/* Adjusted ml-10 to ml-6 to decrease the gap next to each card by 20px */}
         <div className="self-center">
@@ -29,21 +31,13 @@ export default function SubscriptionCard({ subscription, categories }) {
           </svg>
         </div>
         <div className="flex flex-col">
-          <h3 className="text-lg font-medium">{subscription.name}</h3>
+          <h3 className="text-lg font-medium">{subscription?.name}</h3>
           <p className="text-gray-600">
-            {subscription.active ? "Active" : "Inactive"}
+            {subscription?.active ? "Active" : "Inactive"}
           </p>
-          <p className="text-lg font-semibold">EUR {subscription.price}</p>
+          <p className="text-lg font-semibold">EUR {subscription?.price}</p>
         </div>
       </button>
-
-      {/* SubscriptionForm component */}
-      <SubscriptionForm
-        subscription={subscription}
-        categories={categories}
-        opened={subFormOpened}
-        onClose={() => setSubFormOpened(false)}
-      />
     </>
   );
 }
