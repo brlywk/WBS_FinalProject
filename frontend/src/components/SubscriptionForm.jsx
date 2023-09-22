@@ -166,126 +166,174 @@ export default function SubscriptionForm({
     onClose();
   }
 
-  return (
-    <Transition show={opened} as={Fragment} className="w-full">
-      <Dialog
-        className="fixed inset-0 z-10 flex items-center justify-center"
-        isOpen={opened}
-        onClose={onClose}
-      >
-        {/* Backdrop overlay */}
-        <Transition.Child
-          as={Fragment}
-          enter="w-full duration-200"
-          enterFrom="scale-100 opacity-0"
-          enterTo="scale-100 opacity-100"
-          leave="duration-200 ease-in"
-          leaveFrom="scale-100 opacity-100"
-          leaveTo="scale-100 opacity-0"
-        >
-          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur" />
-        </Transition.Child>
+ return (
+    <Transition appear show={opened} as={Fragment}>
+      <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={onClose}>
+        <div className="min-h-screen px-4 text-center">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-25 backdrop-filter backdrop-blur-md" />
+          </Transition.Child>
+          <span
+            className="inline-block h-full align-middle"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <Dialog.Panel>
+                {/* Title */}
+                <Dialog.Title 
+  className="text-lg font-medium leading-6 text-gray-900 text-center"
+>
+  {currentMode === 'add' ? 'Add Subscription' : `${currentMode} Subscription`}
+</Dialog.Title>
+                <Dialog.Panel>
 
-        {/* Dialog Content */}
-        <Transition.Child
-          enter="duration-200 ease-out"
-          enterFrom="scale-95 opacity-0"
-          enterTo="flex w-full scale-100 justify-center opacity-100"
-          leave="duration-200 ease-in"
-          leaveFrom="flex w-full scale-100 justify-center opacity-100"
-          leaveTo="flex w-full scale-95 justify-center opacity-0"
-        >
-          <Dialog.Panel className="z-20 rounded-lg bg-white p-4">
-            {/* Title Bar */}
-            <Dialog.Title className="text-xl font-bold uppercase">
-              {currentMode} Subscription
-            </Dialog.Title>
+            {/* Form */}
+            <div className="mt-2 grid grid-cols-1 gap-y-4 gap-x-8 sm:grid-cols-2">
+              
+              {/* Name */}
+              <label 
+                htmlFor="name"
+                className="text-sm font-medium leading-none text-gray-600"
+              >
+                Name
+              </label>
 
-            {/* Subscription Form */}
-            <div className="grid grid-cols-[max-content_1fr] gap-4">
-              {/* Subscription Name */}
-              <label htmlFor="name">Name</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              {(currentMode === 'add' || currentMode === 'edit') && (
                 <input
+                  ref={nameRef}
                   type="text"
                   name="name"
                   placeholder="Subscription Name"
-                  ref={nameRef}
-                  defaultValue={subscription.name || ""}
+                  defaultValue={subscription?.name}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
-              {currentMode === "show" && <div>{subscription.name}</div>}
+
+              {currentMode === 'show' && (
+                <div className="text-sm font-medium leading-none text-gray-900">
+                  {subscription.name}
+                </div>
+              )}
 
               {/* Price */}
-              <label htmlFor="price">Price</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              <label
+                htmlFor="price"
+                className="text-sm font-medium leading-none text-gray-600"
+              >
+                Price  
+              </label>
+
+              {(currentMode === 'add' || currentMode === 'edit') && (
                 <input
-                  type="text"
+                  ref={priceRef}
+                  type="text"  
                   name="price"
                   placeholder="Price in EUR"
-                  ref={priceRef}
-                  defaultValue={subscription.price || ""}
+                  defaultValue={subscription?.price}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
-              {currentMode === "show" && <div>{subscription.price}</div>}
+
+              {currentMode === 'show' && (
+                <div className="text-sm font-medium leading-none text-gray-900">
+                  {subscription.price}
+                </div>  
+              )}
 
               {/* Category */}
-              <label htmlFor="category">Category</label>
-              {(currentMode === "add" || currentMode === "edit") && (
-                <Listbox
+              <label
+                htmlFor="category"
+                className="text-sm font-medium leading-none text-gray-600"
+              >
+                Category
+              </label>
+
+              {(currentMode === 'add' || currentMode === 'edit') && (
+                <Listbox 
                   value={selectedCategory}
                   onChange={setSelectedCategory}
-                  as="div"
                   name="category"
                 >
-                  <Listbox.Button className="">
-                    <div className="flex items-center gap-2">
-                      <CategoryIcon icon={selectedCategory.icon} />
-                      <div>{selectedCategory.name}</div>
-                    </div>
+                  <Listbox.Button className="relative cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                    <span className="flex items-center">
+                      <CategoryIcon icon={selectedCategory.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                      <span className="ml-3 block truncate">{selectedCategory.name}</span>
+                    </span>
+                    <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 8.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clipRule="evenodd" />
+                      </svg>
+                    </span>
                   </Listbox.Button>
-                  <Listbox.Options className="absolute mt-1 max-h-60 overflow-auto  rounded-md bg-white p-4 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {categories.map((category) => (
                       <Listbox.Option
                         key={category._id}
                         value={category}
-                        className="cursor-pointer p-2 hover:bg-gray-100"
+                        className="relative cursor-default select-none py-2 pl-3 pr-9"
                       >
-                        <div className="flex items-center gap-2">
-                          <CategoryIcon icon={category.icon} />
-                          <div>{category.name}</div>
-                        </div>
-                      </Listbox.Option>
+                        <span className="flex items-center">
+                          <CategoryIcon icon={category.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                          <span className="ml-3 block font-normal truncate">{category.name}</span>
+                        </span>
+                      </Listbox.Option>  
                     ))}
                   </Listbox.Options>
                 </Listbox>
               )}
-              {currentMode === "show" && (
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CategoryIcon icon={subscription.category.icon} />
-                    <div>{subscription.category.name}</div>
+              
+              {currentMode === 'show' && (
+                <div className="flex items-center">
+                  <CategoryIcon icon={subscription.category.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                  <div className="ml-3 text-sm font-medium leading-none text-gray-900">
+                    {subscription.category.name}
                   </div>
                 </div>
               )}
 
               {/* Billing Cycle */}
-              <label htmlFor="billing_cycle">Billing Cycle</label>
-              {(currentMode === "add" || currentMode === "edit") && (
+              <label
+                htmlFor="billing_cycle"
+                className="text-sm font-medium leading-none text-gray-600"
+              >
+                Billing Cycle
+              </label>
+
+              {(currentMode === 'add' || currentMode === 'edit') && (
                 <Listbox
                   value={selectedBillingCycle}
                   onChange={setSelectedBillingCycle}
-                  as="div"
                   name="billingCycle"
                 >
-                  <Listbox.Button>per {selectedBillingCycle}</Listbox.Button>
+                  <Listbox.Button className="relative cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                    per {selectedBillingCycle}
+                  </Listbox.Button>
 
-                  <Listbox.Options className="absolute mt-1 max-h-60 overflow-auto  rounded-md bg-white p-4 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {billingCycles.map((cycle) => (
                       <Listbox.Option
                         key={cycle}
                         value={cycle}
-                        className="cursor-pointer p-2 hover:bg-gray-100"
+                        className="relative cursor-default select-none py-2 pl-3 pr-9"
                       >
                         per {cycle}
                       </Listbox.Option>
@@ -293,37 +341,69 @@ export default function SubscriptionForm({
                   </Listbox.Options>
                 </Listbox>
               )}
-              {currentMode === "show" && <div>per {subscription.interval}</div>}
-            </div>
 
-            <div className="flex justify-end gap-4">
-              <button onClick={handleDeleteSubscription}>Delete</button>
-              <button onClick={() => setCurrentMode("edit")}>Edit</button>
-
-              {/* Needs to be made nicer */}
-              {currentMode === "edit" && (
-                <>
-                  <button onClick={handleSaveEditSubscription}>Save</button>
-                  <button onClick={() => setCurrentMode("show")}>Cancel</button>
-                </>
+              {currentMode === 'show' && (
+                <div className="text-sm font-medium leading-none text-gray-900">
+                  per {subscription.interval}
+                </div>
               )}
 
-              <button
-                className="button-white-white-instance rounded-md border border-gray-300 bg-white px-4 py-2"
-                onClick={handleClose}
-              >
-                Cancel
-              </button>
-              <button
-                className="button-white-white-instance rounded-md bg-blue-500 px-4 py-2 text-white"
-                onClick={handleAddSubscription}
-              >
-                Add
-              </button>
             </div>
+
+{/* Buttons */}
+<div className="mt-4 flex justify-end gap-2">
+  {currentMode === 'edit' && (
+    <button
+      className="inline-flex justify-center rounded-md bg-red-500 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+      onClick={handleDeleteSubscription}
+    >
+      Delete
+    </button>
+  )}
+
+  {currentMode !== 'edit' && (
+    <button
+      className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      onClick={() => setCurrentMode('edit')}  
+    >
+      Edit
+    </button>
+  )}
+
+  {currentMode === 'edit' && (
+    <>
+      <button
+        className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        onClick={handleSaveEditSubscription}
+      >
+        Save
+      </button>
+
+      <button
+        className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600" 
+        onClick={() => setCurrentMode('show')}
+      >
+        Cancel
+      </button>
+    </>
+  )}
+
+  {currentMode !== 'edit' && (
+    <button
+      className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      onClick={handleAddSubscription}
+    >
+      Add
+    </button>
+  )}
+</div>
           </Dialog.Panel>
-        </Transition.Child>
-      </Dialog>
-    </Transition>
-  );
-}
+          </Dialog.Panel>
+
+        </div>
+      </Transition.Child>
+    </div>
+  </Dialog>
+</Transition>
+);
+              }

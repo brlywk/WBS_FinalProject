@@ -21,7 +21,7 @@ export default function MainContent({
   };
 
   return (
-    <div className="grid grid-cols-4 gap-4 p-4">
+    <div className="grid grid-cols-4 gap-4">
       {" "}
       {/* No changes needed here */}
       {filteredSubscriptions()?.length > 0 &&

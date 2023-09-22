@@ -10,6 +10,8 @@ import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
 import TabNavigation from "../components/TabNavigation";
+import UsageTab from '../components/UsageTab';
+
 
 import useSubscription from "../hooks/useSubscription";
 import useDashboard from "../hooks/useDashboard";
@@ -27,6 +29,11 @@ function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [subscriptions, setSubscriptions] = useState(null);
   const [categories, setCategories] = useState(null);
+
+// USAGE
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
 
   // ---- CUSTOM HOOKS ----
   const { getAllSubscriptions } = useSubscription();
@@ -157,7 +164,7 @@ function Dashboard() {
                   {/* Add Subscription Button */}
                   <button
                     onClick={() => setIsAddSubscriptionOpen(true)}
-                    className="bg-black/25 p-4 hover:bg-black hover:text-white"
+                    className="bg-black text-white rounded p-4 hover:bg-black hover:text-white"
                   >
                     Add Subscription
                   </button>
@@ -166,11 +173,11 @@ function Dashboard() {
                   <SidebarTop className="w-full p-2" />
 
                   {/* Categories */}
-                  <Sidebar categories={categories} className="w-full p-2" />
+                  <Sidebar categories={categories} className="" />
                 </div>
 
                 {/* Main Content */}
-                <div className="w-full bg-white/25">
+                <div className="container mx-auto px-4 bg-white/25">
                   {loading && <Loading />}
 
                   {!loading && error && <ErrorDisplay message={errorMessage} />}
@@ -180,49 +187,51 @@ function Dashboard() {
                     dashboardData &&
                     categories?.length > 0 &&
                     subscriptions?.length > 0 && (
-                      <TabNavigation
-                        tabs={[
-                          {
-                            name: "Dashboard",
-                            element: (
-                              <div className="grid w-full gap-4">
-                                <Stats
-                                  dashboardData={dashboardData}
-                                  totalSubscriptions={subscriptions.length}
-                                />
+                      <div className=" ">
+                        <TabNavigation
+                          tabs={[
+                            {
+                              name: "Dashboard",
+                              element: (
+                                <div className="">
+                                  <Stats
+                                    dashboardData={dashboardData}
+                                    totalSubscriptions={subscriptions.length}
+                                  />
+                                  <MainContent
+                                    subscriptions={subscriptions}
+                                    categories={categories}
+                                  />
+                                </div>
+                              ),
+                            },
+                            {
+                              name: "Active",
+                              element: (
                                 <MainContent
                                   subscriptions={subscriptions}
                                   categories={categories}
+                                  filter="active"
                                 />
-                              </div>
-                            ),
-                          },
-                          {
-                            name: "Active",
-                            element: (
-                              <MainContent
-                                subscriptions={subscriptions}
-                                categories={categories}
-                                filter="active"
-                              />
-                            ),
-                          },
-                          {
-                            name: "Inactive",
-                            element: (
-                              <MainContent
-                                subscriptions={subscriptions}
-                                categories={categories}
-                                filter="inactive"
-                              />
-                            ),
-                          },
-                          {
-                            name: "Usage",
-                            element: <div>Usage</div>,
-                          },
-                        ]}
-                      />
+                              ),
+                            },
+                            {
+                              name: "Inactive",
+                              element: (
+                                <MainContent
+                                  subscriptions={subscriptions}
+                                  categories={categories}
+                                  filter="inactive"
+                                />
+                              ),
+                            },
+                            {
+                              name: "Usage",
+                              element: <UsageTab openModal={openModal} />
+                            },
+                          ]}
+                        />
+                      </div>
                     )}
                 </div>
               </div>
@@ -245,3 +254,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

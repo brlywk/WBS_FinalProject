@@ -124,6 +124,14 @@ font-size: 50px;
 
 }
 
+.logo {
+	width: 15%;
+  }
+
+  .userButtonWrapper {
+	padding-top: 20px;
+  }
+  
 .homepage .box svg path {
 	fill: blue;
 }
@@ -156,7 +164,7 @@ font-size: 50px;
 
 .homepage .box {
 	width: 100%;
-	background: hsl(0 0% 100%);
+	background: hsla(0, 0%, 100%, 0.192);
 	border-radius: 2rem;
 	display: grid;
 	grid-template-columns: 0.6fr 0.4fr;
@@ -392,7 +400,6 @@ font-size: 50px;
 }
 
 .homepage nav img {
-	height: 50%;
 	justify-self: start;
 }
 

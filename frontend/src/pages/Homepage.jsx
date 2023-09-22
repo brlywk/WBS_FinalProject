@@ -15,22 +15,24 @@ export default function Homepage() {
       </head>
 
       <nav>
-        <div className={styles.nav__content}>
-          <img src="/public/subzero_logo_og.svg" alt="Subzero Logo" />
+  <div className={styles.nav__content}>
+    <img src="/public/subzero_logo_og.svg" alt="Subzero Logo" className={styles.logo} />
 
-          <SignedOut>
-            <Link to="/signup" className={styles.button}>SIGN UP</Link>
-            <Link to="/login" className={styles.button}>SIGN IN</Link>
-          </SignedOut>
+    <SignedOut>
+      <Link to="/signup" className={styles.button}>SIGN UP</Link>
+      <Link to="/login" className={styles.button}>SIGN IN</Link>
+    </SignedOut>
 
-          <SignedIn>
-            <div className={styles.flex}>
-              <UserButton />
-              <LogoutButton />
-            </div>
-          </SignedIn>
+    <SignedIn>
+      <div className={styles.flex}>
+        <div className={styles.userButtonWrapper}>
+          <UserButton />
         </div>
-      </nav>
+        <LogoutButton />
+      </div>
+    </SignedIn>
+  </div>
+</nav>
 
       <main>
         <section>

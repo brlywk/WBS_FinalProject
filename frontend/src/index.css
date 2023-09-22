@@ -3,8 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 @layer components {
-  .dashboard .gradient-bg {
-    background: linear-gradient(to right, rgba(245, 243, 244, 0.022), rgba(59, 131, 246, 0.028), rgba(128, 0, 128, 0.1), rgba(245, 243, 244, 0.018)),
+  .gradient-bg {
+    background: linear-gradient(to right, rgba(245, 243, 244, 0.022), rgba(59, 131, 246, 0.441), rgba(128, 0, 128, 0.1), rgba(245, 243, 244, 0.018)),
       radial-gradient(circle at 10% 20%, rgba(245, 243, 244, 0.032), rgba(59, 131, 246, 0.022), rgba(128, 0, 128, 0.029), rgba(245, 243, 244, 0.028));
     background-size: 800% 800%, 100% 100%;
     animation: gradient 120s ease infinite;
@@ -23,3 +23,16 @@
   }
 }
 
+/* Desktop */
+@media (min-width: 1024px) {
+  .dashboard {
+    width: 1024px; 
+  }
+}
+
+/* Mobile */ 
+@media (max-width: 640px) {
+  .dashboard {
+    width: 100%;
+  }
+}
