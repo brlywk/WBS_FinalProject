@@ -4,6 +4,7 @@ import subscriptionUsageRouter from "./_subscriptionUsageRouter.js";
 import usageRouter from "./_usageRouter.js";
 import dashboardDataRouter from "./_dashboardDataRouter.js";
 import searchRouter from "./_searchRouter.js";
+import notificationRouter from "./_notificatonRouter.js";
 
 import { Router } from "express";
 
@@ -26,5 +27,8 @@ apiRouter.use("/dashboard", dashboardDataRouter);
 
 // ---- ROUTE: /api/search
 apiRouter.use("/search", searchRouter);
+
+// ---- ROUTE: /notifications
+apiRouter.use("/notifications", notificationRouter);
 
 export default apiRouter;

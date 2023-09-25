@@ -5,6 +5,14 @@ export default function useAuthRequest() {
 
   async function startRequest(url, method, abortController, body = {}) {
     if (!method || !url || !abortController) {
+      console.log(
+        "Method:",
+        method,
+        "URL:",
+        url,
+        "Abort Controller",
+        abortController,
+      );
       throw new Error("Invalid arguments");
     }
 
