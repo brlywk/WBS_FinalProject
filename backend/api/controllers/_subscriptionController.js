@@ -1,4 +1,7 @@
 import Subscription from "../models/_subscriptionSchema.js";
+import Notification from "../models/_notificatonSchema.js";
+import Usage from "../models/_usageSchema.js";
+import { startSession } from "mongoose";
 
 // ---- GET /api/subscriptions ----
 export async function getAllSubscriptions(req, res, next) {
@@ -15,10 +18,6 @@ export async function getAllSubscriptions(req, res, next) {
   const subscriptions = await Subscription.find({ userId }).populate(
     "category",
   );
-
-  if (!subscriptions) {
-    return res.status(404).send("No subscriptions found.");
-  }
 
   res.status(200).json(subscriptions);
 }
@@ -54,7 +53,16 @@ export async function postSubscription(req, res, next) {
     "host",
   )}/api/subscriptions/${newSubId}`;
 
-  console.log(location);
+  // Create notification today + 1 week for usage
+  const { _id: newNotificationId } = await Notification.create({
+    userId,
+    type: "usage",
+    subscriptionId: newSubId,
+  });
+
+  if (!newNotificationId) {
+    console.warn(`Unable to create notification for subscription ${newSubId}`);
+  }
 
   res.status(201).location(location).end();
 }
@@ -140,6 +148,31 @@ export async function deleteSubscriptionById(req, res, next) {
   }
 
   if (result.acknowledged) {
+    // if deleted successfully, we also need to delete all related information:
+    // Usages
+    // Notifications
+    const deleteSession = await startSession();
+    deleteSession.startTransaction();
+
+    try {
+      await Usage.deleteMany({ subscriptionId: id, userId }, { deleteSession });
+      await Notification.deleteMany(
+        { subscriptionId: id, userId },
+        { deleteSession },
+      );
+
+      await deleteSession.commitTransaction();
+      deleteSession.endSession();
+    } catch (error) {
+      await deleteSession.abortTransaction();
+      deleteSession.endSession();
+
+      console.error(
+        `Error during deletion of related information for subscription ${id}`,
+        error,
+      );
+    }
+
     return res.status(204).end();
   }
 }

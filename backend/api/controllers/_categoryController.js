@@ -6,10 +6,6 @@ export async function getAllCategories(req, res, next) {
 
   const categories = await Category.find({});
 
-  if (!categories) {
-    return res.status(404).send("No categories found.");
-  }
-
   res.status(200).json(categories);
 }
 

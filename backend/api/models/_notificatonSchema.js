@@ -6,8 +6,9 @@ const Schema = mongoose.Schema;
 const notificationSchema = new Schema(
   {
     userId: { type: String, required: true },
-    type: { type: String, required: true }, // usage, cancel?
+    type: { type: String, required: true, enum: ["usage", "cancel"] }, // usage, cancel?
     sent: { type: Boolean, required: true, default: false },
+    deliveries: { type: Number, default: 0 },
     subscriptionId: {
       type: Schema.Types.ObjectId,
       ref: Subscription,
