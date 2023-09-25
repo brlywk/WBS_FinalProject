@@ -11,6 +11,7 @@ import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
 import TabNavigation from "../components/TabNavigation";
+import UsageTab from "../components/UsageTab";
 
 import useDataFetching from "../hooks/useDataFetching";
 import eventEmitter from "../utils/EventEmitter";
@@ -33,7 +34,7 @@ function Dashboard() {
     showForm: false,
   });
 
-// USAGE
+  // USAGE
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -176,7 +177,7 @@ function Dashboard() {
                     {/* Add Subscription Button */}
                     <button
                       onClick={handleAddSubscriptionClick}
-                      className="bg-black text-white rounded p-4 hover:bg-black hover:text-white"
+                      className="rounded bg-black p-4 text-white hover:bg-black hover:text-white"
                     >
                       Add Subscription
                     </button>
@@ -213,7 +214,7 @@ function Dashboard() {
                           },
                           {
                             name: "Usage",
-                            element: <UsageTab openModal={openModal} />
+                            element: <UsageTab openModal={openModal} />,
                           },
                         ]}
                       />
@@ -270,4 +271,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-
