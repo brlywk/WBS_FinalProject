@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { UserButton } from "@clerk/clerk-react";
+import { useParams } from "react-router-dom";
 
 import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -10,25 +11,27 @@ import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
 import TabNavigation from "../components/TabNavigation";
-import UsageTab from '../components/UsageTab';
 
-
-import useSubscription from "../hooks/useSubscription";
-import useDashboard from "../hooks/useDashboard";
-import useCategory from "../hooks/useCategory";
+import useDataFetching from "../hooks/useDataFetching";
+import eventEmitter from "../utils/EventEmitter";
+import { useDataContext } from "../contexts/dataContext";
 
 function Dashboard() {
+  // ---- CONTEXT ----
+  const {
+    subscriptions,
+    allCategories,
+    usedCategories,
+    usages,
+    dashboardData,
+  } = useDataContext();
+
   // ---- STATE ----
-  const [loading, setLoading] = useState();
-  const [error, setError] = useState();
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
-  const [isTestShowSub, setTestShowSub] = useState(false);
-
-  const [dashboardData, setDashboardData] = useState(null);
-  const [subscriptions, setSubscriptions] = useState(null);
-  const [categories, setCategories] = useState(null);
+  const [subscriptionFormState, setSubscriptionFormState] = useState({
+    mode: null,
+    subscription: {},
+    showForm: false,
+  });
 
 // USAGE
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,217 +39,230 @@ function Dashboard() {
   const openModal = () => setIsModalOpen(true);
 
   // ---- CUSTOM HOOKS ----
-  const { getAllSubscriptions } = useSubscription();
-  const { getDashboardData } = useDashboard();
-  const { getAllCategories } = useCategory();
+  const { loading, error, errorMessage, refetchData } = useDataFetching();
+  const { pageId } = useParams();
 
+  // ---- Event Callbacks ----
+
+  function openSubscriptionFormCallback(subscription, mode) {
+    setSubscriptionFormState({
+      mode,
+      subscription,
+      showForm: true,
+    });
+  }
+
+  function switchFormModeCallback(mode) {
+    setSubscriptionFormState((prev) => {
+      return {
+        ...prev,
+        mode,
+      };
+    });
+  }
+
+  // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
     const abortController = new AbortController();
 
-    setLoading(true);
-    setError(false);
-    setErrorMessage("");
-
-    async function fetchData() {
-      try {
-        const [subs, dashData, cats] = await Promise.all([
-          getAllSubscriptions(abortController),
-          getDashboardData(abortController),
-          getAllCategories(abortController),
-        ]);
-
-        setDashboardData(dashData);
-        setSubscriptions(subs);
-        setCategories(cats);
-      } catch (error) {
-        setError(true);
-        setErrorMessage(error.message);
-      }
-      setLoading(false);
-      setErrorMessage("");
+    // Need this one in here for the abort controller
+    function refetchCallback() {
+      refetchData(abortController);
     }
 
-    fetchData();
+    // register event listeners
+    eventEmitter.on("refetchData", refetchCallback);
+    eventEmitter.on("openSubscriptionForm", openSubscriptionFormCallback);
+    eventEmitter.on("changeFormMode", switchFormModeCallback);
 
-    return () => abortController.abort();
+    // TODO: more robust implementation
+    document.body.style.background =
+      "linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 2% 5%, #f5f3f4, #3b82f6, #800080, #f5f3f4)";
+    document.body.style.backgroundSize = "500% 500%, 100% 100%";
+    document.body.style.animation = "gradient 60s ease infinite";
+
+    return () => {
+      abortController.abort();
+      eventEmitter.off("refetchData", refetchCallback);
+      eventEmitter.off("openSubscriptionForm", openSubscriptionFormCallback);
+      eventEmitter.off("changeFormMode", switchFormModeCallback);
+    };
   }, []);
 
-  // We need to refetch after all operations...
-  async function refetchData() {
-    const abortController = new AbortController();
-    setLoading(true);
-    setSubscriptions(null);
-    setDashboardData(null);
-    setError(false);
-    setErrorMessage("");
-
-    try {
-      const [subs, dashData] = await Promise.all([
-        getAllSubscriptions(abortController),
-        getAllCategories(abortController),
-      ]);
-      setDashboardData(dashData);
-      setSubscriptions(subs);
-    } catch (error) {
-      setError(true);
-      setErrorMessage(error.message);
-    } finally {
-      setLoading(false);
-      setErrorMessage("");
-    }
+  // ---- MORE FUNCTIONS ----
+  // open subscription form with an empty subscription
+  function handleAddSubscriptionClick() {
+    setSubscriptionFormState({
+      mode: "add",
+      subscription: {},
+      showForm: true,
+    });
   }
 
-  // TODO: Right now this always refetches when the form closes... \
-  // We need to add a way to check if a subscription has actually been added
-  function handleSubscriptionAdded() {
-    setIsAddSubscriptionOpen(false);
+  // quick helper function to keep JSX less cluttered
+  function checkDataLoadingSuccessful() {
+    const loadingSuccessful =
+      subscriptions?.length > 0 &&
+      usedCategories?.length > 0 &&
+      allCategories?.length > 0 &&
+      Object.keys(dashboardData).length > 0 &&
+      usages?.length > 0;
 
-    refetchData();
+    return loadingSuccessful;
   }
 
   // Main return block for the Dashboard component
   return (
     <>
-      <div className="flex h-full w-full flex-col items-center p-4">
-        {/* Top bar with logo and search */}
-        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
-          {/* Logo */}
-          <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+      {loading && <Loading />}
 
-          {/* Search Bar */}
-          <div className="flex w-full justify-center">
-            <SearchModal />
+      {!loading && error && <ErrorDisplay message={errorMessage} />}
+
+      {!loading && !error && checkDataLoadingSuccessful() && (
+        <div className="flex h-full w-full flex-col items-center p-4">
+          {/* Top bar with logo and search */}
+          <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+            {/* Logo */}
+            <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+
+            {/* Search Bar */}
+            <div className="flex w-full justify-center">
+              <SearchModal />
+            </div>
           </div>
-        </div>
 
-        {/* App content */}
-        <div className="flex w-3/5 flex-row items-center justify-between gap-4">
-          <div className="col-start-2 pt-8">
-            <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
-              {/* Title Bar */}
-              <div className="flex items-center gap-4 p-4">
-                {/* Title */}
-                <div className="w-full text-lg font-bold uppercase">
-                  Dashboard
-                </div>
-
-                {/* Notification */}
-                <div>
-                  <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
-                    <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
-                      2
-                    </div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="h-6 w-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                      />
-                    </svg>
+          {/* App content */}
+          <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+            <div className="col-start-2 pt-8">
+              <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+                {/* Title Bar */}
+                <div className="flex items-center gap-4 p-4">
+                  {/* Title */}
+                  <div className="w-full text-lg font-bold uppercase">
+                    Dashboard
                   </div>
-                </div>
 
-                {/* User Icon */}
-                <UserButton />
-              </div>
-
-              {/* Content Area */}
-              <div className="flex w-full flex-row divide-x divide-black/25">
-                {/* Sidebar Content */}
-                <div className="flex flex-col divide-y divide-black/25">
-                  {/* Add Subscription Button */}
-                  <button
-                    onClick={() => setIsAddSubscriptionOpen(true)}
-                    className="bg-black text-white rounded p-4 hover:bg-black hover:text-white"
-                  >
-                    Add Subscription
-                  </button>
-
-                  {/* Overview, Recommendations, Cancel */}
-                  <SidebarTop className="w-full p-2" />
-
-                  {/* Categories */}
-                  <Sidebar categories={categories} className="" />
-                </div>
-
-                {/* Main Content */}
-                <div className="container mx-auto px-4 bg-white/25">
-                  {loading && <Loading />}
-
-                  {!loading && error && <ErrorDisplay message={errorMessage} />}
-
-                  {!loading &&
-                    !error &&
-                    dashboardData &&
-                    categories?.length > 0 &&
-                    subscriptions?.length > 0 && (
-                      <div className=" ">
-                        <TabNavigation
-                          tabs={[
-                            {
-                              name: "Dashboard",
-                              element: (
-                                <div className="">
-                                  <Stats
-                                    dashboardData={dashboardData}
-                                    totalSubscriptions={subscriptions.length}
-                                  />
-                                  <MainContent
-                                    subscriptions={subscriptions}
-                                    categories={categories}
-                                  />
-                                </div>
-                              ),
-                            },
-                            {
-                              name: "Active",
-                              element: (
-                                <MainContent
-                                  subscriptions={subscriptions}
-                                  categories={categories}
-                                  filter="active"
-                                />
-                              ),
-                            },
-                            {
-                              name: "Inactive",
-                              element: (
-                                <MainContent
-                                  subscriptions={subscriptions}
-                                  categories={categories}
-                                  filter="inactive"
-                                />
-                              ),
-                            },
-                            {
-                              name: "Usage",
-                              element: <UsageTab openModal={openModal} />
-                            },
-                          ]}
-                        />
+                  {/* Notification */}
+                  <div>
+                    <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
+                      <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+                        2
                       </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* User Icon */}
+                  <UserButton />
+                </div>
+
+                {/* Content Area */}
+                <div className="flex w-full flex-row divide-x divide-black/25">
+                  {/* Sidebar Content */}
+                  <div className="flex flex-col divide-y divide-black/25">
+                    {/* Add Subscription Button */}
+                    <button
+                      onClick={handleAddSubscriptionClick}
+                      className="bg-black text-white rounded p-4 hover:bg-black hover:text-white"
+                    >
+                      Add Subscription
+                    </button>
+
+                    {/* Overview, Recommendations, Cancel */}
+                    <SidebarTop className="w-full p-2" />
+
+                    {/* Categories */}
+                    <Sidebar className="" />
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="w-full bg-white/25">
+                    {/* Main Dashboard View */}
+                    {!pageId && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Dashboard",
+                            element: (
+                              <div className="grid w-full gap-4">
+                                <Stats />
+                                <MainContent />
+                              </div>
+                            ),
+                          },
+                          {
+                            name: "Active",
+                            element: <MainContent filter="active" />,
+                          },
+                          {
+                            name: "Inactive",
+                            element: <MainContent filter="inactive" />,
+                          },
+                          {
+                            name: "Usage",
+                            element: <UsageTab openModal={openModal} />
+                          },
+                        ]}
+                      />
                     )}
+
+                    {/* Recommendations / Cancel */}
+                    {(pageId === "recommendations" || pageId === "cancel") && (
+                      <TabNavigation
+                        tabs={[
+                          {
+                            name: "Recommendations",
+                            element: (
+                              <div className="w-full">Recommendations</div>
+                            ),
+                          },
+                          {
+                            name: "Cancel",
+                            element: (
+                              <div className="w-full">Recommendations</div>
+                            ),
+                          },
+                        ]}
+                        initialTabIndex={pageId === "recommendations" ? 0 : 1}
+                      />
+                    )}
+
+                    {/* Category Pages */}
+                    {pageId &&
+                      pageId !== "recommendations" &&
+                      pageId !== "cancel" && <MainContent filter={pageId} />}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Subscription Add Form */}
-      {categories?.length > 0 && (
+      {!loading && !error && checkDataLoadingSuccessful() && (
         <SubscriptionForm
-          mode="add"
-          categories={categories}
-          opened={isAddSubscriptionOpen}
-          onClose={handleSubscriptionAdded}
+          mode={subscriptionFormState.mode}
+          subscription={subscriptionFormState.subscription}
+          opened={subscriptionFormState.showForm}
+          onClose={() =>
+            setSubscriptionFormState((prev) => {
+              return { ...prev, showForm: false };
+            })
+          }
         />
       )}
     </>

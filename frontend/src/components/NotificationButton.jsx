@@ -1,13 +1,10 @@
 import CategoryIcon from "./CategoryIcon";
+import { Link } from "react-router-dom";
 
-export default function CategoryButton({
-  category,
-  clickHandler,
-  notifications = 2,
-}) {
+export default function CategoryButton({ category, to, notifications = 2 }) {
   return (
-    <button
-      onClick={clickHandler}
+    <Link
+      to={to}
       className="relative flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:bg-gray-100"
     >
       <CategoryIcon icon={category.icon} />
@@ -17,6 +14,6 @@ export default function CategoryButton({
           {notifications}
         </div>
       )}
-    </button>
+    </Link>
   );
 }

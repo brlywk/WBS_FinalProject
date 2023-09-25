@@ -1,7 +1,7 @@
 export default function CategoryIcon({ icon, iconSize = 6 }) {
   const adjustedIcon = {
     ...icon,
-    d: icon.path,
+    d: icon?.path,
     path: undefined,
   };
 

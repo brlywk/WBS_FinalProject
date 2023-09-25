@@ -1,56 +1,46 @@
 import { Dialog, Listbox, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import CategoryIcon from "./CategoryIcon";
+import { Fragment, useRef, useState } from "react";
+import { useDataContext } from "../contexts/dataContext";
 import useSubscription from "../hooks/useSubscription";
+import eventEmitter from "../utils/EventEmitter";
+import CategoryIcon from "./CategoryIcon";
 
 export default function SubscriptionForm({
-  mode = "show",
+  mode,
+  subscription,
   opened,
   onClose,
-  subscription = {},
-  categories,
 }) {
+  // ---- Data Context ----
+  const { allCategories } = useDataContext();
+
   // ---- Some settings ----
   const billingCycles = ["month", "year"];
   const noneCategoryId = "65085704f18207c1481e6642";
 
-  // This feels very hack-y... might need to refactor everything to use a context
-  const setInitialCategory = () => {
-    if (mode === "add") {
-      return categories.find((c) => c._id === noneCategoryId);
-    } else {
-      return subscription.category;
-    }
-  };
-
-  const setInitialBillingCycle = () => {
-    if (mode === "add") {
-      return "month";
-    } else {
-      return subscription.interval;
-    }
-  };
-
   // ---- State ----
   const [selectedCategory, setSelectedCategory] = useState(
-    setInitialCategory(),
+    subscription?.category ??
+      allCategories.find((c) => c._id === noneCategoryId),
   );
   const [selectedBillingCycle, setSelectedBillingCycle] = useState(
-    setInitialBillingCycle(),
+    subscription?.interval ?? "month",
   );
-  const [currentMode, setCurrentMode] = useState(mode);
-  const [openSubscription, setOpenSubscription] = useState(subscription);
   const [working, setWorking] = useState();
 
-  // ---- Custom hooks ----
+  // ---- HOOKS ----
   const { createSubscription, updateSubscription, deleteSubscription } =
     useSubscription();
 
-  // ---- Refs ----
+  // ---- REFS ----
   const nameRef = useRef();
   const priceRef = useRef();
 
-  // ---- Functions ----
+  // ---- FUNCTIONS ----
+  // switch to another form mode
+  function switchMode(mode) {
+    eventEmitter.emit("changeFormMode", mode);
+  }
 
   // create temp. subscription from current form data
   function createSubscriptionDataFromForm() {
@@ -98,11 +88,10 @@ export default function SubscriptionForm({
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
     onClose();
-
-    // TODO: Reset Form Data once saving is successful
   }
 
   // Change in edit mode needs to be saved
@@ -122,12 +111,11 @@ export default function SubscriptionForm({
         updatedSubscription,
         abortController,
       );
-
-      console.log(subscriptionUpdate);
     } catch (error) {
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
     onClose();
@@ -154,108 +142,86 @@ export default function SubscriptionForm({
       alert(error.message);
     } finally {
       setWorking(false);
+      eventEmitter.emit("refetchData");
     }
 
     onClose();
   }
 
-  // close form handler, we need this because we otherwise don't exit edit mode
-  function handleClose() {
-    console.log("Close", mode);
-    setCurrentMode(mode);
-    onClose();
-  }
+  return (
+    <Transition show={opened} as={Fragment} className="w-full">
+      <Dialog
+        className="fixed inset-0 z-10 flex items-center justify-center"
+        open={opened}
+        onClose={onClose}
+      >
+        {/* Backdrop overlay */}
+        <Transition.Child
+          as={Fragment}
+          enter="w-full duration-200"
+          enterFrom="scale-100 opacity-0"
+          enterTo="scale-100 opacity-100"
+          leave="duration-200 ease-in"
+          leaveFrom="scale-100 opacity-100"
+          leaveTo="scale-100 opacity-0"
+        >
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur" />
+        </Transition.Child>
 
- return (
-    <Transition appear show={opened} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={onClose}>
-        <div className="min-h-screen px-4 text-center">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-25 backdrop-filter backdrop-blur-md" />
-          </Transition.Child>
-          <span
-            className="inline-block h-full align-middle"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
-          >
-            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-              <Dialog.Panel>
-                {/* Title */}
-                <Dialog.Title 
-  className="text-lg font-medium leading-6 text-gray-900 text-center"
->
-  {currentMode === 'add' ? 'Add Subscription' : `${currentMode} Subscription`}
-</Dialog.Title>
-                <Dialog.Panel>
+        {/* Dialog Content */}
+        <Transition.Child
+          enter="duration-200 ease-out"
+          enterFrom="scale-95 opacity-0"
+          enterTo="flex w-full scale-100 justify-center opacity-100"
+          leave="duration-200 ease-in"
+          leaveFrom="flex w-full scale-100 justify-center opacity-100"
+          leaveTo="flex w-full scale-95 justify-center opacity-0"
+        >
+          <Dialog.Panel className="z-20 rounded-lg bg-white p-4">
+            {/* Title Bar */}
+            <Dialog.Title className="text-xl font-bold uppercase">
+              {mode} Subscription
+            </Dialog.Title>
 
-            {/* Form */}
-            <div className="mt-2 grid grid-cols-1 gap-y-4 gap-x-8 sm:grid-cols-2">
-              
-              {/* Name */}
-              <label 
-                htmlFor="name"
-                className="text-sm font-medium leading-none text-gray-600"
-              >
-                Name
-              </label>
-
-              {(currentMode === 'add' || currentMode === 'edit') && (
+            {/* Subscription Form */}
+            <div className="grid grid-cols-[max-content_1fr] gap-4">
+              {/* Subscription Name */}
+              <label htmlFor="name">Name</label>
+              {(currentMode === "add" || currentMode === "edit") && (
                 <input
                   ref={nameRef}
                   type="text"
                   name="name"
                   placeholder="Subscription Name"
+                  ref={nameRef}
                   defaultValue={subscription?.name}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
 
-              {currentMode === 'show' && (
+              {mode === 'show' && (
                 <div className="text-sm font-medium leading-none text-gray-900">
-                  {subscription.name}
+                  {subscription?.name}
                 </div>
               )}
 
               {/* Price */}
-              <label
-                htmlFor="price"
-                className="text-sm font-medium leading-none text-gray-600"
-              >
-                Price  
-              </label>
-
-              {(currentMode === 'add' || currentMode === 'edit') && (
+              <label htmlFor="price">Price</label>
+              {(currentMode === "add" || currentMode === "edit") && (
                 <input
                   ref={priceRef}
                   type="text"  
                   name="price"
                   placeholder="Price in EUR"
+                  ref={priceRef}
                   defaultValue={subscription?.price}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
 
-              {currentMode === 'show' && (
+              {mode === 'show' && (
                 <div className="text-sm font-medium leading-none text-gray-900">
-                  {subscription.price}
+                  {subscription?.price}
                 </div>  
               )}
 
@@ -267,7 +233,7 @@ export default function SubscriptionForm({
                 Category
               </label>
 
-              {(currentMode === 'add' || currentMode === 'edit') && (
+              {(mode === 'add' || mode === 'edit') && (
                 <Listbox 
                   value={selectedCategory}
                   onChange={setSelectedCategory}
@@ -275,8 +241,8 @@ export default function SubscriptionForm({
                 >
                   <Listbox.Button className="relative cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                     <span className="flex items-center">
-                      <CategoryIcon icon={selectedCategory.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                      <span className="ml-3 block truncate">{selectedCategory.name}</span>
+                      <CategoryIcon icon={selectedCategory?.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                      <span className="ml-3 block truncate">{selectedCategory?.name}</span>
                     </span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
                       <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -285,15 +251,15 @@ export default function SubscriptionForm({
                     </span>
                   </Listbox.Button>
                   <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {categories.map((category) => (
+                    {allCategories?.map((category) => (
                       <Listbox.Option
                         key={category._id}
                         value={category}
                         className="relative cursor-default select-none py-2 pl-3 pr-9"
                       >
                         <span className="flex items-center">
-                          <CategoryIcon icon={category.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                          <span className="ml-3 block font-normal truncate">{category.name}</span>
+                          <CategoryIcon icon={category?.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                          <span className="ml-3 block font-normal truncate">{category?.name}</span>
                         </span>
                       </Listbox.Option>  
                     ))}
@@ -301,11 +267,11 @@ export default function SubscriptionForm({
                 </Listbox>
               )}
               
-              {currentMode === 'show' && (
+              {mode === 'show' && (
                 <div className="flex items-center">
-                  <CategoryIcon icon={subscription.category.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                  <CategoryIcon icon={subscription?.category?.icon} className="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
                   <div className="ml-3 text-sm font-medium leading-none text-gray-900">
-                    {subscription.category.name}
+                    {subscription?.category?.name}
                   </div>
                 </div>
               )}
@@ -318,7 +284,7 @@ export default function SubscriptionForm({
                 Billing Cycle
               </label>
 
-              {(currentMode === 'add' || currentMode === 'edit') && (
+              {(mode === 'add' || mode === 'edit') && (
                 <Listbox
                   value={selectedBillingCycle}
                   onChange={setSelectedBillingCycle}
@@ -342,9 +308,9 @@ export default function SubscriptionForm({
                 </Listbox>
               )}
 
-              {currentMode === 'show' && (
+              {mode === 'show' && (
                 <div className="text-sm font-medium leading-none text-gray-900">
-                  per {subscription.interval}
+                  per {subscription?.interval}
                 </div>
               )}
 
@@ -352,7 +318,7 @@ export default function SubscriptionForm({
 
 {/* Buttons */}
 <div className="mt-4 flex justify-end gap-2">
-  {currentMode === 'edit' && (
+  {mode === 'edit' && (
     <button
       className="inline-flex justify-center rounded-md bg-red-500 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
       onClick={handleDeleteSubscription}
@@ -361,16 +327,16 @@ export default function SubscriptionForm({
     </button>
   )}
 
-  {currentMode !== 'edit' && (
+  {mode !== 'edit' && (
     <button
       className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      onClick={() => setCurrentMode('edit')}  
+      onClick={() => switchMode('edit')}  
     >
       Edit
     </button>
   )}
 
-  {currentMode === 'edit' && (
+  {mode === 'edit' && (
     <>
       <button
         className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -381,14 +347,14 @@ export default function SubscriptionForm({
 
       <button
         className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600" 
-        onClick={() => setCurrentMode('show')}
+        onClick={() => onClose()}
       >
         Cancel
       </button>
     </>
   )}
 
-  {currentMode !== 'edit' && (
+  mode !== 'edit' && (
     <button
       className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       onClick={handleAddSubscription}

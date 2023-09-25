@@ -1,14 +1,11 @@
-// Stats.jsx
 import StatsCard from "./StatsCard";
+import { useDataContext } from "../contexts/dataContext";
 
-export default function Stats({ totalSubscriptions, dashboardData }) {
-  if (
-    !dashboardData.totalCostPerMonth ||
-    !dashboardData.potentialMonthlySavings ||
-    !dashboardData.mostUsed.name ||
-    !totalSubscriptions
-  )
-    return;
+export default function Stats() {
+  const { subscriptions, dashboardData } = useDataContext();
+
+  if (!Object.keys(dashboardData).length > 0) return;
+  const totalSubscriptions = subscriptions?.length ?? 0;
 
   return (
     <div className="flex items-center justify-around">
