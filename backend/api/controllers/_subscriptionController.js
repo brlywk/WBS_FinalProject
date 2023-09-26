@@ -1,12 +1,13 @@
 import Subscription from "../models/_subscriptionSchema.js";
 import Notification from "../models/_notificatonSchema.js";
 import Usage from "../models/_usageSchema.js";
+import { fullSubscriptionData } from "../data/_aggregates.js";
 import { startSession } from "mongoose";
 
 // ---- GET /api/subscriptions ----
 export async function getAllSubscriptions(req, res, next) {
   // NOTE: Let's assume for now that users don't have more than a hundred
-  // subscriptions, so we can rather safely forgoe pagination for now
+  // subscriptions, so we can rather safely forgoe pagination
   const { userId } = req.auth;
 
   console.info(
@@ -15,9 +16,15 @@ export async function getAllSubscriptions(req, res, next) {
     userId,
   );
 
-  const subscriptions = await Subscription.find({ userId }).populate(
-    "category",
-  );
+  // NOTE: We will rarely if ever need to only get subscription data, so let's
+  // always fetch 'supscription data plus'
+  const fullDataAggregate = fullSubscriptionData(userId);
+
+  const subscriptions = await Subscription.aggregate(fullDataAggregate);
+
+  // const subscriptions = await Subscription.find({ userId }).populate(
+  //   "category",
+  // );
 
   res.status(200).json(subscriptions);
 }
