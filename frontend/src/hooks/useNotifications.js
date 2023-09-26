@@ -16,5 +16,16 @@ export default function useNotifications() {
     );
   }
 
-  return { getAllNotifications };
+  /**
+   * Returns an updated notification that has been set inactive
+   */
+  async function getAndUpdateNotificationById(id, abortController) {
+    return await startRequest(
+      ApiEndpoints.notificationById(id),
+      "get",
+      abortController,
+    );
+  }
+
+  return { getAllNotifications, getAndUpdateNotificationById };
 }

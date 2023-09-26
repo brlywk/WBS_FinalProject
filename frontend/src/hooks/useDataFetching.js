@@ -4,6 +4,7 @@ import useCategory from "./useCategory";
 import useDashboard from "./useDashboard";
 import useSubscription from "./useSubscription";
 import useSubscriptionUsage from "./useSubscriptionUsage";
+import useNotifications from "./useNotifications";
 
 export default function useDataFetching() {
   // ---- Data Context ----
@@ -12,6 +13,7 @@ export default function useDataFetching() {
     setAllCategories,
     setUsedCategories,
     setDashboardData,
+    setNotifications,
   } = useDataContext();
 
   // ---- Data Fetching ----
@@ -19,6 +21,7 @@ export default function useDataFetching() {
   const { getAllCategories, getUsedCategories } = useCategory();
   const { getDashboardData } = useDashboard();
   const { getAllSubscriptionUsage } = useSubscriptionUsage();
+  const { getAllNotifications } = useNotifications();
 
   // ---- State ----
   const [loading, setLoading] = useState(false);
@@ -39,10 +42,12 @@ export default function useDataFetching() {
           fetchedSubscriptions,
           fetchedDashboardData,
           fetchedUsedCategories,
+          fetchedNotifications,
         ] = await Promise.all([
           getAllSubscriptions(abortController),
           getDashboardData(abortController),
           getUsedCategories(abortController),
+          getAllNotifications(abortController),
         ]);
 
         // const fetchedUsedCategories = fetchedSubscriptions?.reduce(
@@ -60,6 +65,7 @@ export default function useDataFetching() {
         setSubscriptions(fetchedSubscriptions);
         setDashboardData(fetchedDashboardData);
         setUsedCategories(fetchedUsedCategories);
+        setNotifications(fetchedNotifications);
         // setUsages(fetchedUsages);
       } catch (error) {
         setError(true);

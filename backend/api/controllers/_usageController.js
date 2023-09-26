@@ -57,20 +57,21 @@ export async function postUsage(req, res, next) {
   createUsageSession.startTransaction();
 
   try {
-    // 1. get all notifications with sent = false
+    // 1. get all notifications with active = true
     const previousNotifications = await Notification.find(
       {
         userId,
         subscriptionId: body.subscriptionId,
+        active: true,
       },
       null,
       { session: createUsageSession },
     );
 
-    // 2. update these notifications to sent = true
+    // 2. update these notifications to active = false
     const notificatonUpdateResult = await Notification.updateMany(
       { _id: { $in: previousNotifications.map((n) => n._id) } },
-      { sent: true },
+      { active: false },
       { session: createUsageSession },
     );
 

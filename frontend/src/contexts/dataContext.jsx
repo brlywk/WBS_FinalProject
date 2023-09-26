@@ -11,6 +11,7 @@ export default function DataContextProvider({ children }) {
   const [usedCategories, setUsedCategories] = useState(null);
   const [usages, setUsages] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const [notifications, setNotifications] = useState(null);
 
   return (
     <DataContext.Provider
@@ -25,6 +26,8 @@ export default function DataContextProvider({ children }) {
         // setUsages,
         dashboardData,
         setDashboardData,
+        notifications,
+        setNotifications,
       }}
     >
       {children}

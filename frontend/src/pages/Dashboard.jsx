@@ -25,6 +25,7 @@ function Dashboard() {
     usedCategories,
     // usages,
     dashboardData,
+    notifications,
   } = useDataContext();
 
   // ---- STATE ----
@@ -68,6 +69,7 @@ function Dashboard() {
   console.log("usedCategories", usedCategories);
   // console.log("Usages", usages);
   console.log("dashboardData", dashboardData);
+  console.log("notifications", notifications);
 
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
