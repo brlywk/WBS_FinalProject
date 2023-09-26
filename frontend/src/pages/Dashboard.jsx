@@ -110,11 +110,11 @@ function Dashboard() {
   // quick helper function to keep JSX less cluttered
   function checkDataLoadingSuccessful() {
     const loadingSuccessful =
-      subscriptions?.length > 0 &&
-      usedCategories?.length > 0 &&
-      allCategories?.length > 0 &&
+      subscriptions?.length >= 0 &&
+      usedCategories?.length >= 0 &&
+      allCategories?.length >= 0 &&
       Object.keys(dashboardData).length > 0 &&
-      usages?.length > 0;
+      usages?.length >= 0;
 
     return loadingSuccessful;
   }
