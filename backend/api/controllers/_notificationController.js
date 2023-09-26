@@ -35,9 +35,11 @@ export async function getNotifications(req, res, next) {
     },
   };
 
-  const notifications = await Notification.find(notificationFilter).sort({
-    createdAt: -1,
-  });
+  const notifications = await Notification.find(notificationFilter)
+    .populate("subscriptionId")
+    .sort({
+      createdAt: -1,
+    });
 
   // if no notifications are avaible, send back an empty array to stop further
   // processing

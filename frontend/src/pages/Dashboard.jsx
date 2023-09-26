@@ -16,6 +16,7 @@ import UsageTab from "../components/UsageTab";
 import useDataFetching from "../hooks/useDataFetching";
 import eventEmitter from "../utils/EventEmitter";
 import { useDataContext } from "../contexts/dataContext";
+import Notifications from "../components/Notifications";
 
 function Dashboard() {
   // ---- CONTEXT ----
@@ -25,7 +26,6 @@ function Dashboard() {
     usedCategories,
     // usages,
     dashboardData,
-    notifications,
   } = useDataContext();
 
   // ---- STATE ----
@@ -69,7 +69,6 @@ function Dashboard() {
   console.log("usedCategories", usedCategories);
   // console.log("Usages", usages);
   console.log("dashboardData", dashboardData);
-  console.log("notifications", notifications);
 
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
@@ -152,27 +151,7 @@ function Dashboard() {
                   </div>
 
                   {/* Notification */}
-                  <div>
-                    <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
-                      <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
-                        2
-                      </div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="h-6 w-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  <Notifications />
 
                   {/* User Icon */}
                   <UserButton />
