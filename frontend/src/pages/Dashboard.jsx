@@ -45,7 +45,6 @@ function Dashboard() {
   const { pageId } = useParams();
 
   // ---- Event Callbacks ----
-
   function openSubscriptionFormCallback(subscription, mode) {
     setSubscriptionFormState({
       mode,
@@ -61,6 +60,12 @@ function Dashboard() {
         mode,
       };
     });
+  }
+
+  function notificationClickedCallback(id) {
+    alert(
+      `Notification with ID ${id} has been clicked. Something should happen!`,
+    );
   }
 
   // DEBUG LOGGING
@@ -79,10 +84,17 @@ function Dashboard() {
       refetchData(abortController);
     }
 
+    // Same with this
+    function notificationReadCallback(id) {
+      alert(`Notification with ID ${id} should be marked as read!`);
+    }
+
     // register event listeners
     eventEmitter.on("refetchData", refetchCallback);
     eventEmitter.on("openSubscriptionForm", openSubscriptionFormCallback);
     eventEmitter.on("changeFormMode", switchFormModeCallback);
+    eventEmitter.on("markNotificationAsRead", notificationReadCallback);
+    eventEmitter.on("notificationClicked", notificationClickedCallback);
 
     // TODO: more robust implementation
     document.body.style.background =
@@ -95,6 +107,8 @@ function Dashboard() {
       eventEmitter.off("refetchData", refetchCallback);
       eventEmitter.off("openSubscriptionForm", openSubscriptionFormCallback);
       eventEmitter.off("changeFormMode", switchFormModeCallback);
+      eventEmitter.off("markNotificationAsRead", notificationReadCallback);
+      eventEmitter.off("notificationClicked", notificationClickedCallback);
     };
   }, []);
 

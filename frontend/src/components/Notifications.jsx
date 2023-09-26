@@ -43,13 +43,15 @@ export default function Notifications() {
       </Popover.Button>
 
       <Popover.Panel className="absolute z-10 min-w-[15vw] -translate-x-1/2 translate-y-2 rounded-xl bg-white p-2 shadow-xl">
-        {notifications?.length > 0 &&
-          notifications?.map((notification) => (
-            <NotificationsCard
-              key={notification._id}
-              notification={notification}
-            />
-          ))}
+        <div className="grid gap-2">
+          {notifications?.length > 0 &&
+            notifications?.map((notification) => (
+              <NotificationsCard
+                key={notification._id}
+                notification={notification}
+              />
+            ))}
+        </div>
       </Popover.Panel>
     </Popover>
   );

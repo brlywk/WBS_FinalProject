@@ -1,19 +1,28 @@
+import eventEmitter from "../utils/EventEmitter";
+
 export default function NotificationsCard({ notification }) {
   const subscription = notification?.subscriptionId;
 
   return (
-    <div className="cursor-pointer rounded-lg p-1 hover:bg-gray-100">
-      <div className="flex flex-col items-start justify-center gap-2">
-        <button onClick={() => alert("Notification")}>
+    <>
+      <div className="flex w-full items-center justify-start rounded-lg border">
+        <button
+          className="h-full w-full rounded-lg hover:bg-gray-100"
+          onClick={() =>
+            eventEmitter.emit("notificationClicked", notification?._id)
+          }
+        >
           {subscription.name}
         </button>
         <button
-          className="self-end text-sm"
-          onClick={() => alert("Mark as read")}
+          className="place-self-end text-sm"
+          onClick={() =>
+            eventEmitter.emit("markNotificationAsRead", notification?._id)
+          }
         >
           Mark as read
         </button>
       </div>
-    </div>
+    </>
   );
 }
