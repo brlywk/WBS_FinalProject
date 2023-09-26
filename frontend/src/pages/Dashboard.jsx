@@ -177,12 +177,14 @@ function Dashboard() {
                   {/* Sidebar Content */}
                   <div className="flex flex-grow flex-col divide-y divide-black/25">
                     {/* Add Subscription Button */}
-                    <button
-                      onClick={handleAddSubscriptionClick}
-                      className="rounded bg-black p-4 text-white hover:bg-black hover:text-white"
-                    >
-                      Add Subscription
-                    </button>
+                    <div className="p-1 flex justify-center">
+                      <button
+                        onClick={handleAddSubscriptionClick}
+                        className="rounded-lg bg-black px-5 py-3 text-center text-white hover:bg-gray-700 hover:text-white w-full mx-2"
+                      >
+                        Add Subscription
+                      </button>
+                    </div>
 
                     {/* Overview, Recommendations, Cancel */}
                     <SidebarTop className="w-full p-2" />
