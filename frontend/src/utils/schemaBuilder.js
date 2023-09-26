@@ -9,6 +9,7 @@ export function createSubscriptionBody(name, price, categoryId, interval) {
     interval,
   };
 }
+
 /**
  * Creates an Usage body to be sent to a POST endpoint
  */

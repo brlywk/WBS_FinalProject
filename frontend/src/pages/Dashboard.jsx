@@ -62,6 +62,13 @@ function Dashboard() {
     });
   }
 
+  // DEBUG LOGGING
+  console.log("Subscriptions", subscriptions);
+  console.log("allCategories", allCategories);
+  console.log("usedCategories", usedCategories);
+  console.log("Usages", usages);
+  console.log("dashboardData", dashboardData);
+
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
     const abortController = new AbortController();

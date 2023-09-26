@@ -61,19 +61,19 @@ export default function ApiTest() {
     testGetNotifications();
 
     // test new usage creation
-    async function testCreateUsage() {
-      const subId = "65118ff0669122bf1a8671b5";
-
-      try {
-        const usageBody = createUsageBody(subId, 3);
-
-        const newUsage = await createUsage(usageBody, abortController);
-        console.log(newUsage);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    testCreateUsage();
+    // async function testCreateUsage() {
+    //   const subId = "65118ff0669122bf1a8671b5";
+    //
+    //   try {
+    //     const usageBody = createUsageBody(subId, 3);
+    //
+    //     const newUsage = await createUsage(usageBody, abortController);
+    //     console.log(newUsage);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
+    // testCreateUsage();
 
     return () => {
       abortController.abort();

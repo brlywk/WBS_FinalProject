@@ -187,15 +187,17 @@ export function totalMonthlyCostAggregate(userId) {
 }
 
 /**
- * Returns the most used subscription (i.e. highest total score) for user
+ * Returns the most or least used subscription (i.e. highest total score) for user
+ * sort = -1 (default)    most used
+ * sort = 1               least used
  */
-export function mostUsedSubscriptionAggregate(userId) {
+export function mostUsedSubscriptionAggregate(userId, sort = -1) {
   const pipeline = subscriptionUsageAggregate(userId);
 
   const additionalStages = [
     {
       $sort: {
-        averageScore: -1,
+        averageScore: sort,
       },
     },
     {
@@ -259,4 +261,211 @@ export function searchAggregate(query) {
   ];
 
   return pipeline;
+}
+
+/**
+ * Returns an aggregate to get all used categories for user
+ */
+export function usedCategoriesAggregate(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId,
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        _id: "$category._id",
+        category: "$category",
+      },
+    },
+    {
+      $group: {
+        _id: "$category",
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: "$_id",
+      },
+    },
+  ];
+
+  return pipeline;
+}
+
+/**
+ * Returns an aggregate to get all used categories for user, including ALL data about the
+ * categories (score, costs, savings)
+ */
+export function usedCategoryFullDataAggregate(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId: "user_2VQfAlxwCjKvmC8rQbapVEWA6fj",
+      },
+    },
+    {
+      $lookup: {
+        from: "usages",
+        localField: "_id",
+        foreignField: "subscriptionId",
+        as: "subscriptionUsage",
+      },
+    },
+    {
+      $addFields: {
+        validScore: {
+          $gte: [
+            {
+              $size: "$subscriptionUsage",
+            },
+            4,
+          ],
+        },
+        adjustedPrice: {
+          $cond: {
+            if: {
+              $eq: ["$interval", "year"],
+            },
+            then: {
+              $divide: ["$price", 12],
+            },
+            else: "$price",
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        subscriptionScore: {
+          $cond: [
+            "$validScore",
+            {
+              $avg: "$subscriptionUsage.score",
+            },
+            null,
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        isPotentialSaving: {
+          $cond: [
+            {
+              $and: [
+                "$validScore",
+                {
+                  $lte: ["$subscriptionScore", 2],
+                },
+              ],
+            },
+            true,
+            false,
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        subscriptionUsage: 0,
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "categoryData",
+      },
+    },
+    {
+      $unwind: "$categoryData",
+    },
+    {
+      $group: {
+        _id: "$categoryData._id",
+        name: {
+          $first: "$categoryData.name",
+        },
+        subscriptionCount: {
+          $sum: 1,
+        },
+        totalCost: {
+          $sum: "$adjustedPrice",
+        },
+        averagePrice: {
+          $avg: "$adjustedPrice",
+        },
+        potentialSavings: {
+          $sum: {
+            $cond: ["$isPotentialSaving", "$adjustedPrice", 0],
+          },
+        },
+        validSubscriptionScores: {
+          $push: {
+            $cond: ["$validScore", "$subscriptionScore", "$$REMOVE"],
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        categoryScore: {
+          $ifNull: [
+            {
+              $avg: "$validSubscriptionScores",
+            },
+            0,
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        validSubscriptionScores: 0,
+      },
+    },
+  ];
+
+  return pipeline;
+}
+
+/**
+ * Returns the most or least used subscription (i.e. highest total score) for user
+ * sort = -1 (default)    most used
+ * sort = 1               least used
+ */
+export function mostOrLeastUsedCategory(userId, sort = -1) {
+  const pipeline = usedCategoryFullDataAggregate(userId);
+
+  const additionalStages = [
+    {
+      $sort: {
+        averageScore: sort,
+      },
+    },
+    {
+      $limit: 1,
+    },
+  ];
+
+  const finalPipeline = pipeline.concat(additionalStages);
+
+  return finalPipeline;
 }

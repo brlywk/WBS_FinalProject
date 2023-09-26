@@ -9,6 +9,11 @@ export async function getAllCategories(req, res, next) {
   res.status(200).json(categories);
 }
 
+// ---- GET /api/categories/used ----
+export async function getUsedCategories(req, res, next) {
+  console.info(new Date().toISOString(), "getUsedCategories");
+}
+
 // ---- GET /api/categories/:id ----
 export async function getCategoryById(req, res, next) {
   const { id } = req.params;
