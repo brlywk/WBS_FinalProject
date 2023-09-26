@@ -4,6 +4,7 @@ import { useDataContext } from "../contexts/dataContext";
 import useSubscription from "../hooks/useSubscription";
 import eventEmitter from "../utils/EventEmitter";
 import CategoryIcon from "./CategoryIcon";
+import { createSubscriptionBody } from "../utils/schemaBuilder";
 
 export default function SubscriptionForm({
   mode,
@@ -51,12 +52,12 @@ export default function SubscriptionForm({
       return;
     }
 
-    const formSubscription = {
-      name: nameRef.current.value,
-      price: cleanPrice,
-      category: selectedCategory._id,
-      interval: selectedBillingCycle,
-    };
+    const formSubscription = createSubscriptionBody(
+      nameRef.current.value,
+      cleanPrice,
+      selectedCategory._id,
+      selectedBillingCycle,
+    );
 
     return formSubscription;
   }

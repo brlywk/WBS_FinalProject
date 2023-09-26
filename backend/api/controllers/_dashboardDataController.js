@@ -3,6 +3,7 @@ import {
   mostUsedSubscriptionAggregate,
   potentialMonthlySavingsAggregate,
   totalMonthlyCostAggregate,
+  barelyUsedMostExpensiveAggregate,
 } from "../data/_aggregates.js";
 
 /**
@@ -19,26 +20,39 @@ export async function getDashboardData(req, res, next) {
 
   // get all the aggregates!
   const mostUsedAggregate = mostUsedSubscriptionAggregate(userId);
+  const leastUsedAggregate = mostUsedSubscriptionAggregate(userId, 1);
   const totalCostAggregate = totalMonthlyCostAggregate(userId);
   const potentialSavingsAggregate = potentialMonthlySavingsAggregate(userId);
+  const barelyUsedAggregate = barelyUsedMostExpensiveAggregate(userId);
 
-  const [mostUsedResult, totalCostResult, potentialSavingsResult] =
-    await Promise.all([
-      Subscription.aggregate(mostUsedAggregate),
-      Subscription.aggregate(totalCostAggregate),
-      Subscription.aggregate(potentialSavingsAggregate),
-    ]);
+  const [
+    mostUsedResult,
+    leastUsedResult,
+    totalCostResult,
+    potentialSavingsResult,
+    barelyUsedResult,
+  ] = await Promise.all([
+    Subscription.aggregate(mostUsedAggregate),
+    Subscription.aggregate(leastUsedAggregate),
+    Subscription.aggregate(totalCostAggregate),
+    Subscription.aggregate(potentialSavingsAggregate),
+    Subscription.aggregate(barelyUsedAggregate),
+  ]);
 
   // all results here are arrays with exactly one object in them
   // TODO: More error handling. Probably...
   const mostUsed = mostUsedResult[0] ?? {};
+  const leastUsed = leastUsedResult[0] ?? {};
   const totalCost = totalCostResult[0] ?? { totalCostPerMonth: 0 };
   const potentialSavings = potentialSavingsResult[0] ?? {
     potentialMonthlySavings: 0,
   };
+  const barelyUsedMostExpensive = barelyUsedResult[0] ?? {};
 
   const dashboardData = {
     mostUsed,
+    leastUsed,
+    barelyUsedMostExpensive,
     ...totalCost,
     ...potentialSavings,
   };

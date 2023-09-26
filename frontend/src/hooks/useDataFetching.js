@@ -11,13 +11,12 @@ export default function useDataFetching() {
     setSubscriptions,
     setAllCategories,
     setUsedCategories,
-    setUsages,
     setDashboardData,
   } = useDataContext();
 
   // ---- Data Fetching ----
   const { getAllSubscriptions } = useSubscription();
-  const { getAllCategories } = useCategory();
+  const { getAllCategories, getUsedCategories } = useCategory();
   const { getDashboardData } = useDashboard();
   const { getAllSubscriptionUsage } = useSubscriptionUsage();
 
@@ -36,29 +35,32 @@ export default function useDataFetching() {
     // Fetch all the required data
     async function fetchRequiredData() {
       try {
-        const [fetchedSubscriptions, fetchedDashboardData, fetchedUsages] =
-          await Promise.all([
-            getAllSubscriptions(abortController),
-            getDashboardData(abortController),
-            getAllSubscriptionUsage(abortController),
-          ]);
+        const [
+          fetchedSubscriptions,
+          fetchedDashboardData,
+          fetchedUsedCategories,
+        ] = await Promise.all([
+          getAllSubscriptions(abortController),
+          getDashboardData(abortController),
+          getUsedCategories(abortController),
+        ]);
 
-        const fetchedUsedCategories = fetchedSubscriptions?.reduce(
-          (prev, curr) => {
-            if (!prev.some((category) => category._id === curr.category._id)) {
-              prev.push(curr.category);
-            }
-
-            return prev;
-          },
-          [],
-        );
+        // const fetchedUsedCategories = fetchedSubscriptions?.reduce(
+        //   (prev, curr) => {
+        //     if (!prev.some((category) => category._id === curr.category._id)) {
+        //       prev.push(curr.category);
+        //     }
+        //
+        //     return prev;
+        //   },
+        //   [],
+        // );
 
         // write data to context
         setSubscriptions(fetchedSubscriptions);
         setDashboardData(fetchedDashboardData);
         setUsedCategories(fetchedUsedCategories);
-        setUsages(fetchedUsages);
+        // setUsages(fetchedUsages);
       } catch (error) {
         setError(true);
         setErrorMessage(error.message);

@@ -21,8 +21,8 @@ export default function DataContextProvider({ children }) {
         setAllCategories,
         usedCategories,
         setUsedCategories,
-        usages,
-        setUsages,
+        // usages,
+        // setUsages,
         dashboardData,
         setDashboardData,
       }}
