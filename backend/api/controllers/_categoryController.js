@@ -1,4 +1,5 @@
 import Category from "../models/_categorySchema.js";
+import { usedCategoryFullDataAggregate } from "../data/_aggregates.js";
 
 // ---- GET /api/categories ----
 export async function getAllCategories(req, res, next) {
@@ -11,7 +12,15 @@ export async function getAllCategories(req, res, next) {
 
 // ---- GET /api/categories/used ----
 export async function getUsedCategories(req, res, next) {
+  const { userId } = req.auth;
+
   console.info(new Date().toISOString(), "getUsedCategories");
+
+  const aggregate = usedCategoryFullDataAggregate();
+
+  const usedCategories = await Category.aggregate(aggregate);
+
+  res.status(200).json(usedCategories);
 }
 
 // ---- GET /api/categories/:id ----

@@ -82,6 +82,100 @@ export function subscriptionUsageAggregate(userId, id = null) {
   return pipeline;
 }
 
+/**
+ * Returns a pipeline that create full subscription data, including score, category,
+ * array with all usages, whether the score is valid for calculations etc.
+ */
+export function fullSubscriptionData(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId,
+      },
+    },
+    {
+      $lookup: {
+        from: "usages",
+        localField: "_id",
+        foreignField: "subscriptionId",
+        as: "usages",
+      },
+    },
+    {
+      $addFields: {
+        validScore: {
+          $gte: [
+            {
+              $size: "$usages",
+            },
+            4,
+          ],
+        },
+        monthlyPrice: {
+          $cond: {
+            if: {
+              $eq: ["$interval", "year"],
+            },
+            then: {
+              $divide: ["$price", 12],
+            },
+            else: "$price",
+          },
+        },
+        usagesCount: {
+          $size: "$usages",
+        },
+      },
+    },
+    {
+      $addFields: {
+        score: {
+          $cond: [
+            "$validScore",
+            {
+              $avg: "$usages.score",
+            },
+            0,
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        isPotentialSaving: {
+          $cond: [
+            {
+              $and: [
+                "$validScore",
+                {
+                  $lte: ["$subscriptionScore", 2],
+                },
+              ],
+            },
+            true,
+            false,
+          ],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+      },
+    },
+  ];
+
+  return pipeline;
+}
+
 /*
  * Return pipeline to get monthly savings per user
  */
@@ -468,4 +562,111 @@ export function mostOrLeastUsedCategory(userId, sort = -1) {
   const finalPipeline = pipeline.concat(additionalStages);
 
   return finalPipeline;
+}
+
+/**
+ * Returns the least used and most expensive subscription
+ */
+export function barelyUsedMostExpensiveAggregate(userId) {
+  const pipeline = [
+    {
+      $match: {
+        userId: "user_2VQfAlxwCjKvmC8rQbapVEWA6fj",
+      },
+    },
+    {
+      $lookup: {
+        from: "usages",
+        localField: "_id",
+        foreignField: "subscriptionId",
+        as: "usages",
+      },
+    },
+    {
+      $addFields: {
+        validScore: {
+          $gte: [
+            {
+              $size: "$usages",
+            },
+            4,
+          ],
+        },
+        monthlyPrice: {
+          $cond: {
+            if: {
+              $eq: ["$interval", "year"],
+            },
+            then: {
+              $divide: ["$price", 12],
+            },
+            else: "$price",
+          },
+        },
+        usagesCount: {
+          $size: "$usages",
+        },
+      },
+    },
+    {
+      $addFields: {
+        score: {
+          $cond: [
+            "$validScore",
+            {
+              $avg: "$usages.score",
+            },
+            0,
+          ],
+        },
+      },
+    },
+    {
+      $addFields: {
+        isPotentialSaving: {
+          $cond: [
+            {
+              $and: [
+                "$validScore",
+                {
+                  $lte: ["$subscriptionScore", 2],
+                },
+              ],
+            },
+            true,
+            false,
+          ],
+        },
+      },
+    },
+    {
+      $match: {
+        validScore: true,
+      },
+    },
+    {
+      $sort: {
+        score: 1,
+        monthlyPrice: -1,
+      },
+    },
+    {
+      $limit: 1,
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+      },
+    },
+  ];
+
+  return pipeline;
 }
