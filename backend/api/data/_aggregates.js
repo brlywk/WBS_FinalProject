@@ -410,7 +410,7 @@ export function usedCategoryFullDataAggregate(userId) {
   const pipeline = [
     {
       $match: {
-        userId: "user_2VQfAlxwCjKvmC8rQbapVEWA6fj",
+        userId,
       },
     },
     {
@@ -496,6 +496,9 @@ export function usedCategoryFullDataAggregate(userId) {
         _id: "$categoryData._id",
         name: {
           $first: "$categoryData.name",
+        },
+        icon: {
+          $first: "$categoryData.icon",
         },
         subscriptionCount: {
           $sum: 1,

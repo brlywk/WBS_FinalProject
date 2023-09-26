@@ -41,6 +41,10 @@ export default class ApiEndpoints {
     return this.endpoints.categories;
   }
 
+  static get usedCategories() {
+    return `${this.endpoints.categories}/used`;
+  }
+
   static get usages() {
     return this.endpoints.usages;
   }

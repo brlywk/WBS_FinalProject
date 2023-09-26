@@ -23,7 +23,7 @@ function Dashboard() {
     subscriptions,
     allCategories,
     usedCategories,
-    usages,
+    // usages,
     dashboardData,
   } = useDataContext();
 
@@ -66,7 +66,7 @@ function Dashboard() {
   console.log("Subscriptions", subscriptions);
   console.log("allCategories", allCategories);
   console.log("usedCategories", usedCategories);
-  console.log("Usages", usages);
+  // console.log("Usages", usages);
   console.log("dashboardData", dashboardData);
 
   // ---- THE ALMIGHTY USE EFFECT ----
@@ -113,8 +113,7 @@ function Dashboard() {
       subscriptions?.length >= 0 &&
       usedCategories?.length >= 0 &&
       allCategories?.length >= 0 &&
-      Object.keys(dashboardData).length > 0 &&
-      usages?.length >= 0;
+      Object.keys(dashboardData).length > 0;
 
     return loadingSuccessful;
   }

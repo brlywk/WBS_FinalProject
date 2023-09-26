@@ -8,6 +8,14 @@ export default function useCategory() {
     return await startRequest(ApiEndpoints.categories, "get", abortController);
   }
 
+  async function getUsedCategories(abortController) {
+    return await startRequest(
+      ApiEndpoints.usedCategories,
+      "get",
+      abortController,
+    );
+  }
+
   async function getCategoryById(id, abortController) {
     return await startRequest(
       ApiEndpoints.category(id),
@@ -16,5 +24,5 @@ export default function useCategory() {
     );
   }
 
-  return { getAllCategories, getCategoryById };
+  return { getAllCategories, getCategoryById, getUsedCategories };
 }
