@@ -16,7 +16,7 @@ export default function Homepage() {
 
       <nav>
   <div className={styles.nav__content}>
-    <img src="/public/subzero_logo_og.svg" alt="Subzero Logo" className={styles.logo} />
+    <img src="/subzero_logo_og.svg" alt="Subzero Logo" className={styles.logo} />
 
     <SignedOut>
       <Link to="/signup" className={styles.button}>SIGN UP</Link>
@@ -45,9 +45,9 @@ export default function Homepage() {
           </div>
 
           <div className={styles['bleed-canvas']}>
-            <img className={styles.moneyhand} src="/public/moneyhand.png" alt="Moneyhand" />
-            <img className={styles.dashboardlaptop} src="/public/Dashboardbglaptop.png" alt="Dashboard Laptop" />
-            <img className={styles.subzerologoicon} src="/public/subzero_logo_icon.png" alt="" />
+            <img className={styles.moneyhand} src="/moneyhand.png" alt="Moneyhand" />
+            <img className={styles.dashboardlaptop} src="/Dashboardbglaptop.png" alt="Dashboard Laptop" />
+            <img className={styles.subzerologoicon} src="/subzero_logo_icon.png" alt="" />
           </div>
         </section>
 
@@ -55,7 +55,7 @@ export default function Homepage() {
           <p>Welcome to the ultimate in subscription oversight.</p>
 
           <div className={styles['dashboard-image']}>
-            <img src="/public/Dashboardbgbrowsertilt.png" alt="Dashboard Image" />
+            <img src="/Dashboardbgbrowsertilt.png" alt="Dashboard Image" />
           </div>
 
           <p className={styles['small-black-text']} style={{ fontSize: '2em', color: 'black' }}>
@@ -83,7 +83,7 @@ export default function Homepage() {
           </div>
 
           <div className={styles.sticky}>
-            <img src="/public/ReminderModalplain.png" alt="Reminder Modal" />
+            <img src="/ReminderModalplain.png" alt="Reminder Modal" />
           </div>
 
           <div className={`${styles.box} ${styles['box--two']}`}>
