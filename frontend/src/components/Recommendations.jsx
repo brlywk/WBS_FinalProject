@@ -5,14 +5,14 @@ export default function Recommendations() {
   const { dashboardData, subscriptions } = useDataContext();
 
   const BarelyUsed = (
-    <div className="flex flex-col items-center">
-      <div>{dashboardData?.barelyUsedMostExpensive.name}</div>
-      <div className="flex flex-row gap-4 text-sm">
-        <div>EUR {dashboardData?.barelyUsedMostExpensive.price}</div>
-        <div>
-          Score: {dashboardData?.barelyUsedMostExpensive.score.toFixed(2)}
-        </div>
-      </div>
+    <div className="">
+      <span className="font-bold">
+        {dashboardData?.barelyUsedMostExpensive.name}
+      </span>{" "}
+      <span className="font-normal">
+        is low usage and high cost. Perhaps consider cancelling{" "}
+        {dashboardData?.barelyUsedMostExpensive.name}.
+      </span>
     </div>
   );
 

@@ -26,8 +26,15 @@ import { createUsageBody } from "../utils/schemaBuilder";
 import useCategory from "../hooks/useCategory";
 import useDashboard from "../hooks/useDashboard";
 import Recommendations from "../components/Recommendations";
+import CategroyStats from "../components/CategroyStats";
 
 function Dashboard() {
+  // ---- PAGE INFORMATION ----
+  const { pageId } = useParams();
+  const {
+    user: { firstName },
+  } = useUser();
+
   // ---- CONTEXT ----
   const {
     subscriptions,
@@ -52,11 +59,6 @@ function Dashboard() {
   });
 
   // ---- CUSTOM HOOKS ----
-  const { pageId } = useParams();
-  const {
-    user: { firstName },
-  } = useUser();
-
   const { loading, error, errorMessage, refetchData } = useDataFetching();
   const { createUsage } = useUsage();
   const { getAllSubscriptions } = useSubscription();
@@ -314,18 +316,19 @@ function Dashboard() {
                     )}
 
                     {/* Recommendations / Cancel */}
-                    {(pageId === "recommendations" || pageId === "cancel") && (
-                      <Recommendations />
-                    )}
+                    {pageId === "recommendations" && <Recommendations />}
 
                     {/* Category Pages */}
-                    {pageId &&
-                      pageId !== "recommendations" &&
-                      pageId !== "cancel" && (
-                        <div className="p-2">
-                          <MainContent filter={pageId} />
-                        </div>
-                      )}
+                    {pageId && pageId !== "recommendations" && (
+                      <div className="p-2">
+                        <CategroyStats
+                          category={usedCategories?.find(
+                            (c) => c._id === pageId,
+                          )}
+                        />
+                        <MainContent filter={pageId} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
