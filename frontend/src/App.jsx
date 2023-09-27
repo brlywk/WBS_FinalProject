@@ -6,14 +6,13 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
+import DataProvider from "./contexts/dataContext";
 import ApiTest from "./pages/ApiTest";
 import Dashboard from "./pages/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import DataProvider from "./contexts/dataContext";
-import DataContextProvider from "./contexts/dataContext";
 
 // access our key
 const publishableKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
@@ -34,23 +33,32 @@ function ClerkRouteProvider() {
       navigate={(to) => navigate(to)}
     >
       <Routes>
-        <Route path="/" element={<Homepage />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <SignedIn>
+                <Navigate to="/dashboard" />
+              </SignedIn>
+              <SignedOut>
+                <Homepage />
+              </SignedOut>
+            </>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route
           path="/dashboard"
           element={
             <>
-              {/* If signed in, load this page / component */}
               <SignedIn>
                 <DataProvider>
                   <Dashboard />
                 </DataProvider>
               </SignedIn>
-
-              {/* If not signed in, show this when user accesses route */}
               <SignedOut>
-                <div>You are not allowed here!</div>
+                <Navigate to="/" />
               </SignedOut>
             </>
           }
@@ -61,21 +69,19 @@ function ClerkRouteProvider() {
           path="/dashboard/:pageId"
           element={
             <>
-              {/* If signed in, load this page / component */}
               <SignedIn>
                 <DataProvider>
                   <Dashboard />
                 </DataProvider>
               </SignedIn>
-
-              {/* If not signed in, show this when user accesses route */}
               <SignedOut>
-                <div>You are not allowed here!</div>
+                <Navigate to="/" />
               </SignedOut>
             </>
           }
         />
 
+        {/* TODO: For testing / debugging, delete this before 'final' deployment! */}
         <Route
           path="/apiTest"
           element={
@@ -108,5 +114,3 @@ function App() {
 }
 
 export default App;
-
-
