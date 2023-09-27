@@ -97,12 +97,6 @@ function Dashboard() {
     eventEmitter.on("markNotificationAsRead", notificationReadCallback);
     eventEmitter.on("notificationClicked", notificationClickedCallback);
 
-    // TODO: more robust implementation
-    document.body.style.background =
-      "linear-gradient(to right, #f5f3f4, #3b82f6, #800080, #f5f3f4), radial-gradient(circle at 2% 5%, #f5f3f4, #3b82f6, #800080, #f5f3f4)";
-    document.body.style.backgroundSize = "500% 500%, 100% 100%";
-    document.body.style.animation = "gradient 60s ease infinite";
-
     return () => {
       abortController.abort();
       eventEmitter.off("refetchData", refetchCallback);
@@ -136,13 +130,13 @@ function Dashboard() {
 
   // Main return block for the Dashboard component
   return (
-    <>
+    <div className="apple-bg h-screen w-screen">
       {loading && <Loading />}
 
       {!loading && error && <ErrorDisplay message={errorMessage} />}
 
       {!loading && !error && checkDataLoadingSuccessful() && (
-        <div className="flex flex-grow min-h-120 w-full flex-col items-center p-4">
+        <div className="flex flex-grow flex-col items-center p-4">
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
@@ -180,7 +174,7 @@ function Dashboard() {
                     <div className="p-1 flex justify-center">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="rounded-lg bg-black px-5 py-3 text-center text-white hover:bg-gray-700 hover:text-white w-full mx-2"
+                        className="cursor-pointer transition-all duration-300 ease-in-out bg-gradient-to-r from-black to-gray-500 text-white text-base border-none rounded-lg px-5 py-3 outline-none hover:from-gray-500 hover:to-black hover:scale-110 transform-gpu w-full mx-2"
                       >
                         Add Subscription
                       </button>
@@ -250,10 +244,11 @@ function Dashboard() {
           }
         />
       )}
-    </>
+    </div>
   );
 }
 
 export default Dashboard;
+
 
 

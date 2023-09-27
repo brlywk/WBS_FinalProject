@@ -23,7 +23,7 @@ export default function MainContent({ filter = "none" }) {
   };
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-3 gap-10">
       {" "}
       {/* No changes needed here */}
       {filteredSubscriptions()?.length > 0 &&

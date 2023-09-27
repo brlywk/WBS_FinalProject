@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { SignIn } from "@clerk/clerk-react";
-import logo from '../../public/subzero_logo_icon.png'; // Assuming the logo is in the public folder
+import logo from '/subzero_logo_icon.png'; // Assuming the logo is in the public folder
 
 export default function Login(props) {
   const navigate = useNavigate();
