@@ -10,10 +10,15 @@ export default function UsageModal({ opened, onClose, notificationId }) {
 
   // ---- STATE ----
   const [selectedScore, setSelectedScore] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [currentNotification, setCurrentNotification] = useState(null);
   const [unratedNotifications, setUnratedNotifications] = useState([]);
 
+  // ---- DERIVED STATE ----
+  const currentIndex = unratedNotifications?.findIndex(
+    (n) => n._id === currentNotification._id,
+  );
+
+  // ---- USE EFFECT ----
   // we need to rerender based on whether property and notifications are available
   useEffect(() => {
     const initialNotification = notifications?.find(
@@ -59,10 +64,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
     // just move to next or previous if nothing is selected
     if (unratedNotifications.length > 1) {
       // direction can be +/- 1 so check both edges
-      const newIndex =
-        unratedNotifications.findIndex(
-          (n) => n._id === currentNotification._id,
-        ) + direction;
+      const newIndex = currentIndex + direction;
 
       if (newIndex > unratedNotifications.length - 1) {
         // setCurrentIndex(0);
