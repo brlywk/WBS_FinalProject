@@ -1,81 +1,122 @@
-import { useState, Fragment, forwardRef, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { RadioGroup } from '@headlessui/react';
-import eventEmitter from "../utils/EventEmitter"; // Event emitter for handling events
+import { Dialog, RadioGroup, Transition } from "@headlessui/react";
+import { Fragment, useEffect, useState } from "react";
 import { useDataContext } from "../contexts/dataContext"; // Context for data
-import axios from 'axios'; // Axios for making HTTP requests
-import { createUsageBody } from '../utils/schemaBuilder'; // Helper function to create request body
+import eventEmitter from "../utils/EventEmitter"; // Event emitter for handling events
 
 // UsageTab now expects a subscriptions prop
-const Usage = forwardRef((props, ref) => {
-    const { subscriptions } = useDataContext(); // Get subscriptions from context
-    const [selected, setSelected] = useState();  // State for selected option
-    const [subscriptionIndex, setSubscriptionIndex] = useState(0); // Index of the current subscription
-    const [isOpen, setIsOpen] = useState(true); // State for modal open/close
-    const [ratedSubscriptions, setRatedSubscriptions] = useState([]); // Array of rated subscriptions
+export default function UsageModal({ opened, onClose, notificationId }) {
+  // ---- CONTEXT ----
+  const { notifications } = useDataContext();
 
-    // Effect to open modal on event
-    useEffect(() => {
-        const openModal = () => {
-            setIsOpen(true); // Open the modal
-        };
-        eventEmitter.on('openSubscriptionForm', openModal); // Listen for the event to open the modal
-        return () => {
-            eventEmitter.off('openSubscriptionForm', openModal); // Clean up listener on unmount
-        };
-    }, []);
+  // ---- STATE ----
+  const [selectedScore, setSelectedScore] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentNotification, setCurrentNotification] = useState(null);
+  const [unratedNotifications, setUnratedNotifications] = useState([]);
 
-    // Handler for selection change
-    const handleSelection = (value) => {
-        let score; // Score for the usage frequency
-        // Assign score based on usage frequency
-        switch (value) {
-            case "Often": // If usage is often, score is 3 (like a high level demon in Demon Slayer)
-                score = 3;
-                break;
-            case "Sometimes": // If usage is sometimes, score is 2 (like a mid level demon)
-                score = 2;
-                break;
-            case "Rarely": // If usage is rarely, score is 1 (like a low level demon)
-                score = 1;
-                break;
-            default: // If no usage, score is 0 (like a human)
-                score = 0;
-        }
-        setSelected(value); // Set the selected value
-        // Create the request body
-        const usageBody = createUsageBody(subscriptions[subscriptionIndex]._id, score);
-        // Post the usage data
-        axios.post('/api/subscriptionUsage', usageBody)
-            .then(response => {
-                console.log('Usage data sent successfully:', response.data); // Log success
-                // Add the rated subscription to the array
-                setRatedSubscriptions([...ratedSubscriptions, subscriptions[subscriptionIndex]]);
-                setSubscriptionIndex(subscriptionIndex + 1); // Move to the next subscription
-                setSelected(null); // Reset the selected value
-                // If all subscriptions have been rated, close the modal
-                if (subscriptionIndex >= subscriptions.length - 1) {
-                    setIsOpen(false);
-                }
-            })
-            .catch(error => {
-                console.error('Error sending usage data:', error); // Log error
-            });
-    };
+  // we need to rerender based on whether property and notifications are available
+  useEffect(() => {
+    const initialNotification = notifications?.find(
+      (n) => n._id === notificationId,
+    );
 
-    // If the current subscription has already been rated, move to the next one
-    if (ratedSubscriptions.includes(subscriptions[subscriptionIndex])) {
-        setSubscriptionIndex(subscriptionIndex + 1);
+    // Depending on which notification the user clicked we need to reorder our notifications
+    // to go through
+    const remainingNotifications =
+      notifications?.filter((n) => n._id !== notificationId) || [];
+
+    const initialUnratedNotificatons = [
+      initialNotification,
+      ...remainingNotifications,
+    ];
+
+    setCurrentNotification(initialNotification);
+    setUnratedNotifications(initialUnratedNotificatons);
+  }, [notificationId, notifications]);
+
+  // go throug all notifications currently active
+  function handleChangeSubscriptionClick(direction) {
+    if (direction !== 1 && direction !== -1) return;
+
+    if (selectedScore) {
+      const selectedSubscriptionId =
+        unratedNotifications[currentIndex].subscriptionId._id;
+
+      // we need to send a new event: 'usageRatingSent' -> set Rating for ID and mark Notification as read
+      eventEmitter.emit(
+        "useScoreSelected",
+        selectedSubscriptionId,
+        selectedScore,
+        currentNotification._id,
+      );
+
+      // remove from unrated subscription
+      setUnratedNotifications((prev) =>
+        prev.filter((n) => n._id !== currentNotification._id),
+      );
     }
+
+    // just move to next or previous if nothing is selected
+    if (unratedNotifications.length > 1) {
+      // direction can be +/- 1 so check both edges
+      const newIndex =
+        unratedNotifications.findIndex(
+          (n) => n._id === currentNotification._id,
+        ) + direction;
+
+      if (newIndex > unratedNotifications.length - 1) {
+        // setCurrentIndex(0);
+        setCurrentNotification(unratedNotifications[0]);
+      } else if (newIndex < 0) {
+        // setCurrentIndex(unratedNotifications.length - 1);
+        setCurrentNotification(
+          unratedNotifications[unratedNotifications.length - 1],
+        );
+      } else {
+        // setCurrentIndex(newIndex);
+        setCurrentNotification(unratedNotifications[newIndex]);
+      }
+
+      // IF we move selected score needs to be reset
+      setSelectedScore(null);
+    }
+  }
+
+  // User clicks 'done'
+  // Saves score if one is selected, just closed otherwise
+  function handleDoneClick() {
+    if (selectedScore) {
+      submitSelectedScore(
+        currentNotification.subscriptionId._id,
+        selectedScore,
+        currentNotification._id,
+      );
+    }
+
+    onClose();
+  }
+
+  // Actually send the event to save the usage score and dismiss the related notification
+  function submitSelectedScore(subscriptionId, score, notificationId) {
+    // Reset radiogroup
+    setSelectedScore(null);
+
+    eventEmitter.emit(
+      "useScoreSelected",
+      subscriptionId,
+      score,
+      notificationId,
+    );
+  }
 
   // Render the modal
   return (
-    <Transition show={isOpen} as={Fragment}>
+    <Transition show={opened} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        open={isOpen}
-        onClose={setIsOpen}
+        open={opened}
+        onClose={onClose}
       >
         <div className="min-h-screen px-4 text-center">
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
@@ -85,67 +126,128 @@ const Usage = forwardRef((props, ref) => {
           >
             &#8203;
           </span>
-          <div ref={ref} className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+          <div className="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
             <Dialog.Title
               as="h3"
               className="text-lg font-medium leading-6 text-gray-900"
             >
-              How often do you use {subscriptions[subscriptionIndex]?.name ?? 'Loading...'}?
+              How often do you use{" "}
+              <span className="font-bold">
+                {currentNotification?.subscriptionId.name}
+              </span>
+              ?
             </Dialog.Title>
             <div className="mt-2">
               <p className="text-sm text-gray-500">
-                Don't think, just select!
+                Don&apos;t think, just select!
               </p>
-              <RadioGroup value={selected} onChange={handleSelection} className="mt-4">
-                <RadioGroup.Option 
-                  value="often"
-                  className={({ checked }) => 
-                    `bg-green-300 ${checked ? 'ring-green-600' : 'ring-green-200'}
-                    mb-4 relative flex cursor-pointer rounded-lg px-4 py-3 shadow-md focus:outline-none`
+              <RadioGroup
+                onChange={(event) => setSelectedScore(event)}
+                className="mt-4"
+                value={selectedScore}
+              >
+                <RadioGroup.Option
+                  value="5"
+                  className={({ checked }) =>
+                    `bg-green-300 ${checked ? "ring-2 ring-black" : ""}
+                    mb-4 relative flex cursor-pointer rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
                   }
                 >
                   {({ checked }) => (
-                    <RadioGroup.Label className={checked ? 'text-white' : 'text-gray-900'}>
+                    <RadioGroup.Label
+                      className={checked ? "text-white" : "text-gray-900"}
+                    >
                       Often
                     </RadioGroup.Label>
                   )}
                 </RadioGroup.Option>
                 <RadioGroup.Option
-                  value="sometimes"
-                  className={({ checked }) => 
-                    `bg-orange-300 ${checked ? 'ring-2 ring-orange-500' : 'ring-orange-200'}
-                    mb-4 rounded-lg px-4 py-3 shadow-md focus:outline-none`
+                  value="3"
+                  className={({ checked }) =>
+                    `bg-orange-300 ${checked ? "ring-2 ring-black" : ""}
+                    mb-4 rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
                   }
                 >
                   {({ checked }) => (
-                    <RadioGroup.Label className={checked ? 'text-white' : 'text-gray-900'}>
+                    <RadioGroup.Label
+                      className={checked ? "text-white" : "text-gray-900"}
+                    >
                       Sometimes
                     </RadioGroup.Label>
                   )}
                 </RadioGroup.Option>
                 <RadioGroup.Option
-                  value="rarely"
-                  className={({ checked }) => 
-                    `bg-red-300 ${checked ? 'ring-2 ring-red-500' : 'ring-red-200'}
-                    rounded-lg px-4 py-3 shadow-md focus:outline-none`
-                  }  
+                  value="1"
+                  className={({ checked }) =>
+                    `bg-red-300 ${checked ? "ring-2 ring-black" : ""}
+                    rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
+                  }
                 >
                   {({ checked }) => (
-                    <RadioGroup.Label className={checked ? 'text-white' : 'text-gray-900'}>
+                    <RadioGroup.Label
+                      className={checked ? "text-white" : "text-gray-900"}
+                    >
                       Rarely
                     </RadioGroup.Label>
                   )}
                 </RadioGroup.Option>
               </RadioGroup>
-              <button onClick={() => setIsOpen(false)} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                Done
-              </button>
+              <div className="flex w-full flex-row items-center justify-between">
+                <button
+                  onClick={handleDoneClick}
+                  className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
+                >
+                  Done
+                </button>
+                {unratedNotifications?.length > 1 && (
+                  <div className="flex flex-row justify-end gap-2">
+                    <button
+                      onClick={() => handleChangeSubscriptionClick(-1)}
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                        />
+                      </svg>
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handleChangeSubscriptionClick(1)}
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white"
+                    >
+                      Next
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </Dialog>
     </Transition>
   );
-});
-
-export default Usage;
+}

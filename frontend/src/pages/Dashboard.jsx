@@ -12,11 +12,13 @@ import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
 import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
 import OverviewStat from "../components/OverviewStat"; // Import BarChart component
+import UsageModal from "../components/UsageModal";
 
 import useDataFetching from "../hooks/useDataFetching";
 import eventEmitter from "../utils/EventEmitter";
 import { useDataContext } from "../contexts/dataContext";
 import Notifications from "../components/Notifications";
+import getGreeting from "../utils/greetings.js";
 
 function Dashboard() {
   // ---- CONTEXT ----
@@ -24,8 +26,8 @@ function Dashboard() {
     subscriptions,
     allCategories,
     usedCategories,
-    // usages,
     dashboardData,
+    setNotifications,
   } = useDataContext();
 
   // ---- STATE ----
@@ -34,16 +36,17 @@ function Dashboard() {
     subscription: {},
     showForm: false,
   });
-
-  // USAGE
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
+  const [usageModalState, setUsageModalState] = useState({
+    showForm: false,
+    notificationId: null,
+  });
 
   // ---- CUSTOM HOOKS ----
   const { loading, error, errorMessage, refetchData } = useDataFetching();
   const { pageId } = useParams();
-  const { firstName } = useUser();
+  const {
+    user: { firstName },
+  } = useUser();
 
   // ---- Event Callbacks ----
   function openSubscriptionFormCallback(subscription, mode) {
@@ -64,9 +67,8 @@ function Dashboard() {
   }
 
   function notificationClickedCallback(id) {
-    alert(
-      `Notification with ID ${id} has been clicked. Something should happen!`,
-    );
+    console.log(id);
+    setUsageModalState({ showForm: true, notificationId: id });
   }
 
   // DEBUG LOGGING
@@ -80,6 +82,10 @@ function Dashboard() {
   useEffect(() => {
     const abortController = new AbortController();
 
+    // All event handlers that require backend communcation need to be
+    // inside the use effect because we need the abortionController
+    // TODO: We could create a new controller withint the event handler maybe?
+
     // Need this one in here for the abort controller
     function refetchCallback() {
       refetchData(abortController);
@@ -90,12 +96,19 @@ function Dashboard() {
       alert(`Notification with ID ${id} should be marked as read!`);
     }
 
+    function usageScoreSelectedCallback(subscriptionId, score, notificationId) {
+      alert(
+        `Usage has been set for ${subscriptionId}, Score ${score} (Notification ${notificationId})`,
+      );
+    }
+
     // register event listeners
     eventEmitter.on("refetchData", refetchCallback);
     eventEmitter.on("openSubscriptionForm", openSubscriptionFormCallback);
     eventEmitter.on("changeFormMode", switchFormModeCallback);
     eventEmitter.on("markNotificationAsRead", notificationReadCallback);
     eventEmitter.on("notificationClicked", notificationClickedCallback);
+    eventEmitter.on("useScoreSelected", usageScoreSelectedCallback);
 
     // TODO: more robust implementation
     document.body.style.background =
@@ -110,6 +123,7 @@ function Dashboard() {
       eventEmitter.off("changeFormMode", switchFormModeCallback);
       eventEmitter.off("markNotificationAsRead", notificationReadCallback);
       eventEmitter.off("notificationClicked", notificationClickedCallback);
+      eventEmitter.off("useScoreSelected", usageScoreSelectedCallback);
     };
   }, []);
 
@@ -142,7 +156,7 @@ function Dashboard() {
       {!loading && error && <ErrorDisplay message={errorMessage} />}
 
       {!loading && !error && checkDataLoadingSuccessful() && (
-        <div className="flex flex-grow min-h-120 w-full flex-col items-center p-4">
+        <div className="min-h-120 flex w-full flex-grow flex-col items-center p-4">
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
@@ -162,7 +176,7 @@ function Dashboard() {
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
                   <div className="w-full text-lg font-bold uppercase">
-                    Hello, {firstName}
+                    {getGreeting(firstName)}
                   </div>
 
                   {/* Notification */}
@@ -177,10 +191,10 @@ function Dashboard() {
                   {/* Sidebar Content */}
                   <div className="flex flex-grow flex-col divide-y divide-black/25">
                     {/* Add Subscription Button */}
-                    <div className="p-1 flex justify-center">
+                    <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="rounded-lg bg-black px-5 py-3 text-center text-white hover:bg-gray-700 hover:text-white w-full mx-2"
+                        className="mx-2 w-full rounded-lg bg-black px-5 py-3 text-center text-white hover:bg-gray-700 hover:text-white"
                       >
                         Add Subscription
                       </button>
@@ -250,10 +264,19 @@ function Dashboard() {
           }
         />
       )}
+
+      {/* Usage Modal */}
+      <UsageModal
+        opened={usageModalState.showForm}
+        notificationId={usageModalState.notificationId}
+        onClose={() =>
+          setUsageModalState((prev) => {
+            return { ...prev, showForm: false };
+          })
+        }
+      />
     </>
   );
 }
 
 export default Dashboard;
-
-

@@ -3,7 +3,7 @@ import { useDataContext } from "../contexts/dataContext";
 import { useState } from "react";
 
 export default function SubscriptionList() {
-  const { subscriptions, setEditMode, setSelectedSubscription } = useDataContext();
+  const { subscriptions } = useDataContext();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -15,23 +15,26 @@ export default function SubscriptionList() {
 
   const handleSubscriptionClick = (subscription) => {
     eventEmitter.emit("openSubscriptionForm", subscription, "show");
-  }
+  };
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(subscriptions.length / itemsPerPage);
+  const totalPages = Math.ceil(subscriptions?.length / itemsPerPage);
 
   // Get the subscriptions for the current page
-  const currentSubscriptions = subscriptions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const currentSubscriptions = subscriptions?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   return (
     <div className="space-y-4 px-4">
-      {currentSubscriptions.map((subscription, index) => (
-        <div 
-          className="flex items-center hover:bg-white hover:bg-opacity-25 cursor-pointer border border-gray-200 rounded-md p-2" 
-          key={subscription._id} 
+      {currentSubscriptions?.map((subscription) => (
+        <div
+          key={subscription?._id}
+          className="flex cursor-pointer items-center rounded-md border border-gray-200 p-2 hover:bg-white hover:bg-opacity-25"
           onClick={() => handleSubscriptionClick(subscription)}
         >
-          <div className="h-9 w-9 rounded-full bg-gray-500 flex items-center justify-center">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -47,9 +50,11 @@ export default function SubscriptionList() {
               />
             </svg>
           </div>
-          <div className="flex-grow flex justify-between items-center ml-[10px]">  
+          <div className="ml-[10px] flex flex-grow items-center justify-between">
             <div className="flex flex-col">
-              <p className="text-sm font-medium leading-none">{subscription.name}</p>
+              <p className="text-sm font-medium leading-none">
+                {subscription.name}
+              </p>
               <p className="text-xs text-gray-500">
                 {subscription.active ? "Active" : "Inactive"}
               </p>
@@ -65,8 +70,10 @@ export default function SubscriptionList() {
       ))}
       <div className="join flex justify-center space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (
-          <button 
-            className={`join-item btn ${currentPage === i + 1 ? 'btn-active' : ''} bg-gray-300 rounded-md p-2`} 
+          <button
+            className={`join-item btn ${
+              currentPage === i + 1 ? "btn-active" : ""
+            } bg-gray-300 rounded-md p-2`}
             onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
