@@ -27,15 +27,11 @@ function ApiTestChild() {
 
 export default function ApiTest() {
   // Context
-  const {
-    subscriptions,
-    usedCategories,
-    usages,
-    dashboardData,
-    allCategories,
-  } = useDataContext();
+  const { subscriptions, usedCategories, dashboardData, allCategories } =
+    useDataContext();
 
-  const { getAllNotifications } = useNotifications();
+  const { getAllNotifications, getAndUpdateNotificationById } =
+    useNotifications();
   const { createUsage } = useUsage();
 
   const { loading, errorMessage, error, refetchData } = useDataFetching();
@@ -59,6 +55,21 @@ export default function ApiTest() {
       }
     }
     testGetNotifications();
+
+    // notification update test
+    // async function testUpdateNotification() {
+    //   try {
+    //     const updatedNotification = await getAndUpdateNotificationById(
+    //       "6512e198da7e69386cdb8f25",
+    //       abortController,
+    //     );
+    //
+    //     console.log(updatedNotification);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+    // testUpdateNotification();
 
     // test new usage creation
     // async function testCreateUsage() {
@@ -98,10 +109,6 @@ export default function ApiTest() {
         <h1 className="mt-4 text-xl">Used Categories</h1>
         {!loading && !error && usedCategories && (
           <div className="text-xs">{JSON.stringify(usedCategories)}</div>
-        )}
-        <h1 className="mt-4 text-xl">Usages</h1>
-        {!loading && !error && usages && (
-          <div className="text-xs">{JSON.stringify(usages)}</div>
         )}
         <h1 className="mt-4 text-xl">All Categories</h1>
         {!loading && !error && allCategories && (

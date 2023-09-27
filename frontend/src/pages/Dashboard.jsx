@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserButton } from "@clerk/clerk-react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 import { useParams } from "react-router-dom";
 
 import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
@@ -10,12 +10,13 @@ import SearchModal from "../components/SearchModal"; // Import SearchModal compo
 import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
-import TabNavigation from "../components/TabNavigation";
-import UsageTab from "../components/UsageTab";
+import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
+import OverviewStat from "../components/OverviewStat"; // Import BarChart component
 
 import useDataFetching from "../hooks/useDataFetching";
 import eventEmitter from "../utils/EventEmitter";
 import { useDataContext } from "../contexts/dataContext";
+import Notifications from "../components/Notifications";
 
 function Dashboard() {
   // ---- CONTEXT ----
@@ -42,9 +43,9 @@ function Dashboard() {
   // ---- CUSTOM HOOKS ----
   const { loading, error, errorMessage, refetchData } = useDataFetching();
   const { pageId } = useParams();
+  const { firstName } = useUser();
 
   // ---- Event Callbacks ----
-
   function openSubscriptionFormCallback(subscription, mode) {
     setSubscriptionFormState({
       mode,
@@ -60,6 +61,12 @@ function Dashboard() {
         mode,
       };
     });
+  }
+
+  function notificationClickedCallback(id) {
+    alert(
+      `Notification with ID ${id} has been clicked. Something should happen!`,
+    );
   }
 
   // DEBUG LOGGING
@@ -78,10 +85,17 @@ function Dashboard() {
       refetchData(abortController);
     }
 
+    // Same with this
+    function notificationReadCallback(id) {
+      alert(`Notification with ID ${id} should be marked as read!`);
+    }
+
     // register event listeners
     eventEmitter.on("refetchData", refetchCallback);
     eventEmitter.on("openSubscriptionForm", openSubscriptionFormCallback);
     eventEmitter.on("changeFormMode", switchFormModeCallback);
+    eventEmitter.on("markNotificationAsRead", notificationReadCallback);
+    eventEmitter.on("notificationClicked", notificationClickedCallback);
 
     // TODO: more robust implementation
     document.body.style.background =
@@ -94,6 +108,8 @@ function Dashboard() {
       eventEmitter.off("refetchData", refetchCallback);
       eventEmitter.off("openSubscriptionForm", openSubscriptionFormCallback);
       eventEmitter.off("changeFormMode", switchFormModeCallback);
+      eventEmitter.off("markNotificationAsRead", notificationReadCallback);
+      eventEmitter.off("notificationClicked", notificationClickedCallback);
     };
   }, []);
 
@@ -126,9 +142,9 @@ function Dashboard() {
       {!loading && error && <ErrorDisplay message={errorMessage} />}
 
       {!loading && !error && checkDataLoadingSuccessful() && (
-        <div className="flex h-full w-full flex-col items-center p-4">
+        <div className="flex flex-grow min-h-120 w-full flex-col items-center p-4">
           {/* Top bar with logo and search */}
-          <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
             <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
 
@@ -139,54 +155,36 @@ function Dashboard() {
           </div>
 
           {/* App content */}
-          <div className="flex w-3/5 flex-row items-center justify-between gap-4">
+          <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="col-start-2 pt-8">
-              <div className="flex flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+              <div className="flex flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
                   <div className="w-full text-lg font-bold uppercase">
-                    Dashboard
+                    Hello, {firstName}
                   </div>
 
                   {/* Notification */}
-                  <div>
-                    <div className="relative rounded-full border border-black/25 bg-white/25 p-1">
-                      <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
-                        2
-                      </div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="h-6 w-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  <Notifications />
 
                   {/* User Icon */}
                   <UserButton />
                 </div>
 
                 {/* Content Area */}
-                <div className="flex w-full flex-row divide-x divide-black/25">
+                <div className="flex w-full flex-grow flex-row divide-x divide-black/25">
                   {/* Sidebar Content */}
-                  <div className="flex flex-col divide-y divide-black/25">
+                  <div className="flex flex-grow flex-col divide-y divide-black/25">
                     {/* Add Subscription Button */}
-                    <button
-                      onClick={handleAddSubscriptionClick}
-                      className="rounded bg-black p-4 text-white hover:bg-black hover:text-white"
-                    >
-                      Add Subscription
-                    </button>
+                    <div className="p-1 flex justify-center">
+                      <button
+                        onClick={handleAddSubscriptionClick}
+                        className="rounded-lg bg-black px-5 py-3 text-center text-white hover:bg-gray-700 hover:text-white w-full mx-2"
+                      >
+                        Add Subscription
+                      </button>
+                    </div>
 
                     {/* Overview, Recommendations, Cancel */}
                     <SidebarTop className="w-full p-2" />
@@ -196,34 +194,14 @@ function Dashboard() {
                   </div>
 
                   {/* Main Content */}
-                  <div className="w-full bg-white/25">
+                  <div className=" bg-white/25">
                     {/* Main Dashboard View */}
                     {!pageId && (
-                      <TabNavigation
-                        tabs={[
-                          {
-                            name: "Dashboard",
-                            element: (
-                              <div className="grid w-full gap-4">
-                                <Stats />
-                                <MainContent />
-                              </div>
-                            ),
-                          },
-                          {
-                            name: "Active",
-                            element: <MainContent filter="active" />,
-                          },
-                          {
-                            name: "Inactive",
-                            element: <MainContent filter="inactive" />,
-                          },
-                          {
-                            name: "Usage",
-                            element: <UsageTab openModal={openModal} />,
-                          },
-                        ]}
-                      />
+                      <div className="grid  gap-4">
+                        <Stats />
+                        <OverviewStat />
+                        <SubscriptionList />
+                      </div>
                     )}
 
                     {/* Recommendations / Cancel */}
@@ -277,3 +255,5 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+

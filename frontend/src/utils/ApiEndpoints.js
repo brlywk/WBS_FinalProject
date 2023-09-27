@@ -97,4 +97,8 @@ export default class ApiEndpoints {
   static searchQuery(query) {
     return `${this.search}?query=${query}`;
   }
+
+  static notificationById(id) {
+    return `${this.notifications}/${id}`;
+  }
 }
