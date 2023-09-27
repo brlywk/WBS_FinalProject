@@ -36,7 +36,7 @@ export default function Notifications() {
 
         {/* Notifications */}
         {notifications?.length > 0 && (
-          <div className="absolute bottom-0 right-0 flex h-4 w-4 translate-x-1 translate-y-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+          <div className="absolute bottom-0 right-0 flex h-4 w-4 -translate-y-5 translate-x-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
             {notifications?.length}
           </div>
         )}
@@ -44,6 +44,7 @@ export default function Notifications() {
 
       <Popover.Panel className="absolute z-10 min-w-[15vw] -translate-x-1/2 translate-y-2 rounded-xl bg-white p-2 shadow-xl">
         <div className="grid gap-2">
+          {/* Notifications to show */}
           {notifications?.length > 0 &&
             notifications?.map((notification) => (
               <NotificationsCard
@@ -51,6 +52,14 @@ export default function Notifications() {
                 notification={notification}
               />
             ))}
+
+          {/* Nothing to show */}
+          {notifications?.length === 0 && (
+            <div>
+              You currently have no notifications. Awesome job staying on top of
+              things! 👏
+            </div>
+          )}
         </div>
       </Popover.Panel>
     </Popover>

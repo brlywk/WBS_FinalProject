@@ -13,20 +13,29 @@ import Stats from "../components/Stats"; // Import Stats component
 import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
 import OverviewStat from "../components/OverviewStat"; // Import BarChart component
 import UsageModal from "../components/UsageModal";
-
-import useDataFetching from "../hooks/useDataFetching";
-import eventEmitter from "../utils/EventEmitter";
-import { useDataContext } from "../contexts/dataContext";
 import Notifications from "../components/Notifications";
+
+import { useDataContext } from "../contexts/dataContext";
+import useDataFetching from "../hooks/useDataFetching";
+import useSubscription from "../hooks/useSubscription";
+import useUsage from "../hooks/useUsage";
+import useNotifications from "../hooks/useNotifications";
+import eventEmitter from "../utils/EventEmitter";
 import getGreeting from "../utils/greetings.js";
+import { createUsageBody } from "../utils/schemaBuilder";
+import useCategory from "../hooks/useCategory";
+import useDashboard from "../hooks/useDashboard";
 
 function Dashboard() {
   // ---- CONTEXT ----
   const {
     subscriptions,
+    setSubscriptions,
     allCategories,
     usedCategories,
+    setUsedCategories,
     dashboardData,
+    setDashboardData,
     setNotifications,
   } = useDataContext();
 
@@ -42,13 +51,21 @@ function Dashboard() {
   });
 
   // ---- CUSTOM HOOKS ----
-  const { loading, error, errorMessage, refetchData } = useDataFetching();
   const { pageId } = useParams();
   const {
     user: { firstName },
   } = useUser();
 
+  const { loading, error, errorMessage, refetchData } = useDataFetching();
+  const { createUsage } = useUsage();
+  const { getAllSubscriptions } = useSubscription();
+  const { getUsedCategories } = useCategory();
+  const { getDashboardData } = useDashboard();
+  const { getAllNotifications, getAndUpdateNotificationById } =
+    useNotifications();
+
   // ---- Event Callbacks ----
+  // show subscription form
   function openSubscriptionFormCallback(subscription, mode) {
     setSubscriptionFormState({
       mode,
@@ -57,6 +74,7 @@ function Dashboard() {
     });
   }
 
+  // Switch Edit mode for subscription form
   function switchFormModeCallback(mode) {
     setSubscriptionFormState((prev) => {
       return {
@@ -66,6 +84,7 @@ function Dashboard() {
     });
   }
 
+  // Notification has been clicked, show usageModal
   function notificationClickedCallback(id) {
     console.log(id);
     setUsageModalState({ showForm: true, notificationId: id });
@@ -75,12 +94,73 @@ function Dashboard() {
   console.log("Subscriptions", subscriptions);
   console.log("allCategories", allCategories);
   console.log("usedCategories", usedCategories);
-  // console.log("Usages", usages);
   console.log("dashboardData", dashboardData);
 
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
     const abortController = new AbortController();
+
+    // Unfortunately, every time we add usage data we need to sneakily refetch almost
+    // all data, as otherwise our application doesn't show the current state of data *buuuuuuh!*
+    async function sneakyDataRefetch() {
+      try {
+        const [
+          updatedSubscriptions,
+          updatedUsedCategories,
+          updatedDashboardData,
+        ] = await Promise.all([
+          getAllSubscriptions(abortController),
+          getUsedCategories(abortController),
+          getDashboardData(abortController),
+        ]);
+
+        setSubscriptions(updatedSubscriptions);
+        setUsedCategories(updatedUsedCategories);
+        setDashboardData(updatedDashboardData);
+      } catch (error) {
+        console.log(`Error refetching subscriptions: ${errorMessage}`);
+      }
+    }
+
+    // Rerequest notifications only, as re-rendering the whole UI for removing a notification
+    // seems pretty excessive
+    async function refetchNotifications() {
+      try {
+        const notifications = await getAllNotifications(abortController);
+        setNotifications(notifications);
+      } catch (error) {
+        console.log(`Error refetching notifications: ${errorMessage}`);
+      }
+    }
+
+    // creating new usage data
+    async function createUsageData(subscriptionId, score) {
+      try {
+        const usageBody = createUsageBody(subscriptionId, score);
+
+        await createUsage(usageBody, abortController);
+      } catch (error) {
+        console.log(`Error creating usage data: ${errorMessage}`);
+      }
+    }
+
+    // dismissing a single notification as read
+    // TODO: With this, a user can skip feedback for usage, but if we don't want to allow
+    // this we would probably need to remove the 'mark as read' option...
+    async function updateNotification(notificationId) {
+      try {
+        // TODO: Check what this actually returns ...
+        const updateNotification = await getAndUpdateNotificationById(
+          notificationId,
+          abortController,
+        );
+        console.log("Updated Notification", updateNotification);
+
+        refetchNotifications();
+      } catch (error) {
+        console.log(`Error creating usage data: ${errorMessage}`);
+      }
+    }
 
     // All event handlers that require backend communcation need to be
     // inside the use effect because we need the abortionController
@@ -91,15 +171,29 @@ function Dashboard() {
       refetchData(abortController);
     }
 
-    // Same with this
+    // mark a single notification as read
     function notificationReadCallback(id) {
-      alert(`Notification with ID ${id} should be marked as read!`);
+      updateNotification(id);
     }
 
+    // Create new usage Data and mark notification this feedback came from as read
     function usageScoreSelectedCallback(subscriptionId, score, notificationId) {
-      alert(
-        `Usage has been set for ${subscriptionId}, Score ${score} (Notification ${notificationId})`,
+      console.log(
+        `Creating usageData for ${subscriptionId}, score: ${score} (from notification ${notificationId})`,
       );
+
+      // create usage data
+      createUsageData(subscriptionId, score);
+
+      // refetch notifications
+      refetchNotifications();
+
+      // unfortunately we also need to refetch all subscriptions this way as otherwise
+      // we sit on stale usage data for our just updated subscription
+      sneakyDataRefetch();
+
+      // NOTE: We don't need to mark a notification as read here, as every posted usage data
+      // invalidates all notifications associated with a single subscription
     }
 
     // register event listeners

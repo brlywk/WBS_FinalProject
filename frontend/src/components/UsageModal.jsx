@@ -15,7 +15,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
 
   // ---- DERIVED STATE ----
   const currentIndex = unratedNotifications?.findIndex(
-    (n) => n._id === currentNotification._id,
+    (n) => n?._id === currentNotification?._id,
   );
 
   // ---- USE EFFECT ----
@@ -157,7 +157,10 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
-                      className={checked ? "text-white" : "text-gray-900"}
+                      className={
+                        (checked ? "text-white" : "text-gray-900") +
+                        " cursor-pointer"
+                      }
                     >
                       Often
                     </RadioGroup.Label>
@@ -172,7 +175,10 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
-                      className={checked ? "text-white" : "text-gray-900"}
+                      className={
+                        (checked ? "text-white" : "text-gray-900") +
+                        " cursor-pointer"
+                      }
                     >
                       Sometimes
                     </RadioGroup.Label>
@@ -187,7 +193,10 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
-                      className={checked ? "text-white" : "text-gray-900"}
+                      className={
+                        (checked ? "text-white" : "text-gray-900") +
+                        " cursor-pointer"
+                      }
                     >
                       Rarely
                     </RadioGroup.Label>
@@ -221,13 +230,11 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                           d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                         />
                       </svg>
-                      Previous
                     </button>
                     <button
                       onClick={() => handleChangeSubscriptionClick(1)}
                       className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white"
                     >
-                      Next
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
