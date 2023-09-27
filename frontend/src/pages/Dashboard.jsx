@@ -25,6 +25,7 @@ import getGreeting from "../utils/greetings.js";
 import { createUsageBody } from "../utils/schemaBuilder";
 import useCategory from "../hooks/useCategory";
 import useDashboard from "../hooks/useDashboard";
+import Recommendations from "../components/Recommendations";
 
 function Dashboard() {
   // ---- CONTEXT ----
@@ -264,8 +265,8 @@ function Dashboard() {
 
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
-            <div className="col-start-2 pt-8">
-              <div className="flex flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+            <div className="w-full pt-8">
+              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
@@ -302,7 +303,7 @@ function Dashboard() {
                   </div>
 
                   {/* Main Content */}
-                  <div className=" bg-white/25">
+                  <div className="w-full bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
                       <div className="grid  gap-4">
@@ -314,29 +315,17 @@ function Dashboard() {
 
                     {/* Recommendations / Cancel */}
                     {(pageId === "recommendations" || pageId === "cancel") && (
-                      <TabNavigation
-                        tabs={[
-                          {
-                            name: "Recommendations",
-                            element: (
-                              <div className="w-full">Recommendations</div>
-                            ),
-                          },
-                          {
-                            name: "Cancel",
-                            element: (
-                              <div className="w-full">Recommendations</div>
-                            ),
-                          },
-                        ]}
-                        initialTabIndex={pageId === "recommendations" ? 0 : 1}
-                      />
+                      <Recommendations />
                     )}
 
                     {/* Category Pages */}
                     {pageId &&
                       pageId !== "recommendations" &&
-                      pageId !== "cancel" && <MainContent filter={pageId} />}
+                      pageId !== "cancel" && (
+                        <div className="p-2">
+                          <MainContent filter={pageId} />
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
