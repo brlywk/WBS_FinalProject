@@ -1,16 +1,63 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useRef } from "react"; // Added useRef import
-import useSearch from "../hooks/useSearch";
+import { Fragment, useEffect, useState } from "react"; // Added useRef import
+import { useDataContext } from "../contexts/dataContext";
+import eventEmitter from "../utils/EventEmitter";
+import SubscriptionListCard from "./SubscriptionListCard";
 
 export default function SearchModal() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { startSearch } = useSearch();
-  const inputRef = useRef(); // Created a ref for the input field
+  // ---- CONTEXT ----
+  const { subscriptions } = useDataContext();
 
-  const handleSearch = async (query) => {
-    const results = await startSearch(query);
-    console.log(results);
-  };
+  // ---- STATE ----
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [correctModifierKey, setCorrectModifierKey] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  function handleInputChange(event) {
+    event.preventDefault();
+    const currentInput = event.target.value;
+
+    // set state to show / hide results
+    setSearchInput(currentInput);
+
+    if (currentInput) {
+      const results = subscriptions?.filter((s) =>
+        s.name.toLowerCase().includes(currentInput.toLowerCase()),
+      );
+
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  }
+
+  // close search modal and open subscription
+  function searchResultClickHandler(subscription) {
+    setSearchInput("");
+    setIsOpen(false);
+    eventEmitter.emit("openSubscriptionForm", subscription, "show");
+  }
+
+  // Set up keyboard shortcut and such
+  useEffect(() => {
+    const isMac = navigator.userAgent.indexOf("Mac") > -1;
+    const displayKey = isMac ? "\u2318" : "CTRL";
+    setCorrectModifierKey(displayKey);
+
+    function handleKeyDown(event) {
+      const modifierKey = isMac ? event.metaKey : event.ctrlKey;
+
+      if (modifierKey && event.key === "k") {
+        event.preventDefault();
+        setIsOpen(true);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <>
@@ -46,14 +93,20 @@ export default function SearchModal() {
           Search...
         </span>
         <span className="flex-none text-xs font-semibold text-gray-400">
-          Ctrl+K
+          <span className="rounded border border-gray-300 bg-gray-200 px-2 py-1 text-xs font-semibold shadow-inner">
+            {correctModifierKey}
+          </span>
+          <span className="px-1">+</span>
+          <span className="rounded border border-gray-300 bg-gray-200 px-2 py-1 text-xs font-semibold shadow-inner">
+            K
+          </span>
         </span>
       </button>
 
       <Transition show={isOpen} as={Fragment} className="w-full">
         <Dialog
           as="div"
-          className="fixed inset-0 z-50 flex h-full w-full items-center justify-center" // Changed items-start to items-center to center the modal vertically
+          className="fixed inset-0 z-50 flex h-full w-full items-start justify-center pt-32" // Changed items-start to items-center to center the modal vertically
           onClose={() => setIsOpen(false)}
         >
           <Transition.Child
@@ -76,14 +129,8 @@ export default function SearchModal() {
             leaveFrom="flex w-full scale-100 justify-center opacity-100"
             leaveTo="flex w-full scale-95 justify-center opacity-0"
           >
-            <div className="w-1/2 rounded-xl bg-white px-4 py-2 shadow-xl">
-              <form
-                className="flex items-center"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSearch(inputRef.current.value); // Used the ref to get the input value
-                }}
-              >
+            <div className="w-1/3 rounded-xl bg-white px-4 py-2 shadow-xl">
+              <form className="flex items-center">
                 <svg
                   className="h-5 w-5 text-gray-700"
                   xmlns="http://www.w3.org/2000/svg"
@@ -100,20 +147,39 @@ export default function SearchModal() {
                 </svg>
 
                 <input
-                  ref={inputRef} // Assigned the ref to the input field
                   className="w-full border-gray-100 bg-white/25  py-4 pl-12 placeholder-gray-400 outline-none"
                   type="text"
                   placeholder="Search..."
+                  value={searchInput}
+                  onChange={handleInputChange}
                 />
 
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-xxs flex items-center rounded-md border border-gray-200 p-1.5 font-semibold uppercase tracking-wider text-gray-700 focus:border-gray-300 focus:outline-none"
+                  className="rounded border border-gray-300 bg-gray-200 px-2 py-1 text-sm font-semibold uppercase shadow-inner"
                   type="button"
                 >
                   Esc
                 </button>
               </form>
+
+              {/* Show results if input and results */}
+              {searchInput && searchResults?.length > 0 && (
+                <div className="grid gap-2 py-2">
+                  {searchResults.map((sr, index) => (
+                    <SubscriptionListCard
+                      key={index}
+                      subscription={sr}
+                      clickHandler={() => searchResultClickHandler(sr)}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Show 'no results' if input but no results... */}
+              {searchInput && searchResults?.length === 0 && (
+                <div>No results found that match your search</div>
+              )}
             </div>
           </Transition.Child>
         </Dialog>
