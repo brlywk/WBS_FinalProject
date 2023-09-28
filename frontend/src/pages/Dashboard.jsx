@@ -12,20 +12,39 @@ import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
 import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
 import OverviewStat from "../components/OverviewStat"; // Import BarChart component
-
-import useDataFetching from "../hooks/useDataFetching";
-import eventEmitter from "../utils/EventEmitter";
-import { useDataContext } from "../contexts/dataContext";
+import UsageModal from "../components/UsageModal";
 import Notifications from "../components/Notifications";
 
+import { useDataContext } from "../contexts/dataContext";
+import useDataFetching from "../hooks/useDataFetching";
+import useSubscription from "../hooks/useSubscription";
+import useUsage from "../hooks/useUsage";
+import useNotifications from "../hooks/useNotifications";
+import eventEmitter from "../utils/EventEmitter";
+import getGreeting from "../utils/greetings.js";
+import { createUsageBody } from "../utils/schemaBuilder";
+import useCategory from "../hooks/useCategory";
+import useDashboard from "../hooks/useDashboard";
+import Recommendations from "../components/Recommendations";
+import CategroyStats from "../components/CategroyStats";
+
 function Dashboard() {
+  // ---- PAGE INFORMATION ----
+  const { pageId } = useParams();
+  const {
+    user: { firstName },
+  } = useUser();
+
   // ---- CONTEXT ----
   const {
     subscriptions,
+    setSubscriptions,
     allCategories,
     usedCategories,
-    // usages,
+    setUsedCategories,
     dashboardData,
+    setDashboardData,
+    setNotifications,
   } = useDataContext();
 
   // ---- STATE ----
@@ -34,18 +53,22 @@ function Dashboard() {
     subscription: {},
     showForm: false,
   });
-
-  // USAGE
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
+  const [usageModalState, setUsageModalState] = useState({
+    showForm: false,
+    notificationId: null,
+  });
 
   // ---- CUSTOM HOOKS ----
   const { loading, error, errorMessage, refetchData } = useDataFetching();
-  const { pageId } = useParams();
-  const { firstName } = useUser();
+  const { createUsage } = useUsage();
+  const { getAllSubscriptions } = useSubscription();
+  const { getUsedCategories } = useCategory();
+  const { getDashboardData } = useDashboard();
+  const { getAllNotifications, getAndUpdateNotificationById } =
+    useNotifications();
 
   // ---- Event Callbacks ----
+  // show subscription form
   function openSubscriptionFormCallback(subscription, mode) {
     setSubscriptionFormState({
       mode,
@@ -54,6 +77,7 @@ function Dashboard() {
     });
   }
 
+  // Switch Edit mode for subscription form
   function switchFormModeCallback(mode) {
     setSubscriptionFormState((prev) => {
       return {
@@ -63,31 +87,116 @@ function Dashboard() {
     });
   }
 
+  // Notification has been clicked, show usageModal
   function notificationClickedCallback(id) {
-    alert(
-      `Notification with ID ${id} has been clicked. Something should happen!`,
-    );
+    console.log(id);
+    setUsageModalState({ showForm: true, notificationId: id });
   }
 
   // DEBUG LOGGING
   console.log("Subscriptions", subscriptions);
   console.log("allCategories", allCategories);
   console.log("usedCategories", usedCategories);
-  // console.log("Usages", usages);
   console.log("dashboardData", dashboardData);
 
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
     const abortController = new AbortController();
 
+    // Unfortunately, every time we add usage data we need to sneakily refetch almost
+    // all data, as otherwise our application doesn't show the current state of data *buuuuuuh!*
+    async function sneakyDataRefetch() {
+      try {
+        const [
+          updatedSubscriptions,
+          updatedUsedCategories,
+          updatedDashboardData,
+        ] = await Promise.all([
+          getAllSubscriptions(abortController),
+          getUsedCategories(abortController),
+          getDashboardData(abortController),
+        ]);
+
+        setSubscriptions(updatedSubscriptions);
+        setUsedCategories(updatedUsedCategories);
+        setDashboardData(updatedDashboardData);
+      } catch (error) {
+        console.log(`Error refetching subscriptions: ${errorMessage}`);
+      }
+    }
+
+    // Rerequest notifications only, as re-rendering the whole UI for removing a notification
+    // seems pretty excessive
+    async function refetchNotifications() {
+      try {
+        const notifications = await getAllNotifications(abortController);
+        setNotifications(notifications);
+      } catch (error) {
+        console.log(`Error refetching notifications: ${errorMessage}`);
+      }
+    }
+
+    // creating new usage data
+    async function createUsageData(subscriptionId, score) {
+      try {
+        const usageBody = createUsageBody(subscriptionId, score);
+
+        await createUsage(usageBody, abortController);
+      } catch (error) {
+        console.log(`Error creating usage data: ${errorMessage}`);
+      }
+    }
+
+    // dismissing a single notification as read
+    // TODO: With this, a user can skip feedback for usage, but if we don't want to allow
+    // this we would probably need to remove the 'mark as read' option...
+    async function updateNotification(notificationId) {
+      try {
+        // TODO: Check what this actually returns ...
+        const updateNotification = await getAndUpdateNotificationById(
+          notificationId,
+          abortController,
+        );
+        console.log("Updated Notification", updateNotification);
+
+        refetchNotifications();
+      } catch (error) {
+        console.log(`Error creating usage data: ${errorMessage}`);
+      }
+    }
+
+    // All event handlers that require backend communcation need to be
+    // inside the use effect because we need the abortionController
+    // TODO: We could create a new controller withint the event handler maybe?
+
     // Need this one in here for the abort controller
     function refetchCallback() {
       refetchData(abortController);
     }
 
-    // Same with this
+    // mark a single notification as read
     function notificationReadCallback(id) {
-      alert(`Notification with ID ${id} should be marked as read!`);
+      updateNotification(id);
+    }
+
+    // Create new usage Data and mark notification this feedback came from as read
+    function usageScoreSelectedCallback(subscriptionId, score, notificationId) {
+      console.log(
+        `Creating usageData for ${subscriptionId}, score: ${score} (from notification ${notificationId})`,
+      );
+
+      // create usage data
+      createUsageData(subscriptionId, score);
+
+      // refetch notifications
+      refetchNotifications();
+
+      // unfortunately we also need to refetch all subscriptions this way as otherwise
+      // we sit on stale usage data for our just updated subscription
+      sneakyDataRefetch();
+
+      // NOTE: We don't need to mark a notification as read here, as every posted usage data
+      // invalidates all notifications associated with a single subscription
     }
 
     // register event listeners
@@ -96,6 +205,7 @@ function Dashboard() {
     eventEmitter.on("changeFormMode", switchFormModeCallback);
     eventEmitter.on("markNotificationAsRead", notificationReadCallback);
     eventEmitter.on("notificationClicked", notificationClickedCallback);
+    eventEmitter.on("useScoreSelected", usageScoreSelectedCallback);
 
     return () => {
       abortController.abort();
@@ -104,6 +214,7 @@ function Dashboard() {
       eventEmitter.off("changeFormMode", switchFormModeCallback);
       eventEmitter.off("markNotificationAsRead", notificationReadCallback);
       eventEmitter.off("notificationClicked", notificationClickedCallback);
+      eventEmitter.off("useScoreSelected", usageScoreSelectedCallback);
     };
   }, []);
 
@@ -136,7 +247,7 @@ function Dashboard() {
       {!loading && error && <ErrorDisplay message={errorMessage} />}
 
       {!loading && !error && checkDataLoadingSuccessful() && (
-        <div className="flex flex-grow flex-col items-center p-4">
+        <div className="min-h-120 flex w-full flex-grow flex-col items-center p-4">
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
@@ -150,13 +261,13 @@ function Dashboard() {
 
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
-            <div className="col-start-2 pt-8">
-              <div className="flex flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+            <div className="w-full pt-8">
+              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
                   <div className="w-full text-lg font-bold uppercase">
-                    Hello, {firstName}
+                    {getGreeting(firstName)}
                   </div>
 
                   {/* Notification */}
@@ -171,7 +282,7 @@ function Dashboard() {
                   {/* Sidebar Content */}
                   <div className="flex flex-grow flex-col divide-y divide-black/25">
                     {/* Add Subscription Button */}
-                    <div className="p-1 flex justify-center">
+                    <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
                         className="cursor-pointer transition-all duration-300 ease-in-out bg-gradient-to-r from-black to-gray-500 text-white text-base border-none rounded-lg px-5 py-3 outline-none hover:from-gray-500 hover:to-black hover:scale-110 transform-gpu w-full mx-2"
@@ -188,7 +299,7 @@ function Dashboard() {
                   </div>
 
                   {/* Main Content */}
-                  <div className=" bg-white/25">
+                  <div className="w-full bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
                       <div className="grid  gap-4">
@@ -199,30 +310,19 @@ function Dashboard() {
                     )}
 
                     {/* Recommendations / Cancel */}
-                    {(pageId === "recommendations" || pageId === "cancel") && (
-                      <TabNavigation
-                        tabs={[
-                          {
-                            name: "Recommendations",
-                            element: (
-                              <div className="w-full">Recommendations</div>
-                            ),
-                          },
-                          {
-                            name: "Cancel",
-                            element: (
-                              <div className="w-full">Recommendations</div>
-                            ),
-                          },
-                        ]}
-                        initialTabIndex={pageId === "recommendations" ? 0 : 1}
-                      />
-                    )}
+                    {pageId === "recommendations" && <Recommendations />}
 
                     {/* Category Pages */}
-                    {pageId &&
-                      pageId !== "recommendations" &&
-                      pageId !== "cancel" && <MainContent filter={pageId} />}
+                    {pageId && pageId !== "recommendations" && (
+                      <div className="p-2">
+                        <CategroyStats
+                          category={usedCategories?.find(
+                            (c) => c._id === pageId,
+                          )}
+                        />
+                        <MainContent filter={pageId} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -244,11 +344,19 @@ function Dashboard() {
           }
         />
       )}
-    </div>
+
+      {/* Usage Modal */}
+      <UsageModal
+        opened={usageModalState.showForm}
+        notificationId={usageModalState.notificationId}
+        onClose={() =>
+          setUsageModalState((prev) => {
+            return { ...prev, showForm: false };
+          })
+        }
+      />
+    </>
   );
 }
 
 export default Dashboard;
-
-
-
