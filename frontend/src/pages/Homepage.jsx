@@ -1,70 +1,120 @@
-import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react";
-import { ProtectedPart } from "./Protected";
+import React from 'react';
 import { Link } from "react-router-dom";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import LogoutButton from "../components/LogoutButton";
-
-// just for testing
-import axios from "axios";
-import { useEffect } from "react";
-import { apiEndpoint } from "../utils/apiEndpoints";
+import styles from './Homepage.module.css';
 
 export default function Homepage() {
-  const { getToken } = useAuth();
-
-  const testApi = `${apiEndpoint}/restricted`;
-
-  useEffect(() => {
-    // we need to get the token to authenticate our requests to Clerk
-    // BUT getting the token is async, so we have to wrap everything
-    // in an async function before calling that function...
-    // ... probably a good idea to make this into a helper function for easier use
-    //     later on
-    async function authGetReq() {
-      const token = await getToken();
-
-      axios
-        .get(testApi, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => console.log(err));
-    }
-
-    authGetReq();
-  }, []);
-
   return (
-    <div>
-      <h1>Hi, I am the homepage</h1>
-      <div>
-        {/* Show signup and login only if not logged in */}
-        <SignedOut>
-          <Link to="/signup">Signup</Link>
-          <Link to="/login">Login</Link>
-        </SignedOut>
+    <div className={styles.homepage}>
+      <head>
+        <meta charSet="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>subzero</title>
+      </head>
 
-        {/* Show logout if logged in */}
-        <SignedIn>
-          <LogoutButton />
-        </SignedIn>
-      </div>
-      {/* Only show this when the user is signed in! */}
-      <SignedIn>
-        {/* Show a protected component */}
-        <ProtectedPart />
-        <div>
-          <hr />
-          {/* Show user information */}
+      <nav>
+  <div className={styles.nav__content}>
+    <img src="/subzero_logo_og.svg" alt="Subzero Logo" className={styles.logo} />
+
+    <SignedOut>
+      <Link to="/signup" className={styles.button}>SIGN UP</Link>
+      <Link to="/login" className={styles.button}>SIGN IN</Link>
+    </SignedOut>
+
+    <SignedIn>
+      <div className={styles.flex}>
+        <div className={styles.userButtonWrapper}>
           <UserButton />
-
-          {/* Provide a link to a protected page */}
-          <Link to="/test">And here is a link to a protected page!</Link>
         </div>
-      </SignedIn>
+        <LogoutButton />
+      </div>
+    </SignedIn>
+  </div>
+</nav>
+
+      <main>
+        <section>
+          <h1 className={styles['custom-h1']}>Zero in on What Matters</h1>
+
+          <div className={`${styles.box} ${styles['box--two']}`}>
+            <div className={styles.box__content0}>
+              <p>Elevate Essentials, Freeze Out the Waste — Decide What Stays</p>
+            </div>
+          </div>
+
+          <div className={styles['bleed-canvas']}>
+            <img className={styles.moneyhand} src="/moneyhand.png" alt="Moneyhand" />
+            <img className={styles.dashboardlaptop} src="/Dashboardbglaptop.png" alt="Dashboard Laptop" />
+            <img className={styles.subzerologoicon} src="/subzero_logo_icon.png" alt="" />
+          </div>
+        </section>
+
+        <section>
+          <p>Welcome to the ultimate in subscription oversight.</p>
+
+          <div className={styles['dashboard-image']}>
+            <img src="/Dashboardbgbrowsertilt.png" alt="Dashboard Image" />
+          </div>
+
+          <p className={styles['small-black-text']} style={{ fontSize: '2em', color: 'black' }}>
+            The dashboard, offers a 360-degree view of your subscription landscape. 
+            It merges all elements from a monthly report right into the dashboard, providing a dynamic summary.
+            Actionable insights like Potential Savings, Most and least used.
+          </p>
+        </section>
+
+        <section>
+          <h2>Are you still watching?</h2>
+        </section>
+
+        <section>
+          <div className={styles['spacing-box']}></div>
+
+          <div className={styles.box}>
+            <div className={styles.box__content}>
+              <p>
+                Taking a cue from Netflix's iconic "Are you still watching?", SubZero respectfully inquires, "Are you still using Netflix?” 
+                
+                Our insights might just prompt you to hit 'pause' on that seldom-used subscription and tip the scales back in favor of your finances.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.sticky}>
+            <img src="/ReminderModalplain.png" alt="Reminder Modal" />
+          </div>
+
+          <div className={`${styles.box} ${styles['box--two']}`}>
+            <div className={styles.box__content}>
+              <p>
+                <span className={styles.logo}></span>
+                <span>Join today</span>, and take control of your subscriptions.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className={styles['bento--mini']}>
+            <div></div>
+            <div></div>
+          </div>
+
+          <div className={styles['bento--mini']}>
+            <div></div>
+            <div></div>  
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.section__content}>
+            <h2></h2>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
+

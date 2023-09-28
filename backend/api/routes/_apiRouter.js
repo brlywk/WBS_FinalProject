@@ -1,40 +1,34 @@
-import clerk, {
-  ClerkExpressWithAuth,
-  ClerkExpressRequireAuth,
-} from "@clerk/clerk-sdk-node";
+import categoryRouter from "./_categoryRouter.js";
+import subscriptionRouter from "./_subscriptionRouter.js";
+import subscriptionUsageRouter from "./_subscriptionUsageRouter.js";
+import usageRouter from "./_usageRouter.js";
+import dashboardDataRouter from "./_dashboardDataRouter.js";
+import searchRouter from "./_searchRouter.js";
+import notificationRouter from "./_notificatonRouter.js";
 
 import { Router } from "express";
-import asyncWrapper from "../utils/_asyncWrapper.js";
 
 const apiRouter = Router();
 
-// test for a route that does not need authorisation
-apiRouter.route("/public").get(
-  asyncWrapper(async (req, res, next) => {
-    const userList = await clerk.users.getUserList();
+// ---- ROUTE: /api/subscriptions ----
+apiRouter.use("/subscriptions", subscriptionRouter);
 
-    res.status(200).json(userList);
-  }),
-);
+// ROUTE: /api/subscriptionUsage ----
+apiRouter.use("/subscriptionUsage", subscriptionUsageRouter);
 
-// test for restricted route that just returns nothing
-apiRouter.route("/private").get(
-  ClerkExpressWithAuth(),
-  asyncWrapper(async (req, res, next) => {
-    res.json(req.auth);
-  }),
-);
+// ---- ROUTE: /api/categories ----
+apiRouter.use("/categories", categoryRouter);
 
-// test for restricted route that returns an error when unauhtorised
-apiRouter.route("/restricted").get(
-  ClerkExpressRequireAuth(),
-  asyncWrapper(async (req, res, next) => {
-    console.log(
-      new Date().toLocaleDateString(),
-      "Request has been made to restricted endpoint by user:\n",
-      req.auth.userId,
-    );
-    res.status(200).json({ message: "Allowed" });
-  }),
-);
+// ---- ROUTE: /api/usages ----
+apiRouter.use("/usages", usageRouter);
+
+// ---- ROUTE: /api/dashboard
+apiRouter.use("/dashboard", dashboardDataRouter);
+
+// ---- ROUTE: /api/search
+apiRouter.use("/search", searchRouter);
+
+// ---- ROUTE: /notifications
+apiRouter.use("/notifications", notificationRouter);
+
 export default apiRouter;
