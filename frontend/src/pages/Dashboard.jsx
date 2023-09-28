@@ -239,6 +239,11 @@ function Dashboard() {
     return loadingSuccessful;
   }
 
+  // Inside your Dashboard component's render method:
+if (loading) {
+  return <Loading />;
+}
+
   // Main return block for the Dashboard component
   return (
     <div className="apple-bg h-screen w-screen">

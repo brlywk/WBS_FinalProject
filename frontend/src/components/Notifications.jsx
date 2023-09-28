@@ -38,6 +38,7 @@ export default function Notifications() {
         {notifications?.length > 0 && (
           <div className="absolute bottom-0 right-0 flex h-4 w-4 -translate-y-5 translate-x-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
             {notifications?.length}
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           </div>
         )}
       </Popover.Button>

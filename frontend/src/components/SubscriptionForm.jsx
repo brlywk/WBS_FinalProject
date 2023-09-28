@@ -178,9 +178,9 @@ export default function SubscriptionForm({
           leaveFrom="flex w-full scale-100 justify-center opacity-100"
           leaveTo="flex w-full scale-95 justify-center opacity-0"
         >
-          <Dialog.Panel className="z-20 rounded-lg bg-white p-4">
+          <Dialog.Panel className="z-20 rounded-lg bg-white opacity-90 p-12">
             {/* Title Bar */}
-            <Dialog.Title className="text-xl font-bold uppercase">
+            <Dialog.Title className="text-xl font-semibold uppercase text-center mb-8">
               {mode} Subscription
             </Dialog.Title>
 
@@ -345,10 +345,10 @@ export default function SubscriptionForm({
             </div>
 
             {/* Buttons */}
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="mt-4 flex justify-center gap-2">
               {mode === "edit" && (
                 <button
-                  className="inline-flex justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                  className="inline-flex justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                   onClick={handleDeleteSubscription}
                 >
                   Delete
@@ -357,7 +357,7 @@ export default function SubscriptionForm({
 
               {mode !== "edit" && (
                 <button
-                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   onClick={() => switchMode("edit")}
                 >
                   Edit
@@ -367,14 +367,14 @@ export default function SubscriptionForm({
               {mode === "edit" && (
                 <>
                   <button
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={handleSaveEditSubscription}
                   >
                     Save
                   </button>
 
                   <button
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                     onClick={() => onClose()}
                   >
                     Cancel
@@ -384,7 +384,7 @@ export default function SubscriptionForm({
 
               {mode !== "edit" && (
                 <button
-                  className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-none hover:bg-indigo-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform active:scale-75 transition-transform"
                   onClick={handleAddSubscription}
                 >
                   Add
