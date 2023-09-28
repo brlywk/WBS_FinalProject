@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
 
-const CustomTooltip = ({ active, payload, activeIndex, activePie }) => {
+const CustomTooltip = ({ active, payload, activePie }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
 
@@ -17,7 +17,6 @@ const CustomTooltip = ({ active, payload, activeIndex, activePie }) => {
         </div>
       );
     } else {
-      // Assumes subscriptions is an array of objects with name property
       return (
         <div className="rounded bg-white p-3 shadow">
           {data.subscriptions.map((sub) => (
@@ -38,17 +37,6 @@ const CustomTooltip = ({ active, payload, activeIndex, activePie }) => {
 
 export default function UsedCategoriesPieChart({ pieData }) {
   const [activePie, setActivePie] = useState();
-  const [activeIndex, setActiveIndex] = useState();
-
-  const handleMouseEnter = (data, index, pie) => {
-    setActiveIndex(index);
-    setActivePie(pie);
-  };
-
-  const handleMouseLeave = () => {
-    setActiveIndex(null);
-    setActivePie(null);
-  };
 
   return (
     <ResponsiveContainer>
@@ -61,9 +49,9 @@ export default function UsedCategoriesPieChart({ pieData }) {
           cx="50%"
           cy="50%"
           outerRadius={50}
-          fill="#1D4ED8"
-          onMouseEnter={(data, index) => handleMouseEnter(data, index, "inner")}
-          onMouseLeave={handleMouseLeave}
+          fill="#5DADE2"
+          onMouseEnter={() => setActivePie("inner")}
+          onMouseLeave={() => setActivePie(null)}
         >
           {[].map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -78,7 +66,7 @@ export default function UsedCategoriesPieChart({ pieData }) {
           cy="50%"
           innerRadius={50}
           outerRadius={80}
-          fill="#AAB8C2"
+          fill="#2C00A9"
           labelLine={{ stroke: "black" }}
           label={({
             cx,
@@ -108,14 +96,10 @@ export default function UsedCategoriesPieChart({ pieData }) {
               </text>
             );
           }}
-          onMouseEnter={(data, index) => handleMouseEnter(data, index, "outer")}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => setActivePie("outer")}
+          onMouseLeave={() => setActivePie(null)}
         />
-        <Tooltip
-          content={
-            <CustomTooltip activeIndex={activeIndex} activePie={activePie} />
-          }
-        />
+        <Tooltip content={<CustomTooltip activePie={activePie} />} />
       </PieChart>
     </ResponsiveContainer>
   );

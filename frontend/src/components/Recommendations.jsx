@@ -32,19 +32,17 @@ export default function Recommendations() {
   );
 
   return (
-    <div className="flex h-full flex-row gap-4">
-      <StatsCard
-        title="Expensive & Barely Used"
-        value={BarelyUsed}
-        width="w-1/2"
-        height="h-1/3"
-      />
+    <div className="flex h-1/2 h-full flex-row gap-4">
+      <StatsCard title="Expensive & Barely Used" width="w-1/2" height="h-1/3">
+        {BarelyUsed}
+      </StatsCard>
       <StatsCard
         title="Top 3 Least Used Subscriptions"
-        value={LeastUsed}
         width="w-1/2"
         height="h-1/3"
-      />
+      >
+        {LeastUsed}
+      </StatsCard>
     </div>
   );
 }

@@ -27,6 +27,7 @@ import useCategory from "../hooks/useCategory";
 import useDashboard from "../hooks/useDashboard";
 import Recommendations from "../components/Recommendations";
 import CategroyStats from "../components/CategroyStats";
+import CategoryPage from "./CategoryPage";
 
 function Dashboard() {
   // ---- PAGE INFORMATION ----
@@ -302,7 +303,7 @@ function Dashboard() {
                   <div className="w-full bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
-                      <div className="grid  gap-4">
+                      <div className="grid gap-4">
                         <Stats />
                         <OverviewStat />
                         <SubscriptionList />
@@ -314,14 +315,7 @@ function Dashboard() {
 
                     {/* Category Pages */}
                     {pageId && pageId !== "recommendations" && (
-                      <div className="p-2">
-                        <CategroyStats
-                          category={usedCategories?.find(
-                            (c) => c._id === pageId,
-                          )}
-                        />
-                        <MainContent filter={pageId} />
-                      </div>
+                      <CategoryPage categoryId={pageId} />
                     )}
                   </div>
                 </div>
