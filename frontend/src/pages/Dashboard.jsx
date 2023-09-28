@@ -285,7 +285,7 @@ function Dashboard() {
                     <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="cursor-pointer transition-all duration-300 ease-in-out bg-gradient-to-r from-black to-gray-500 text-white text-base border-none rounded-lg px-5 py-3 outline-none hover:from-gray-500 hover:to-black hover:scale-110 transform-gpu w-full mx-2"
+                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-110 hover:from-gray-500 hover:to-black"
                       >
                         Add Subscription
                       </button>
@@ -355,7 +355,7 @@ function Dashboard() {
           })
         }
       />
-    </>
+    </div>
   );
 }
 
