@@ -1,8 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react"; // Added useRef import
+import { Fragment, useEffect, useState } from "react"; // Added useRef import
 import { useDataContext } from "../contexts/dataContext";
-import SubscriptionListCard from "./SubscriptionListCard";
 import eventEmitter from "../utils/EventEmitter";
+import SubscriptionListCard from "./SubscriptionListCard";
 
 export default function SearchModal() {
   // ---- CONTEXT ----
