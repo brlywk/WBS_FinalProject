@@ -1,5 +1,5 @@
 import { SignUp } from "@clerk/clerk-react";
-import logo from '../../public/subzero_logo_icon.png'; // Assuming the logo is in the public folder
+import logo from '/subzero_logo_icon.png'; // Moved the logo to the src folder
 
 export default function Signup() {
   return (
