@@ -1,5 +1,5 @@
 import { Dialog, Listbox, Transition } from "@headlessui/react";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useDataContext } from "../contexts/dataContext";
 import useSubscription from "../hooks/useSubscription";
 import eventEmitter from "../utils/EventEmitter";
@@ -20,14 +20,8 @@ export default function SubscriptionForm({
   const noneCategoryId = "65085704f18207c1481e6642";
 
   // ---- State ----
-  const [selectedCategory, setSelectedCategory] = useState(
-    subscription?.category ??
-      allCategories.find((c) => c._id === noneCategoryId),
-  );
-  const [selectedBillingCycle, setSelectedBillingCycle] = useState(
-    subscription?.interval ?? "month",
-  );
-  const [working, setWorking] = useState();
+  const [selectedCategory, setSelectedCategory] = useState();
+  const [selectedBillingCycle, setSelectedBillingCycle] = useState();
 
   // ---- HOOKS ----
   const { createSubscription, updateSubscription, deleteSubscription } =
@@ -36,6 +30,16 @@ export default function SubscriptionForm({
   // ---- REFS ----
   const nameRef = useRef();
   const priceRef = useRef();
+
+  // We need to set initial state in useEffect, otherwise we don't get the correct
+  // info from our subscription when we need it
+  useEffect(() => {
+    setSelectedCategory(
+      subscription?.category ??
+        allCategories.find((c) => c._id === noneCategoryId),
+    );
+    setSelectedBillingCycle(subscription?.interval ?? "month");
+  }, [allCategories, subscription]);
 
   // ---- FUNCTIONS ----
   // switch to another form mode
@@ -70,8 +74,6 @@ export default function SubscriptionForm({
       return;
     }
 
-    setWorking(true);
-
     const newSubscription = createSubscriptionDataFromForm();
 
     try {
@@ -88,7 +90,6 @@ export default function SubscriptionForm({
       // TODO: Make this nicer
       alert(error.message);
     } finally {
-      setWorking(false);
       eventEmitter.emit("refetchData");
     }
 
@@ -99,8 +100,6 @@ export default function SubscriptionForm({
   async function handleSaveEditSubscription() {
     if (!subscription._id) return;
 
-    setWorking(true);
-
     const updatedSubscription = createSubscriptionDataFromForm();
     updatedSubscription._id = subscription._id;
 
@@ -108,14 +107,10 @@ export default function SubscriptionForm({
 
     try {
       const abortController = new AbortController();
-      const subscriptionUpdate = await updateSubscription(
-        updatedSubscription,
-        abortController,
-      );
+      await updateSubscription(updatedSubscription, abortController);
     } catch (error) {
       alert(error.message);
     } finally {
-      setWorking(false);
       eventEmitter.emit("refetchData");
     }
 
@@ -125,8 +120,6 @@ export default function SubscriptionForm({
   // Sub should be deleted
   async function handleDeleteSubscription() {
     if (!subscription._id) return;
-
-    setWorking(true);
 
     try {
       const abortController = new AbortController();
@@ -142,7 +135,6 @@ export default function SubscriptionForm({
     } catch (error) {
       alert(error.message);
     } finally {
-      setWorking(false);
       eventEmitter.emit("refetchData");
     }
 
@@ -178,14 +170,14 @@ export default function SubscriptionForm({
           leaveFrom="flex w-full scale-100 justify-center opacity-100"
           leaveTo="flex w-full scale-95 justify-center opacity-0"
         >
-          <Dialog.Panel className="z-20 rounded-lg bg-white opacity-90 p-12">
+          <Dialog.Panel className="z-20 rounded-lg bg-white p-12 opacity-90">
             {/* Title Bar */}
-            <Dialog.Title className="text-xl font-semibold uppercase text-center mb-8">
+            <Dialog.Title className="mb-8 text-center text-xl font-semibold uppercase">
               {mode} Subscription
             </Dialog.Title>
 
             {/* Subscription Form */}
-            <div className="grid grid-cols-[max-content_1fr] gap-4">
+            <div className="grid grid-cols-[max-content_1fr] items-center gap-x-8 gap-y-4">
               {/* Subscription Name */}
               <label htmlFor="name">Name</label>
               {(mode === "add" || mode === "edit") && (
@@ -239,7 +231,7 @@ export default function SubscriptionForm({
                     onChange={setSelectedCategory}
                     name="category"
                   >
-                    <Listbox.Button className="relative cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm w-full">
+                    <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                       <span className="flex items-center">
                         <CategoryIcon
                           icon={selectedCategory?.icon}
@@ -266,12 +258,12 @@ export default function SubscriptionForm({
                         </svg>
                       </span>
                     </Listbox.Button>
-                    <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                       {allCategories?.map((category) => (
                         <Listbox.Option
                           key={category._id}
                           value={category}
-                          className="relative cursor-default select-none py-2 pl-3 pr-9"
+                          className="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-300/25"
                         >
                           <span className="flex items-center">
                             <CategoryIcon
@@ -318,7 +310,7 @@ export default function SubscriptionForm({
                     onChange={setSelectedBillingCycle}
                     name="billingCycle"
                   >
-                    <Listbox.Button className="relative cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm w-full">
+                    <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-1.5 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                       per {selectedBillingCycle}
                     </Listbox.Button>
 
@@ -327,7 +319,7 @@ export default function SubscriptionForm({
                         <Listbox.Option
                           key={cycle}
                           value={cycle}
-                          className="relative cursor-default select-none py-2 pl-3 pr-9"
+                          className="relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-300/25"
                         >
                           per {cycle}
                         </Listbox.Option>
@@ -345,19 +337,19 @@ export default function SubscriptionForm({
             </div>
 
             {/* Buttons */}
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="grid auto-cols-fr grid-flow-col justify-center gap-2 pt-12">
               {mode === "edit" && (
                 <button
-                  className="inline-flex justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                  className="inline-flex justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                   onClick={handleDeleteSubscription}
                 >
                   Delete
                 </button>
               )}
 
-              {mode !== "edit" && (
+              {mode !== "edit" && mode !== "add" && (
                 <button
-                  className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="inline-flex justify-center rounded-md bg-gray-300/50  px-3 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-gray-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   onClick={() => switchMode("edit")}
                 >
                   Edit
@@ -367,29 +359,29 @@ export default function SubscriptionForm({
               {mode === "edit" && (
                 <>
                   <button
-                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={handleSaveEditSubscription}
                   >
                     Save
                   </button>
-
-                  <button
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                    onClick={() => onClose()}
-                  >
-                    Cancel
-                  </button>
                 </>
               )}
 
-              {mode !== "edit" && (
+              {mode !== "edit" && mode !== "show" && (
                 <button
-                  className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-none hover:bg-indigo-700 outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform active:scale-75 transition-transform"
+                  className="inline-flex transform justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-none outline-none transition-transform hover:bg-indigo-800 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:scale-75"
                   onClick={handleAddSubscription}
                 >
                   Add
                 </button>
               )}
+
+              <button
+                className="inline-flex justify-center rounded-md border border-transparent bg-gray-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                onClick={() => onClose()}
+              >
+                {mode === "show" ? "Close" : "Cancel"}
+              </button>
             </div>
           </Dialog.Panel>
         </Transition.Child>

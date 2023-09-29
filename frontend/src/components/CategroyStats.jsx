@@ -9,7 +9,8 @@ export default function CategroyStats({ category }) {
     .sort((a, b) => (a.score >= b.score ? 1 : -1));
 
   const canShowMostAndLeastUsed =
-    subscriptionsInCategory?.length === category?.subscriptionCount;
+    subscriptionsInCategory?.length === category?.subscriptionCount &&
+    subscriptionsInCategory?.length > 1;
 
   console.log("Category", category);
   console.log("Subscriptions in category", subscriptionsInCategory);
@@ -17,10 +18,10 @@ export default function CategroyStats({ category }) {
 
   const mostUsed = canShowMostAndLeastUsed
     ? subscriptionsInCategory[0]
-    : "Insufficient Data";
+    : { name: "Insufficient Data" };
   const leastUsed = canShowMostAndLeastUsed
     ? subscriptionsInCategory[subscriptionsInCategory.length - 1]
-    : "Insufficient Data";
+    : { name: "Insufficient Data" };
 
   return (
     <div className="grid h-[10vh] grid-cols-4 gap-2">
@@ -31,10 +32,10 @@ export default function CategroyStats({ category }) {
         {category?.potentialSavings.toFixed(2)}
       </StatsCard>
       <StatsCard title="Most Used" width="w-full">
-        {mostUsed}
+        {mostUsed.name}
       </StatsCard>
       <StatsCard title="Least Used" width="w-full">
-        {leastUsed}
+        {leastUsed.name}
       </StatsCard>
     </div>
   );

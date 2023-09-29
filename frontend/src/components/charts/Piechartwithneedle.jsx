@@ -47,10 +47,10 @@ const CustomTooltip = ({ active, payload, baseValue }) => {
 
   if (active && payload && payload.length) {
     return (
-      <div className="rounded bg-white p-3 shadow-lg">
+      <div className="rounded border-black/25 bg-white/75 p-3 shadow-xl backdrop-blur">
         <div>{payload[0].name}</div>
         <div className="grid grid-cols-[max-content_1fr] gap-2">
-          <div className="text-gray-600">Average Cost:</div>
+          <div className="text-gray-500">Average Cost:</div>
           <div>EUR {getLabel()}</div>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function PieChartWithNeedle({ maxFirstSegment, needleValue }) {
               <Cell
                 key={`cell-${index}`}
                 fill={
-                  index === 0 ? "#2C00A9" : index === 1 ? "#5DADE2" : "white"
+                  index === 0 ? "#4f46e5" : index === 1 ? "#0ea5e9" : "white"
                 }
               />
             ))}
@@ -148,7 +148,7 @@ export default function PieChartWithNeedle({ maxFirstSegment, needleValue }) {
             computedCY,
             computedIR,
             computedOR,
-            "silver",
+            "#6b7280",
           )}
         </PieChart>
       </ResponsiveContainer>

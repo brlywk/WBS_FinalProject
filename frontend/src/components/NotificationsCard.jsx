@@ -5,9 +5,9 @@ export default function NotificationsCard({ notification }) {
 
   return (
     <>
-      <div className="flex w-full items-center justify-start rounded-lg border">
+      <div className="flex w-full items-center justify-start rounded-lg border border-black/25">
         <button
-          className="h-full w-full rounded-lg p-2 text-left hover:bg-gray-100"
+          className="h-full w-full rounded-l-lg p-2 text-left hover:bg-gray-300/25"
           onClick={() =>
             eventEmitter.emit("notificationClicked", notification?._id)
           }
@@ -15,10 +15,10 @@ export default function NotificationsCard({ notification }) {
           <div className="text-xs text-gray-500">How often do you use...</div>
           <div>{subscription.name}</div>
           {/* Only for debugging purposes */}
-          <div className="text-xs text-gray-500">{notification?._id}</div>
+          {/* <div className="text-xs text-gray-500">{notification?._id}</div> */}
         </button>
         <button
-          className="flex h-full items-center justify-center place-self-end rounded-lg p-2 hover:bg-gray-100"
+          className="flex h-full items-center justify-center place-self-end rounded-r-lg p-2 hover:bg-gray-300/25"
           onClick={() =>
             eventEmitter.emit("markNotificationAsRead", notification?._id)
           }
