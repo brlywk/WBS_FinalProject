@@ -1,33 +1,31 @@
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { UserButton, useUser } from "@clerk/clerk-react";
-import { useParams } from "react-router-dom";
 
-import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import ErrorDisplay from "../components/ErrorDisplay";
 import Loading from "../components/Loading";
-import MainContent from "../components/MainContent";
+import Notifications from "../components/Notifications";
+import OverviewStat from "../components/OverviewStat"; // Import BarChart component
+import Recommendations from "../components/Recommendations";
 import SearchModal from "../components/SearchModal"; // Import SearchModal component
 import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
+import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
-import OverviewStat from "../components/OverviewStat"; // Import BarChart component
 import UsageModal from "../components/UsageModal";
-import Notifications from "../components/Notifications";
+import CategoryPage from "./CategoryPage";
 
 import { useDataContext } from "../contexts/dataContext";
+import useCategory from "../hooks/useCategory";
+import useDashboard from "../hooks/useDashboard";
 import useDataFetching from "../hooks/useDataFetching";
+import useNotifications from "../hooks/useNotifications";
 import useSubscription from "../hooks/useSubscription";
 import useUsage from "../hooks/useUsage";
-import useNotifications from "../hooks/useNotifications";
 import eventEmitter from "../utils/EventEmitter";
 import getGreeting from "../utils/greetings.js";
 import { createUsageBody } from "../utils/schemaBuilder";
-import useCategory from "../hooks/useCategory";
-import useDashboard from "../hooks/useDashboard";
-import Recommendations from "../components/Recommendations";
-import CategroyStats from "../components/CategroyStats";
-import CategoryPage from "./CategoryPage";
 
 function Dashboard() {
   // ---- PAGE INFORMATION ----
@@ -240,11 +238,6 @@ function Dashboard() {
     return loadingSuccessful;
   }
 
-  // Inside your Dashboard component's render method:
-if (loading) {
-  return <Loading />;
-}
-
   // Main return block for the Dashboard component
   return (
     <div className="apple-bg h-screen w-screen">
@@ -257,7 +250,13 @@ if (loading) {
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
-            <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+            <Link to="/dashboard">
+              <img
+                src="/subzero_logo_icon.png"
+                className="h-7 w-7"
+                alt="Logo"
+              />
+            </Link>
 
             {/* Search Bar */}
             <div className="flex w-full justify-center">
@@ -268,7 +267,7 @@ if (loading) {
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="w-full pt-8">
-              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
@@ -291,7 +290,7 @@ if (loading) {
                     <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-110 hover:from-gray-500 hover:to-black"
+                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-105 hover:from-gray-500 hover:to-black hover:shadow-lg"
                       >
                         Add Subscription
                       </button>
@@ -301,11 +300,11 @@ if (loading) {
                     <SidebarTop className="w-full p-2" />
 
                     {/* Categories */}
-                    <Sidebar className="" />
+                    <Sidebar className="p-2" />
                   </div>
 
                   {/* Main Content */}
-                  <div className="w-full bg-white/25 p-2">
+                  <div className="w-full rounded-br-lg bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
                       <div className="grid gap-4">

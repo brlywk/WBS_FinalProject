@@ -1,4 +1,4 @@
-import NotificationButton from "./NotificationButton";
+import CategoryButton from "./CategoryButton";
 
 export default function SidebarTop({ className = "w-full" }) {
   const sidebarTopLinks = [
@@ -34,7 +34,7 @@ export default function SidebarTop({ className = "w-full" }) {
   return (
     <div className={className}>
       {sidebarTopLinks.map((link) => (
-        <NotificationButton key={link.name} category={link} to={link.to} />
+        <CategoryButton key={link.name} category={link} to={link.to} />
       ))}
     </div>
   );

@@ -30,6 +30,11 @@ function ClerkRouteProvider() {
   return (
     <ClerkProvider
       publishableKey={publishableKey}
+      appearance={{
+        elements: {
+          formButtonPrimary: "bg-sky-500 text-white shadow-lg hover:bg-sky-700",
+        },
+      }}
       navigate={(to) => navigate(to)}
     >
       <Routes>

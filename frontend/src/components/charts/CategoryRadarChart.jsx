@@ -1,8 +1,6 @@
 import {
-  Legend,
   PolarAngleAxis,
   PolarGrid,
-  PolarRadiusAxis,
   Radar,
   RadarChart,
   ResponsiveContainer,
@@ -11,7 +9,7 @@ import { useDataContext } from "../../contexts/dataContext";
 import { filterByCategory } from "../../utils/filterHelper";
 
 export default function CategoryRadarChart({ categoryId }) {
-  const { subscriptions, usedCategories } = useDataContext();
+  const { subscriptions } = useDataContext();
 
   const filteredSubscriptions = filterByCategory(subscriptions, categoryId);
 
@@ -31,22 +29,25 @@ export default function CategoryRadarChart({ categoryId }) {
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="60%" data={data}>
           <PolarGrid />
-          <PolarAngleAxis dataKey="name" />
+          <PolarAngleAxis
+            dataKey="name"
+            tick={{ fill: "#6b7280", fontSize: "12px" }}
+          />
           <Radar
             name="Price"
             dataKey="price"
-            stroke="#2C00A9"
-            fill="#2C00A9"
-            fillOpacity={0.6}
+            stroke="#4f46e5"
+            fill="#4f46e5"
+            fillOpacity={0.5}
           />
           <Radar
             name="Score"
             dataKey="score"
-            stroke="#5DADE2"
-            fill="#5DADE2"
-            fillOpacity={0.6}
+            stroke="#0ea5e9"
+            fill="#0ea5e9"
+            fillOpacity={0.75}
+            domain={[1, 5]}
           />
-          <Legend />
         </RadarChart>
       </ResponsiveContainer>
     </>

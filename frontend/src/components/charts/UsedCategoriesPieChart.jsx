@@ -7,7 +7,7 @@ const CustomTooltip = ({ active, payload, activePie }) => {
 
     if (activePie === "outer") {
       return (
-        <div className="rounded bg-white p-3 shadow">
+        <div className="rounded border-black/25 bg-white/75 p-3 shadow-xl backdrop-blur">
           <div className="grid grid-cols-[max-content_1fr] gap-2">
             <div>Category:</div>
             <div>{data.name}</div>
@@ -18,7 +18,7 @@ const CustomTooltip = ({ active, payload, activePie }) => {
       );
     } else {
       return (
-        <div className="rounded bg-white p-3 shadow">
+        <div className="rounded border-black/25 bg-white/75 p-3 shadow-xl backdrop-blur">
           {data.subscriptions.map((sub) => (
             <div key={sub._id} className="flex flex-col">
               <div className="text-sm">Subscription: {sub.name}</div>
@@ -49,7 +49,7 @@ export default function UsedCategoriesPieChart({ pieData }) {
           cx="50%"
           cy="50%"
           outerRadius={50}
-          fill="#5DADE2"
+          fill="#0ea5e9"
           onMouseEnter={() => setActivePie("inner")}
           onMouseLeave={() => setActivePie(null)}
         >
@@ -66,7 +66,7 @@ export default function UsedCategoriesPieChart({ pieData }) {
           cy="50%"
           innerRadius={50}
           outerRadius={80}
-          fill="#2C00A9"
+          fill="#4f46e5"
           labelLine={{ stroke: "black" }}
           label={({
             cx,
