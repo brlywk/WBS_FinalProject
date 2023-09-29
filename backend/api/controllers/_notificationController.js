@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import Notification from "../models/_notificatonSchema.js";
+import { startSession } from "mongoose";
 dotenv.config();
 
 const { NOTIFICATION_DAYS_AGO } = process.env;
@@ -69,11 +70,38 @@ export async function getAndUpdateNotificationById(req, res, next) {
 
   // TODO: If a notifiation is marked as read we need to check if a new notifications
   // needs to be created instead
-  const updatedNotification = await Notification.findOneAndUpdate(
-    { userId, _id: id },
-    { active: false },
-    { new: true },
-  );
 
-  res.status(200).json(updatedNotification);
+  const updateNotificationSession = await startSession();
+  updateNotificationSession.startTransaction();
+
+  try {
+    // find and update the notification...
+    const updatedNotification = await Notification.findOneAndUpdate(
+      { userId, _id: id },
+      { active: false },
+      { new: true },
+    );
+
+    // create a new notification for user; we need to avoid not having a state in
+    // which no notification for a subscription exists, as this would potentially
+    // mean the user never actively gets reminded to give usage feedback
+    const newNotification = {
+      userId,
+      type: "usage",
+      subscriptionId: updatedNotification.subscriptionId,
+    };
+
+    await Notification.create([newNotification], {
+      session: updateNotificationSession,
+    });
+
+    await updateNotificationSession.commitTransaction();
+    updateNotificationSession.endSession();
+
+    res.status(200).json(updatedNotification);
+  } catch (error) {
+    console.error("Update Notification Session", error);
+    updateNotificationSession.abortTransaction();
+    updateNotificationSession.endSession();
+  }
 }
