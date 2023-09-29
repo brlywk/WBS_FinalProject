@@ -151,15 +151,15 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="5"
                   className={({ checked }) =>
-                    `bg-green-300 ${checked ? "ring-2 ring-black" : ""}
-                    mb-4 relative flex cursor-pointer rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
+                    `bg-green-300 ${checked ? "ring-2 ring-blue-500" : ""}
+                    mb-4 relative flex cursor-pointer rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
                   }
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
                       className={
                         (checked ? "text-white" : "text-gray-900") +
-                        " cursor-pointer"
+                        " cursor-pointer font-bold"
                       }
                     >
                       Often
@@ -169,15 +169,15 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="3"
                   className={({ checked }) =>
-                    `bg-orange-300 ${checked ? "ring-2 ring-black" : ""}
-                    mb-4 rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
+                    `bg-orange-300 ${checked ? "ring-2 ring-blue-500" : ""}
+                    mb-4 rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
                   }
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
                       className={
                         (checked ? "text-white" : "text-gray-900") +
-                        " cursor-pointer"
+                        " cursor-pointer font-bold"
                       }
                     >
                       Sometimes
@@ -187,15 +187,15 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="1"
                   className={({ checked }) =>
-                    `bg-red-300 ${checked ? "ring-2 ring-black" : ""}
-                    rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer`
+                    `bg-red-300 ${checked ? "ring-2 ring-blue-500" : ""}
+                    rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
                   }
                 >
                   {({ checked }) => (
                     <RadioGroup.Label
                       className={
                         (checked ? "text-white" : "text-gray-900") +
-                        " cursor-pointer"
+                        " cursor-pointer font-bold"
                       }
                     >
                       Rarely
@@ -206,7 +206,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
               <div className="flex w-full flex-row items-center justify-between">
                 <button
                   onClick={handleDoneClick}
-                  className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
+                  className="mt-4 rounded bg-blue-500 px-4 py-2 text-white font-bold"
                 >
                   Done
                 </button>
@@ -214,7 +214,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                   <div className="flex flex-row justify-end gap-2">
                     <button
                       onClick={() => handleChangeSubscriptionClick(-1)}
-                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white"
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white font-bold"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -233,7 +233,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                     </button>
                     <button
                       onClick={() => handleChangeSubscriptionClick(1)}
-                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white"
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white font-bold"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
