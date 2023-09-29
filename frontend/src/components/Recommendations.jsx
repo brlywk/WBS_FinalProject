@@ -59,10 +59,7 @@ export default function Recommendations() {
           <div key={lu._id}>
             {index + 1}. {lu.name} ({lu.score.toFixed(2)})
           </div>
-        ))}
-        width="w-1/2"
-        height="h-1/3"
-      />
+        ))} />
     </div>
   );
 }

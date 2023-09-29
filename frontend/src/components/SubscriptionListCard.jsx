@@ -3,7 +3,7 @@ import SubscriptionLogo from "./SubscriptionLogos";
 export default function SubscriptionListCard({ subscription, clickHandler }) {
   return (
     <div
-      className="flex cursor-pointer items-center rounded-md border border-gray-200 p-2 backdrop-blur hover:bg-white hover:bg-opacity-25"
+      className="flex cursor-pointer items-center rounded-md border border-gray-200 bg-gray-200/25 p-2 hover:bg-white hover:bg-opacity-25"
       key={subscription?._id}
       onClick={clickHandler}
     >
