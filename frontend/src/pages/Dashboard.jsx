@@ -1,33 +1,31 @@
 import { useEffect, useState } from "react";
-import { UserButton, useUser } from "@clerk/clerk-react";
 import { useParams } from "react-router-dom";
+import { UserButton, useUser } from "@clerk/clerk-react";
 
-import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import ErrorDisplay from "../components/ErrorDisplay";
 import Loading from "../components/Loading";
-import MainContent from "../components/MainContent";
+import Notifications from "../components/Notifications";
+import OverviewStat from "../components/OverviewStat"; // Import BarChart component
+import Recommendations from "../components/Recommendations";
 import SearchModal from "../components/SearchModal"; // Import SearchModal component
 import Sidebar from "../components/Sidebar";
 import SidebarTop from "../components/SidebarTop";
 import Stats from "../components/Stats"; // Import Stats component
+import SubscriptionForm from "../components/SubscriptionForm"; // Import AddSubscriptionForm component
 import SubscriptionList from "../components/SubscriptionList"; // Import SubscriptionList component
-import OverviewStat from "../components/OverviewStat"; // Import BarChart component
 import UsageModal from "../components/UsageModal";
-import Notifications from "../components/Notifications";
+import CategoryPage from "./CategoryPage";
 
 import { useDataContext } from "../contexts/dataContext";
+import useCategory from "../hooks/useCategory";
+import useDashboard from "../hooks/useDashboard";
 import useDataFetching from "../hooks/useDataFetching";
+import useNotifications from "../hooks/useNotifications";
 import useSubscription from "../hooks/useSubscription";
 import useUsage from "../hooks/useUsage";
-import useNotifications from "../hooks/useNotifications";
 import eventEmitter from "../utils/EventEmitter";
 import getGreeting from "../utils/greetings.js";
 import { createUsageBody } from "../utils/schemaBuilder";
-import useCategory from "../hooks/useCategory";
-import useDashboard from "../hooks/useDashboard";
-import Recommendations from "../components/Recommendations";
-import CategroyStats from "../components/CategroyStats";
-import CategoryPage from "./CategoryPage";
 
 function Dashboard() {
   // ---- PAGE INFORMATION ----
@@ -291,7 +289,7 @@ function Dashboard() {
                     <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-110 hover:from-gray-500 hover:to-black"
+                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-105 hover:from-gray-500 hover:to-black"
                       >
                         Add Subscription
                       </button>
@@ -301,7 +299,7 @@ function Dashboard() {
                     <SidebarTop className="w-full p-2" />
 
                     {/* Categories */}
-                    <Sidebar className="" />
+                    <Sidebar className="p-2" />
                   </div>
 
                   {/* Main Content */}

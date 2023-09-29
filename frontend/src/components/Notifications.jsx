@@ -1,19 +1,31 @@
 import { Popover } from "@headlessui/react";
-
 import NotificationsCard from "./NotificationsCard";
-
-import useNotifications from "../hooks/useNotifications";
 import { useDataContext } from "../contexts/dataContext";
+import { useEffect, useState } from "react";
 
 export default function Notifications() {
+  // STOP PINGING ANIMATION AFTER HOW MANY SECONDS
+  const STOP_PING_AFTER_SECONDS = 16;
+
   // ---- CONTEXT ----
   const { notifications } = useDataContext();
 
-  // ---- CUSTOM HOOK ----
-  const { getAndUpdateNotificationById } = useNotifications();
+  // ---- STATE ----
+  const [animatePing, setAnimatePing] = useState(true);
 
-  console.log("NOTIF COMP", "Notifications", notifications?.length);
-  console.log("NOTIF COMP", notifications);
+  // set timeout to stop ping animation
+  useEffect(() => {
+    function stopAnimationCallback() {
+      setAnimatePing(false);
+    }
+
+    const timeout = setTimeout(
+      stopAnimationCallback,
+      STOP_PING_AFTER_SECONDS * 1000,
+    );
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <Popover className="relative">
@@ -38,7 +50,11 @@ export default function Notifications() {
         {notifications?.length > 0 && (
           <div className="absolute bottom-0 right-0 flex h-4 w-4 -translate-y-5 translate-x-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
             {notifications?.length}
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span
+              className={`absolute inline-flex h-full w-full ${
+                animatePing ? "animate-ping bg-sky-400" : ""
+              } rounded-full opacity-75`}
+            ></span>
           </div>
         )}
       </Popover.Button>
