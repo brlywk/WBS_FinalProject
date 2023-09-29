@@ -45,7 +45,7 @@ export default function Homepage() {
           </div>
 
           <div className={styles['bleed-canvas']}>
-            <img className={styles.moneyhand} src="/moneyhand.png" alt="Moneyhand" />
+            <img className={styles.moneyhand} src="/moneyemojifly.gif" alt="Moneyhand" />
             <img className={styles.dashboardlaptop} src="/Dashboardbglaptop.png" alt="Dashboard Laptop" />
             <img className={styles.subzerologoicon} src="/subzero_logo_icon.png" alt="" />
           </div>

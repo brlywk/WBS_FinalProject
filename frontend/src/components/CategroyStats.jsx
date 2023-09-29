@@ -23,19 +23,19 @@ export default function CategroyStats({ category }) {
     : "Insufficient Data";
 
   return (
-    <div className="grid grid-cols-4 gap-4 pb-4">
-      <StatsCard
-        title="Total Cost"
-        value={category?.totalCost.toFixed(2)}
-        width="w-full"
-      />
-      <StatsCard
-        title="Potential Savings"
-        value={category?.potentialSavings.toFixed(2)}
-        width="w-full"
-      />
-      <StatsCard title="Most Used" value={mostUsed} width="w-full" />
-      <StatsCard title="Least Used" value={leastUsed} width="w-full" />
+    <div className="grid h-[10vh] grid-cols-4 gap-2">
+      <StatsCard title="Total Cost" width="w-full">
+        {category?.totalCost.toFixed(2)}
+      </StatsCard>
+      <StatsCard title="Potential Savings" width="w-full">
+        {category?.potentialSavings.toFixed(2)}
+      </StatsCard>
+      <StatsCard title="Most Used" width="w-full">
+        {mostUsed}
+      </StatsCard>
+      <StatsCard title="Least Used" width="w-full">
+        {leastUsed}
+      </StatsCard>
     </div>
   );
 }
