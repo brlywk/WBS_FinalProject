@@ -113,22 +113,34 @@ export default function UsageModal({ opened, onClose, notificationId }) {
 
   // Render the modal
   return (
-    <Transition show={opened} as={Fragment}>
+    <Transition show={opened} as={Fragment} className="w-full">
       <Dialog
         as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
+        className="fixed inset-0 z-10 flex items-center justify-center"
         open={opened}
         onClose={onClose}
       >
-        <div className="min-h-screen px-4 text-center">
-          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-          <span
-            className="inline-block h-screen align-middle"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
-          <div className="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+        <Transition.Child
+          as={Fragment}
+          enter="w-full duration-200"
+          enterFrom="scale-100 opacity-0"
+          enterTo="scale-100 opacity-100"
+          leave="duration-200 ease-in"
+          leaveFrom="scale-100 opacity-100"
+          leaveTo="scale-100 opacity-0"
+        >
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur" />
+        </Transition.Child>
+
+        <Transition.Child
+          enter="duration-200 ease-out"
+          enterFrom="scale-95 opacity-0"
+          enterTo="flex w-full scale-100 justify-center opacity-100"
+          leave="duration-200 ease-in"
+          leaveFrom="flex w-full scale-100 justify-center opacity-100"
+          leaveTo="flex w-full scale-95 justify-center opacity-0"
+        >
+          <Dialog.Panel className="z-20 w-1/4 rounded-lg bg-white p-12 opacity-90">
             <Dialog.Title
               as="h3"
               className="text-lg font-medium leading-6 text-gray-900"
@@ -139,6 +151,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
               </span>
               ?
             </Dialog.Title>
+
             <div className="mt-2">
               <p className="text-sm text-gray-500">
                 Don&apos;t think, just select!
@@ -151,8 +164,8 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="5"
                   className={({ checked }) =>
-                    `bg-green-300 ${checked ? "ring-2 ring-blue-500" : ""}
-                    mb-4 relative flex cursor-pointer rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
+                    `bg-green-300 ${checked ? "ring-2 ring-sky-500" : ""}
+                    mb-4 relative px-4 py-3 shadow focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2  transform active:scale-90 transition-transform`
                   }
                 >
                   {({ checked }) => (
@@ -169,8 +182,8 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="3"
                   className={({ checked }) =>
-                    `bg-orange-300 ${checked ? "ring-2 ring-blue-500" : ""}
-                    mb-4 rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
+                    `bg-orange-300 ${checked ? "ring-2 ring-sky-500" : ""}
+                    mb-4 relative px-4 py-3 shadow focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2  transform active:scale-90 transition-transform`
                   }
                 >
                   {({ checked }) => (
@@ -187,8 +200,8 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 <RadioGroup.Option
                   value="1"
                   className={({ checked }) =>
-                    `bg-red-300 ${checked ? "ring-2 ring-blue-500" : ""}
-                    rounded-lg px-4 py-3 shadow-md focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2 shadow-none transform active:scale-75 transition-transform`
+                    `bg-red-300 ${checked ? "ring-2 ring-sky-500" : ""}
+                    mb-4 relative px-4 py-3 shadow focus:outline-none cursor-pointer flex w-full flex-row items-center justify-start gap-4 rounded-lg p-4 hover:opacity-75 outline-none focus:ring-2  transform active:scale-90 transition-transform`
                   }
                 >
                   {({ checked }) => (
@@ -206,7 +219,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
               <div className="flex w-full flex-row items-center justify-between">
                 <button
                   onClick={handleDoneClick}
-                  className="mt-4 rounded bg-blue-500 px-4 py-2 text-white font-bold"
+                  className="mt-4 rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
                 >
                   Done
                 </button>
@@ -214,7 +227,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                   <div className="flex flex-row justify-end gap-2">
                     <button
                       onClick={() => handleChangeSubscriptionClick(-1)}
-                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white font-bold"
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -233,7 +246,7 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                     </button>
                     <button
                       onClick={() => handleChangeSubscriptionClick(1)}
-                      className="mt-4 flex items-center justify-center gap-1 rounded bg-blue-500 px-4 py-2 text-white font-bold"
+                      className="mt-4 flex items-center justify-center gap-1 rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -254,8 +267,8 @@ export default function UsageModal({ opened, onClose, notificationId }) {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </Dialog.Panel>
+        </Transition.Child>
       </Dialog>
     </Transition>
   );

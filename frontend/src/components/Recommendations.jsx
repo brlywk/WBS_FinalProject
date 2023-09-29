@@ -10,10 +10,10 @@ export default function Recommendations() {
     .splice(0, 4);
 
   return (
-    <div className="flex h-1/2 h-full flex-row gap-4 pt-4">
+    <div className="flex h-1/2 h-full flex-row gap-4">
       <StatsCard
         title={
-          <div className="text-uppercase flex items-center gap-2 text-center font-bold text-red-300">
+          <div className="text-uppercase flex items-center justify-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
@@ -42,7 +42,7 @@ export default function Recommendations() {
       </StatsCard>
       <StatsCard
         title={
-          <div className="text-uppercase flex items-center gap-2 text-center font-bold text-red-300">
+          <div className="text-uppercase flex items-center justify-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"

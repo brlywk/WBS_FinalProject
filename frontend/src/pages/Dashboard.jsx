@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { UserButton, useUser } from "@clerk/clerk-react";
 
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -250,7 +250,13 @@ function Dashboard() {
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
-            <img src="/subzero_logo_icon.png" className="h-7 w-7" alt="Logo" />
+            <Link to="/dashboard">
+              <img
+                src="/subzero_logo_icon.png"
+                className="h-7 w-7"
+                alt="Logo"
+              />
+            </Link>
 
             {/* Search Bar */}
             <div className="flex w-full justify-center">
@@ -261,7 +267,7 @@ function Dashboard() {
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="w-full pt-8">
-              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-200/25 shadow-lg backdrop-blur">
+              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
@@ -284,7 +290,7 @@ function Dashboard() {
                     <div className="flex justify-center p-1">
                       <button
                         onClick={handleAddSubscriptionClick}
-                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-105 hover:from-gray-500 hover:to-black"
+                        className="mx-2 w-full transform-gpu cursor-pointer rounded-lg border-none bg-gradient-to-r from-black to-gray-500 px-5 py-3 text-base text-white outline-none transition-all duration-300 ease-in-out hover:scale-105 hover:from-gray-500 hover:to-black hover:shadow-lg"
                       >
                         Add Subscription
                       </button>
@@ -298,7 +304,7 @@ function Dashboard() {
                   </div>
 
                   {/* Main Content */}
-                  <div className="w-full bg-white/25 p-2">
+                  <div className="w-full rounded-br-lg bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
                       <div className="grid gap-4">

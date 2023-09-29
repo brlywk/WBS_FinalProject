@@ -29,7 +29,7 @@ export default function Notifications() {
 
   return (
     <Popover className="relative">
-      <Popover.Button className="relative rounded-full border border-black/25 bg-white/25 p-1 hover:bg-white/50">
+      <Popover.Button className="relative rounded-full border border-black/25 bg-white/25 p-1 hover:bg-white/75">
         {/* SVG Icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,11 +48,11 @@ export default function Notifications() {
 
         {/* Notifications */}
         {notifications?.length > 0 && (
-          <div className="absolute bottom-0 right-0 flex h-4 w-4 -translate-y-5 translate-x-1 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+          <div className="absolute bottom-0 right-0 flex h-4 w-4 -translate-y-5 translate-x-1 items-center justify-center rounded-full bg-sky-500 text-xs text-white">
             {notifications?.length}
             <span
               className={`absolute inline-flex h-full w-full ${
-                animatePing ? "animate-ping bg-sky-400" : ""
+                animatePing ? "animate-ping bg-sky-500" : ""
               } rounded-full opacity-75`}
             ></span>
           </div>

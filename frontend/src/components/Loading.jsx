@@ -32,6 +32,8 @@ export default function Loading() {
       setMessage(randomMsg);
     }
 
+    pickRandomMessage();
+
     const interval = setInterval(
       pickRandomMessage,
       INTERVAL_TIME_SECONDS * 1000,
