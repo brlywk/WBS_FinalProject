@@ -1,5 +1,6 @@
 import SubscriptionCard from "../components/SubscriptionCard";
 import { useDataContext } from "../contexts/dataContext";
+import { Navigate } from "react-router-dom";
 
 // MainContent component
 export default function MainContent({ filter = "none" }) {
@@ -24,12 +25,14 @@ export default function MainContent({ filter = "none" }) {
 
   return (
     <div className="grid grid-cols-3 gap-10">
-      {" "}
       {/* No changes needed here */}
       {filteredSubscriptions()?.length > 0 &&
         filteredSubscriptions().map((sub) => (
           <SubscriptionCard key={sub._id} subscription={sub} />
         ))}
+
+      {/* Prevent edits from resulting in an empty category -> Redirect to Main */}
+      {filteredSubscriptions()?.length === 0 && <Navigate to="/dashboard" />}
     </div>
   );
 }
