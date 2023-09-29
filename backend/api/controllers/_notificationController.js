@@ -67,6 +67,8 @@ export async function getAndUpdateNotificationById(req, res, next) {
     id,
   );
 
+  // TODO: If a notifiation is marked as read we need to check if a new notifications
+  // needs to be created instead
   const updatedNotification = await Notification.findOneAndUpdate(
     { userId, _id: id },
     { active: false },

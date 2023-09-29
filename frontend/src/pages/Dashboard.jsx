@@ -241,9 +241,9 @@ function Dashboard() {
   }
 
   // Inside your Dashboard component's render method:
-if (loading) {
-  return <Loading />;
-}
+  if (loading) {
+    return <Loading />;
+  }
 
   // Main return block for the Dashboard component
   return (
