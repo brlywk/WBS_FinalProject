@@ -52,6 +52,11 @@ export default function SearchModal() {
         event.preventDefault();
         setIsOpen(true);
       }
+
+      // clear search input when modal is closed
+      if (event.key === "Escape") {
+        setSearchInput("");
+      }
     }
 
     window.addEventListener("keydown", handleKeyDown);
@@ -178,7 +183,7 @@ export default function SearchModal() {
 
               {/* Show 'no results' if input but no results... */}
               {searchInput && searchResults?.length === 0 && (
-                <div className="mb-2 grid gap-2 rounded-lg bg-gray-300/25 p-2 shadow-inner">
+                <div className="mb-2 grid gap-2 rounded-lg bg-gray-300/25 p-2 text-center text-gray-500 shadow-inner">
                   No results found that match your search 🤷
                 </div>
               )}

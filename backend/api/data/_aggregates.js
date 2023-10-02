@@ -290,6 +290,11 @@ export function mostUsedSubscriptionAggregate(userId, sort = -1) {
 
   const additionalStages = [
     {
+      $match: {
+        count: { $gte: 4 },
+      },
+    },
+    {
       $sort: {
         averageScore: sort,
       },
@@ -574,7 +579,7 @@ export function barelyUsedMostExpensiveAggregate(userId) {
   const pipeline = [
     {
       $match: {
-        userId: "user_2VQfAlxwCjKvmC8rQbapVEWA6fj",
+        userId,
       },
     },
     {

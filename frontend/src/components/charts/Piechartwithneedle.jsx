@@ -33,12 +33,12 @@ const needle = (value, data, cx, cy, iR, oR, color) => {
   ];
 };
 
-const CustomTooltip = ({ active, payload, baseValue }) => {
+const CustomTooltip = ({ active, payload, baseValue, userSpend }) => {
   function getLabel() {
     const name = payload[0].name;
-    if (name === "Great") {
+    if (name === "Average") {
       return baseValue;
-    } else if (name === "Okay") {
+    } else if (name === "Above Average") {
       return baseValue + payload[0].value;
     } else {
       return baseValue + 2 * payload[0].value;
@@ -48,9 +48,10 @@ const CustomTooltip = ({ active, payload, baseValue }) => {
   if (active && payload && payload.length) {
     return (
       <div className="rounded border-black/25 bg-white/75 p-3 shadow-xl backdrop-blur">
-        <div>{payload[0].name}</div>
         <div className="grid grid-cols-[max-content_1fr] gap-2">
-          <div className="text-gray-500">Average Cost:</div>
+          <div className="text-gray-500">Your Current Spending:</div>
+          <div>EUR {userSpend.toFixed(2)}</div>
+          <div className="text-gray-500">Global {payload[0].name} Cost:</div>
           <div>EUR {getLabel()}</div>
         </div>
       </div>
@@ -97,13 +98,13 @@ export default function PieChartWithNeedle({ maxFirstSegment, needleValue }) {
   // IMPORTANT: If the name's here are changed, they also need to be changed in
   // the CustomTooltip above!
   const data = [
-    { name: "Great", value: maxFirstSegment },
+    { name: "Average", value: maxFirstSegment },
     {
-      name: "Okay",
+      name: "Above Average",
       value: Math.floor(maxFirstSegment / 2),
     },
     {
-      name: "A lot",
+      name: "High",
       value: Math.floor(maxFirstSegment / 2),
     },
   ];
@@ -139,7 +140,14 @@ export default function PieChartWithNeedle({ maxFirstSegment, needleValue }) {
               />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip baseValue={maxFirstSegment} />} />
+          <Tooltip
+            content={
+              <CustomTooltip
+                baseValue={maxFirstSegment}
+                userSpend={needleValue}
+              />
+            }
+          />
 
           {needle(
             needleValue,
