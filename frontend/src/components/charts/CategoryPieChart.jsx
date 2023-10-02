@@ -9,7 +9,7 @@ export default function CategoryPieChart({ categoryId }) {
   const data = filteredSubscriptions.map((subscription) => {
     return {
       name: subscription.name,
-      value: subscription.price,
+      value: subscription.monthlyPrice,
     };
   });
 

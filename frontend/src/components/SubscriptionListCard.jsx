@@ -1,6 +1,11 @@
+import CategoryIcon from "./CategoryIcon";
 import SubscriptionLogo from "./SubscriptionLogos";
 
-export default function SubscriptionListCard({ subscription, clickHandler }) {
+export default function SubscriptionListCard({
+  subscription,
+  clickHandler,
+  showCategory = true,
+}) {
   return (
     <div
       className="grid cursor-pointer grid-cols-[max-content_1fr_3rem] items-center rounded-md border border-white/50 bg-white/25 p-2 hover:bg-white/50"
@@ -12,12 +17,16 @@ export default function SubscriptionListCard({ subscription, clickHandler }) {
       </div>
       <div className="ml-[10px] flex flex-grow items-center justify-between">
         <div className="flex flex-col">
-          <p className="text-sm font-medium leading-none">
+          <div className="text-sm font-medium leading-none">
             {subscription.name}
-          </p>
-          <p className="text-xs text-gray-500">
-            {subscription.active ? "Active" : "Inactive"}
-          </p>
+          </div>
+          {showCategory && (
+            <div className="flex items-center justify-start gap-2 pt-1 text-xs text-gray-500">
+              {/* {subscription.active ? "Active" : "Inactive"} */}
+              <CategoryIcon icon={subscription.category.icon} iconSize={4} />
+              <div>{subscription.category.name}</div>
+            </div>
+          )}
         </div>
       </div>
       <div>

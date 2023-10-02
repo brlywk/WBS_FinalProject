@@ -26,6 +26,7 @@ import useUsage from "../hooks/useUsage";
 import eventEmitter from "../utils/EventEmitter";
 import getGreeting from "../utils/greetings.js";
 import { createUsageBody } from "../utils/schemaBuilder";
+import UsagePage from "../components/UsagePage";
 
 function Dashboard() {
   // ---- PAGE INFORMATION ----
@@ -246,7 +247,7 @@ function Dashboard() {
       {!loading && error && <ErrorDisplay message={errorMessage} />}
 
       {!loading && !error && checkDataLoadingSuccessful() && (
-        <div className="min-h-120 flex w-full flex-grow flex-col items-center p-4">
+        <div className="flex w-full flex-grow flex-col items-center p-4">
           {/* Top bar with logo and search */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             {/* Logo */}
@@ -267,7 +268,7 @@ function Dashboard() {
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="w-full pt-8">
-              <div className="flex w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
+              <div className="flex max-h-[90vh] min-h-[60vh] w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
@@ -311,16 +312,43 @@ function Dashboard() {
                         <Stats />
                         <OverviewStat />
                         <SubscriptionList />
+
+                        {/* No subscriptions added yet */}
+                        {subscriptions?.length === 0 && (
+                          <div className="flex items-center justify-center pb-8 text-gray-700">
+                            <span className="mr-2">
+                              Welcome! Why not get started by{" "}
+                            </span>
+                            <button
+                              className="underline"
+                              onClick={() =>
+                                eventEmitter.emit(
+                                  "openSubscriptionForm",
+                                  {},
+                                  "add",
+                                )
+                              }
+                            >
+                              adding your first subscription
+                            </button>
+                            ? 👍
+                          </div>
+                        )}
                       </div>
                     )}
 
                     {/* Recommendations / Cancel */}
                     {pageId === "recommendations" && <Recommendations />}
 
+                    {/* Usage Page */}
+                    {pageId === "usage" && <UsagePage />}
+
                     {/* Category Pages */}
-                    {pageId && pageId !== "recommendations" && (
-                      <CategoryPage categoryId={pageId} />
-                    )}
+                    {pageId &&
+                      pageId !== "recommendations" &&
+                      pageId !== "usage" && (
+                        <CategoryPage categoryId={pageId} />
+                      )}
                   </div>
                 </div>
               </div>

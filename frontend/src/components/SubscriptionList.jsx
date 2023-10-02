@@ -27,6 +27,7 @@ export default function SubscriptionList({
         <SubscriptionListCard
           key={index}
           subscription={subscription}
+          showCategory={categoryId ? false : true}
           clickHandler={() =>
             eventEmitter.emit("openSubscriptionForm", subscription, "show")
           }

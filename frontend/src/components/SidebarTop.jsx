@@ -1,6 +1,9 @@
 import CategoryButton from "./CategoryButton";
+import { useDataContext } from "../contexts/dataContext";
 
 export default function SidebarTop({ className = "w-full" }) {
+  const { subscriptions } = useDataContext();
+
   const sidebarTopLinks = [
     {
       name: "Dashboard",
