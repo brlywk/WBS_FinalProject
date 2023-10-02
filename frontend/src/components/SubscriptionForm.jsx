@@ -242,23 +242,8 @@ export default function SubscriptionForm({
                           {selectedCategory?.name}
                         </span>
                       </span>
-                      <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-                        <svg
-                          className="h-5 w-5 text-gray-400"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 8.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </span>
                     </Listbox.Button>
-                    <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full min-w-fit overflow-y-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                       {allCategories?.map((category) => (
                         <Listbox.Option
                           key={category._id}
@@ -271,7 +256,7 @@ export default function SubscriptionForm({
                               className="h-5 w-5 flex-shrink-0 text-gray-400"
                               aria-hidden="true"
                             />
-                            <span className="ml-3 block truncate font-normal">
+                            <span className="ml-3 block font-normal">
                               {category?.name}
                             </span>
                           </span>

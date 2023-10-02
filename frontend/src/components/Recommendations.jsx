@@ -7,10 +7,10 @@ export default function Recommendations() {
   const leastUsedSubs = subscriptions
     ?.filter((s) => s.score !== 0)
     .sort((a, b) => (a.score >= b.score ? 1 : -1))
-    .splice(0, 4);
+    .splice(0, 3);
 
   return (
-    <div className="flex h-1/2 h-full flex-row gap-4">
+    <div className="flex h-1/2 flex-row gap-4">
       <StatsCard
         title={
           <div className="text-uppercase flex items-center justify-center gap-2">
@@ -32,13 +32,19 @@ export default function Recommendations() {
         width="w-1/2"
         height="h-1/3"
       >
-        <span className="font-bold">
-          {dashboardData?.barelyUsedMostExpensive.name}
-        </span>{" "}
-        <span className="font-normal">
-          is low usage and high cost. Perhaps consider cancelling{" "}
-          {dashboardData?.barelyUsedMostExpensive.name}.
-        </span>
+        {dashboardData?.barelyUsedMostExpensive?.name ? (
+          <>
+            <span className="font-bold">
+              {dashboardData?.barelyUsedMostExpensive.name}
+            </span>{" "}
+            <span className="font-normal">
+              is low usage and high cost. Perhaps consider cancelling{" "}
+              {dashboardData?.barelyUsedMostExpensive.name}.
+            </span>
+          </>
+        ) : (
+          "Please start adding subscriptions and ratings to see this recommendation"
+        )}
       </StatsCard>
       <StatsCard
         title={
@@ -64,6 +70,9 @@ export default function Recommendations() {
             {index + 1}. {lu.name} ({lu.score.toFixed(2)})
           </div>
         ))}
+
+        {leastUsedSubs?.length === 0 &&
+          "Not enough rated subscriptions yet. Keep on going!"}
       </StatsCard>
     </div>
   );

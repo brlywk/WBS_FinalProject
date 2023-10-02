@@ -20,7 +20,7 @@ export default function Stats({ columns = 4, height = "h-[10vh]" }) {
         {`EUR ${dashboardData.potentialMonthlySavings.toFixed(2)}`}
       </StatsCard>
       <StatsCard className="text-sm" title="Most Used">
-        {dashboardData.mostUsed.name}
+        {dashboardData.mostUsed.name || "Insufficient Data"}
       </StatsCard>
     </div>
   );
