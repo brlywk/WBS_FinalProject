@@ -16,7 +16,8 @@ export async function getNotifications(req, res, next) {
   );
 
   // get all unsent notifications for user (create 1+ week ago)
-  const daysAgoEnv = 0; //Number(NOTIFICATION_DAYS_AGO);
+  const daysAgoEnv = Number(NOTIFICATION_DAYS_AGO) || 7;
+  console.log("Current Notification Delay (days):", daysAgoEnv);
   const daysAgo = new Date(new Date() - daysAgoEnv * 24 * 60 * 60 * 1000);
 
   const notificationFilter = {
