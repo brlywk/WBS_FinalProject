@@ -68,8 +68,6 @@ export default function PieChartWithNeedle({ maxFirstSegment, needleValue }) {
   const [computedIR, setComputedIR] = useState(0);
   const [computedOR, setComputedOR] = useState(0);
 
-  console.log("needle", computedCX, computedCY, computedIR, computedOR);
-
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0];

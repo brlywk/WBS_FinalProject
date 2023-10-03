@@ -21,14 +21,14 @@ server.use(
 );
 
 // ---- LOGGING ----
-server.use((req, res, next) => {
-  console.log("============================================");
-  console.log(`${req.method} ${req.path}`);
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log(`Body: ${req.body}`);
-  }
-  next();
-});
+// server.use((req, res, next) => {
+//   console.info("============================================");
+//   console.info(`${req.method} ${req.path}`);
+//   if (req.body && Object.keys(req.body).length > 0) {
+//     console.info(`Body: ${req.body}`);
+//   }
+//   next();
+// });
 
 // ---- AUTHENTICATION ----
 server.use(ClerkExpressRequireAuth());
@@ -61,10 +61,12 @@ function tryDbConnection() {
     startServer();
   } else {
     if (retries <= maxRetries) {
-      console.log(`Retrying connection to MongoDB... ${retries}/${maxRetries}`);
+      console.warn(
+        `Retrying connection to MongoDB... ${retries}/${maxRetries}`,
+      );
       retries++;
     } else {
-      console.log("Max retries reached. Exiting...");
+      console.error("Max retries reached. Exiting...");
       clearInterval(retryInterval);
       process.exit(1);
     }

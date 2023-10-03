@@ -86,23 +86,6 @@ function ClerkRouteProvider() {
           }
         />
 
-        {/* TODO: For testing / debugging, delete this before 'final' deployment! */}
-        <Route
-          path="/apiTest"
-          element={
-            <>
-              <SignedIn>
-                <DataProvider>
-                  <ApiTest />
-                </DataProvider>
-              </SignedIn>
-              <SignedOut>
-                <Navigate to="/login" />
-              </SignedOut>
-            </>
-          }
-        />
-
         {/* Needs to be the last one! */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>

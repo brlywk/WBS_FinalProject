@@ -26,9 +26,9 @@ class EventEmitter {
     if (!this.events[eventName]) return;
 
     // Logging
-    console.info(
-      `Event deleted: ${eventName} with callback: ${JSON.stringify(callback)}`,
-    );
+    // console.info(
+    //   `Event deleted: ${eventName} with callback: ${JSON.stringify(callback)}`,
+    // );
 
     // otherwise, remove the callback from the event
     const eventIndex = this.events[eventName].indexOf(callback);

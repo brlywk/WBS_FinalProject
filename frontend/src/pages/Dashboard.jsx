@@ -89,15 +89,8 @@ function Dashboard() {
 
   // Notification has been clicked, show usageModal
   function notificationClickedCallback(id) {
-    console.log(id);
     setUsageModalState({ showForm: true, notificationId: id });
   }
-
-  // DEBUG LOGGING
-  console.log("Subscriptions", subscriptions);
-  console.log("allCategories", allCategories);
-  console.log("usedCategories", usedCategories);
-  console.log("dashboardData", dashboardData);
 
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
@@ -121,7 +114,7 @@ function Dashboard() {
         setUsedCategories(updatedUsedCategories);
         setDashboardData(updatedDashboardData);
       } catch (error) {
-        console.log(`Error refetching subscriptions: ${errorMessage}`);
+        console.error(`Error refetching subscriptions: ${errorMessage}`);
       }
     }
 
@@ -132,7 +125,7 @@ function Dashboard() {
         const notifications = await getAllNotifications(abortController);
         setNotifications(notifications);
       } catch (error) {
-        console.log(`Error refetching notifications: ${errorMessage}`);
+        console.error(`Error refetching notifications: ${errorMessage}`);
       }
     }
 
@@ -143,7 +136,7 @@ function Dashboard() {
 
         await createUsage(usageBody, abortController);
       } catch (error) {
-        console.log(`Error creating usage data: ${errorMessage}`);
+        console.error(`Error creating usage data: ${errorMessage}`);
       }
     }
 
@@ -157,11 +150,10 @@ function Dashboard() {
           notificationId,
           abortController,
         );
-        console.log("Updated Notification", updateNotification);
 
         refetchNotifications();
       } catch (error) {
-        console.log(`Error creating usage data: ${errorMessage}`);
+        console.error(`Error creating usage data: ${errorMessage}`);
       }
     }
 
@@ -181,10 +173,6 @@ function Dashboard() {
 
     // Create new usage Data and mark notification this feedback came from as read
     function usageScoreSelectedCallback(subscriptionId, score, notificationId) {
-      console.log(
-        `Creating usageData for ${subscriptionId}, score: ${score} (from notification ${notificationId})`,
-      );
-
       // create usage data
       createUsageData(subscriptionId, score);
 

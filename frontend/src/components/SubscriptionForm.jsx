@@ -103,8 +103,6 @@ export default function SubscriptionForm({
     const updatedSubscription = createSubscriptionDataFromForm();
     updatedSubscription._id = subscription._id;
 
-    console.log("Trying to update id", subscription._id);
-
     try {
       const abortController = new AbortController();
       await updateSubscription(updatedSubscription, abortController);
