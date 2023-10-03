@@ -95,6 +95,7 @@ function Dashboard() {
   // ---- THE ALMIGHTY USE EFFECT ----
   useEffect(() => {
     const abortController = new AbortController();
+    const notificationAbortController = new AbortController();
 
     // Unfortunately, every time we add usage data we need to sneakily refetch almost
     // all data, as otherwise our application doesn't show the current state of data *buuuuuuh!*
@@ -104,15 +105,26 @@ function Dashboard() {
           updatedSubscriptions,
           updatedUsedCategories,
           updatedDashboardData,
+          updatedNotifications,
         ] = await Promise.all([
           getAllSubscriptions(abortController),
           getUsedCategories(abortController),
           getDashboardData(abortController),
+          getAllNotifications(abortController),
         ]);
 
         setSubscriptions(updatedSubscriptions);
         setUsedCategories(updatedUsedCategories);
         setDashboardData(updatedDashboardData);
+
+        // HACK: For some reason, all data is correctly refetched, but a single notification
+        // keeps getting stuck in context... so remove notification if all that's coming back is
+        // just one...
+        if (updatedNotifications?.length === 1) {
+          setNotifications([]);
+        } else {
+          setNotifications(updatedNotifications);
+        }
       } catch (error) {
         console.error(`Error refetching subscriptions: ${errorMessage}`);
       }
@@ -122,7 +134,9 @@ function Dashboard() {
     // seems pretty excessive
     async function refetchNotifications() {
       try {
-        const notifications = await getAllNotifications(abortController);
+        const notifications = await getAllNotifications(
+          notificationAbortController,
+        );
         setNotifications(notifications);
       } catch (error) {
         console.error(`Error refetching notifications: ${errorMessage}`);
@@ -172,16 +186,16 @@ function Dashboard() {
     }
 
     // Create new usage Data and mark notification this feedback came from as read
-    function usageScoreSelectedCallback(subscriptionId, score, notificationId) {
+    function usageScoreSelectedCallback(subscriptionId, score) {
       // create usage data
       createUsageData(subscriptionId, score);
-
-      // refetch notifications
-      refetchNotifications();
 
       // unfortunately we also need to refetch all subscriptions this way as otherwise
       // we sit on stale usage data for our just updated subscription
       sneakyDataRefetch();
+
+      // refetch notifications
+      // refetchNotifications();
 
       // NOTE: We don't need to mark a notification as read here, as every posted usage data
       // invalidates all notifications associated with a single subscription
@@ -197,6 +211,7 @@ function Dashboard() {
 
     return () => {
       abortController.abort();
+      notificationAbortController.abort();
       eventEmitter.off("refetchData", refetchCallback);
       eventEmitter.off("openSubscriptionForm", openSubscriptionFormCallback);
       eventEmitter.off("changeFormMode", switchFormModeCallback);
@@ -256,7 +271,7 @@ function Dashboard() {
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="w-full pt-8">
-              <div className="flex max-h-[90vh] min-h-[60vh] w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
+              <div className="flex max-h-[85vh] min-h-[85vh] w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
@@ -296,7 +311,7 @@ function Dashboard() {
                   <div className="w-full rounded-br-lg bg-white/25 p-2">
                     {/* Main Dashboard View */}
                     {!pageId && (
-                      <div className="grid gap-4">
+                      <div className="grid h-full grid-rows-[max-content_max-content_1fr] gap-4">
                         <Stats />
                         <OverviewStat />
                         <SubscriptionList />
