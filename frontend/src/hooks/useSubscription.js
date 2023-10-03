@@ -42,8 +42,6 @@ export default function useSubscription() {
       throw new Error("Invalid subscription");
     }
 
-    console.log("createSubscription", subscription);
-
     return await startRequest(
       ApiEndpoints.subscriptions,
       "post",
@@ -60,8 +58,6 @@ export default function useSubscription() {
     if (!subscription) {
       throw new Error("Invalid subscription");
     }
-
-    console.log("updateSubscription", subscription);
 
     return await startRequest(
       ApiEndpoints.subscription(subscription._id),

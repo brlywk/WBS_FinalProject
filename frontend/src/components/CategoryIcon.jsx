@@ -1,9 +1,21 @@
 export default function CategoryIcon({ icon, iconSize = 6 }) {
-  const adjustedIcon = {
-    ...icon,
-    d: icon?.path,
-    path: undefined,
-  };
+  if (!Array.isArray(icon)) {
+    icon = [icon];
+  }
+
+  const adjustedIcons = icon?.map((icn) => {
+    return {
+      ...icn,
+      d: icn.path,
+      path: undefined,
+    };
+  });
+
+  // const adjustedIcon = {
+  //   ...icon,
+  //   d: icon?.path,
+  //   path: undefined,
+  // };
 
   return (
     <svg
@@ -14,7 +26,9 @@ export default function CategoryIcon({ icon, iconSize = 6 }) {
       stroke="currentColor"
       className={`h-${iconSize} w-${iconSize}`}
     >
-      <path {...adjustedIcon} />
+      {adjustedIcons.map((adjustedIcon, index) => (
+        <path key={index} {...adjustedIcon} />
+      ))}
     </svg>
   );
 }

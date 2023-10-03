@@ -5,15 +5,6 @@ dotenv.config();
 
 const { NOTIFICATION_DAYS_AGO } = process.env;
 
-// TODO: Debug, delete
-console.log(
-  "----------------------------",
-  "\nNotifications",
-  "\nDays Ago:",
-  NOTIFICATION_DAYS_AGO,
-  "\n----------------------------",
-);
-
 // ---- GET /api/notifications
 export async function getNotifications(req, res, next) {
   const { userId } = req.auth;
