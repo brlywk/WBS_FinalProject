@@ -9,8 +9,6 @@ export default function CategoryPage({ categoryId }) {
 
   const category = usedCategories?.find((c) => c._id === categoryId);
 
-  console.log("CATEGORY PAGE:", categoryId);
-
   return (
     <div>
       <CategroyStats category={category} />

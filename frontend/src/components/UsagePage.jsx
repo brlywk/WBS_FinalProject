@@ -25,8 +25,6 @@ export default function UsagePage() {
 
   const mostExpensiveCategory = usedCategories?.reduce(
     (prev, curr) => {
-      console.log("Prev", prev, "Curr", curr);
-
       if (curr.totalCost > prev.totalCost) {
         return curr;
       } else {
@@ -40,8 +38,6 @@ export default function UsagePage() {
 
   const leastExpensiveCategory = usedCategories?.reduce(
     (prev, curr) => {
-      console.log("Prev", prev, "Curr", curr);
-
       if (curr.totalCost < prev.totalCost) {
         return curr;
       } else {

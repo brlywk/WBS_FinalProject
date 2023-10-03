@@ -12,10 +12,6 @@ export default function CategroyStats({ category }) {
     subscriptionsInCategory?.length === category?.subscriptionCount &&
     subscriptionsInCategory?.length > 1;
 
-  console.log("Category", category);
-  console.log("Subscriptions in category", subscriptionsInCategory);
-  console.log("Can show most / least", canShowMostAndLeastUsed);
-
   const mostUsed = canShowMostAndLeastUsed
     ? subscriptionsInCategory[0]
     : { name: "Insufficient Data" };

@@ -50,17 +50,6 @@ export default function useDataFetching() {
           getAllNotifications(abortController),
         ]);
 
-        // const fetchedUsedCategories = fetchedSubscriptions?.reduce(
-        //   (prev, curr) => {
-        //     if (!prev.some((category) => category._id === curr.category._id)) {
-        //       prev.push(curr.category);
-        //     }
-        //
-        //     return prev;
-        //   },
-        //   [],
-        // );
-
         // write data to context
         setSubscriptions(fetchedSubscriptions);
         setDashboardData(fetchedDashboardData);

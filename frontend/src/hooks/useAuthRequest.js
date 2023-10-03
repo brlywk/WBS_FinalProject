@@ -5,14 +5,6 @@ export default function useAuthRequest() {
 
   async function startRequest(url, method, abortController, body = {}) {
     if (!method || !url || !abortController) {
-      console.log(
-        "Method:",
-        method,
-        "URL:",
-        url,
-        "Abort Controller",
-        abortController,
-      );
       throw new Error("Invalid arguments");
     }
 
@@ -53,7 +45,7 @@ export default function useAuthRequest() {
       return await result.json();
     } catch (error) {
       if (error.name === "AbortError") {
-        console.log(
+        console.info(
           "Fetch was aborted. This could be due to React Strict mode double mounts.",
         );
         return;

@@ -27,9 +27,7 @@ export default function SubscriptionList({
   );
 
   function handleRelativeButtonClick(change) {
-    console.log("Current page", currentPage);
     const newPage = currentPage + change;
-    console.log("New page:", newPage);
 
     if (newPage >= 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
