@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { useDataContext } from "../contexts/dataContext";
 import useCategory from "./useCategory";
 import useDashboard from "./useDashboard";
-import useSubscription from "./useSubscription";
-import useSubscriptionUsage from "./useSubscriptionUsage";
 import useNotifications from "./useNotifications";
+import useSubscription from "./useSubscription";
 
 export default function useDataFetching() {
   // ---- Data Context ----
@@ -20,7 +19,6 @@ export default function useDataFetching() {
   const { getAllSubscriptions } = useSubscription();
   const { getAllCategories, getUsedCategories } = useCategory();
   const { getDashboardData } = useDashboard();
-  const { getAllSubscriptionUsage } = useSubscriptionUsage();
   const { getAllNotifications } = useNotifications();
 
   // ---- State ----

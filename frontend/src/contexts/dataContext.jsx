@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 
 // Data Context for App
 export const DataContext = createContext(null);
@@ -9,7 +9,6 @@ export default function DataContextProvider({ children }) {
   const [subscriptions, setSubscriptions] = useState(null);
   const [allCategories, setAllCategories] = useState(null);
   const [usedCategories, setUsedCategories] = useState(null);
-  const [usages, setUsages] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [notifications, setNotifications] = useState(null);
 
@@ -22,8 +21,6 @@ export default function DataContextProvider({ children }) {
         setAllCategories,
         usedCategories,
         setUsedCategories,
-        // usages,
-        // setUsages,
         dashboardData,
         setDashboardData,
         notifications,

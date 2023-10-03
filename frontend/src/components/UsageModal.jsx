@@ -25,19 +25,33 @@ export default function UsageModal({ opened, onClose, notificationId }) {
       (n) => n._id === notificationId,
     );
 
-    // Depending on which notification the user clicked we need to reorder our notifications
-    // to go through
-    const remainingNotifications =
-      notifications?.filter((n) => n._id !== notificationId) || [];
+    // We can potentially have a state in which the notificationId the modal was opened with
+    // does not exist anymore, so we need to check if the notificationId is in the
+    // notifications array first before filtering and reordering the list (as we don't need
+    // any reordering if we already rated the original notification)
+    const openedWithNotification =
+      notifications?.findIndex((n) => n._id === notificationId) > -1;
 
-    const initialUnratedNotificatons = [
-      initialNotification,
-      ...remainingNotifications,
-    ];
+    if (openedWithNotification) {
+      // Depending on which notification the user clicked we need to reorder our notifications
+      // to go through
+      const remainingNotifications =
+        notifications?.filter((n) => n._id !== notificationId) ?? [];
 
-    setCurrentNotification(initialNotification);
-    setUnratedNotifications(initialUnratedNotificatons);
-  }, [notificationId, notifications]);
+      const initialUnratedNotificatons = [
+        initialNotification,
+        ...remainingNotifications,
+      ];
+
+      setCurrentNotification(initialNotification);
+      setUnratedNotifications(initialUnratedNotificatons);
+    } else {
+      // if the notification we initially opened the modal with is gone, just use the first
+      // notification and the array itself
+      setCurrentNotification(notifications?.at(0));
+      setUnratedNotifications(notifications);
+    }
+  }, [notificationId]);
 
   // go throug all notifications currently active
   function handleChangeSubscriptionClick(direction) {
@@ -52,7 +66,6 @@ export default function UsageModal({ opened, onClose, notificationId }) {
         "useScoreSelected",
         selectedSubscriptionId,
         selectedScore,
-        currentNotification._id,
       );
 
       // remove from unrated subscription
@@ -91,7 +104,6 @@ export default function UsageModal({ opened, onClose, notificationId }) {
       submitSelectedScore(
         currentNotification.subscriptionId._id,
         selectedScore,
-        currentNotification._id,
       );
     }
 
@@ -99,16 +111,11 @@ export default function UsageModal({ opened, onClose, notificationId }) {
   }
 
   // Actually send the event to save the usage score and dismiss the related notification
-  function submitSelectedScore(subscriptionId, score, notificationId) {
+  function submitSelectedScore(subscriptionId, score) {
     // Reset radiogroup
     setSelectedScore(null);
 
-    eventEmitter.emit(
-      "useScoreSelected",
-      subscriptionId,
-      score,
-      notificationId,
-    );
+    eventEmitter.emit("useScoreSelected", subscriptionId, score);
   }
 
   // Render the modal

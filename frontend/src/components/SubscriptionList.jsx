@@ -35,17 +35,19 @@ export default function SubscriptionList({
   }
 
   return (
-    <div className="space-y-4">
-      {currentSubscriptions?.map((subscription, index) => (
-        <SubscriptionListCard
-          key={index}
-          subscription={subscription}
-          showCategory={categoryId ? false : true}
-          clickHandler={() =>
-            eventEmitter.emit("openSubscriptionForm", subscription, "show")
-          }
-        />
-      ))}
+    <div className="flex h-full flex-col justify-between">
+      <div className="flex flex-col gap-2">
+        {currentSubscriptions?.map((subscription, index) => (
+          <SubscriptionListCard
+            key={index}
+            subscription={subscription}
+            showCategory={categoryId ? false : true}
+            clickHandler={() =>
+              eventEmitter.emit("openSubscriptionForm", subscription, "show")
+            }
+          />
+        ))}
+      </div>
 
       {/* Pagination */}
       {/* Previous Button */}
