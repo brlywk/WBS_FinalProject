@@ -25,7 +25,7 @@ export default function Notifications() {
     );
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [notifications]);
 
   return (
     <Popover className="relative">
