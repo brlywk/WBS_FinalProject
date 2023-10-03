@@ -42,9 +42,9 @@ class EventEmitter {
     if (!this.events[eventName]) return;
 
     // Logging
-    console.info(
-      `Event emitted: ${eventName} with arguments: ${JSON.stringify(args)}`,
-    );
+    // console.info(
+    //   `Event emitted: ${eventName} with arguments: ${JSON.stringify(args)}`,
+    // );
 
     // otherwise, call all callbacks attached to the event
     this.events[eventName].forEach((callback) => {
