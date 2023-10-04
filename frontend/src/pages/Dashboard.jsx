@@ -271,7 +271,7 @@ function Dashboard() {
           {/* App content */}
           <div className="flex w-3/5 flex-grow flex-row items-center justify-between gap-4">
             <div className="w-full pt-8">
-              <div className="flex max-h-[85vh] min-h-[85vh] w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
+              <div className="flex max-h-[86vh] min-h-[86vh] w-full flex-grow flex-col divide-y divide-black/25 rounded-lg border border-black/25 bg-gray-300/25 shadow-xl backdrop-blur">
                 {/* Title Bar */}
                 <div className="flex items-center gap-4 p-4">
                   {/* Title */}
